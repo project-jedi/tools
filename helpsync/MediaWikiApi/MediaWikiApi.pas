@@ -146,7 +146,7 @@ type
     procedure QuerySiteInfoNamespaces(Infos: TStrings); overload;
     function QuerySiteInfoNamespaces(OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
     procedure QuerySiteInfoNamespacesAsync;
-    property OnQuerySiteInfoNamespaceDone: TMediaWikiStringsCallback read FOnQuerySiteInfoNamespacesDone write FOnQuerySiteInfoNamespacesDone;
+    property OnQuerySiteInfoNamespacesDone: TMediaWikiStringsCallback read FOnQuerySiteInfoNamespacesDone write FOnQuerySiteInfoNamespacesDone;
   // Meta information queries, site information, namespacealiases: A list of all namespace aliases (MW 1.13+)
   private
     FOnQuerySiteInfoNamespaceAliasesDone: TMediaWikiStringsCallback;
@@ -1370,6 +1370,8 @@ begin
     QueryExecuteXML(XML);
     QuerySiteInfoExtensionsParseXmlResult(Self, XML);
   finally
+    Infos := FQuerySiteInfoExtensions;
+    FQuerySiteInfoExtensions := nil;
     XML.Free;
   end;
 end;
