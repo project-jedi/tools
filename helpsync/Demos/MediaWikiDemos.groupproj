@@ -1,0 +1,84 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{1fb982a5-9034-409d-9f59-38d3bf53c90d}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="EditProject.dproj" />
+    <Projects Include="QueryAllPagesProject.dproj" />
+    <Projects Include="QueryAllUsersProject.dproj" />
+    <Projects Include="QueryBackLinksProject.dproj" />
+    <Projects Include="QueryBlocksProject.dproj" />
+    <Projects Include="QueryCategoryMembersProject.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="QueryAllPagesProject">
+    <MSBuild Projects="QueryAllPagesProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryAllPagesProject:Clean">
+    <MSBuild Projects="QueryAllPagesProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryAllPagesProject:Make">
+    <MSBuild Projects="QueryAllPagesProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryAllUsersProject">
+    <MSBuild Projects="QueryAllUsersProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryAllUsersProject:Clean">
+    <MSBuild Projects="QueryAllUsersProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryAllUsersProject:Make">
+    <MSBuild Projects="QueryAllUsersProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryBackLinksProject">
+    <MSBuild Projects="QueryBackLinksProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryBackLinksProject:Clean">
+    <MSBuild Projects="QueryBackLinksProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryBackLinksProject:Make">
+    <MSBuild Projects="QueryBackLinksProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryBlocksProject">
+    <MSBuild Projects="QueryBlocksProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryBlocksProject:Clean">
+    <MSBuild Projects="QueryBlocksProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryBlocksProject:Make">
+    <MSBuild Projects="QueryBlocksProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryCategoryMembersProject">
+    <MSBuild Projects="QueryCategoryMembersProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryCategoryMembersProject:Clean">
+    <MSBuild Projects="QueryCategoryMembersProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryCategoryMembersProject:Make">
+    <MSBuild Projects="QueryCategoryMembersProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="EditProject">
+    <MSBuild Projects="EditProject.dproj" Targets="" />
+  </Target>
+  <Target Name="EditProject:Clean">
+    <MSBuild Projects="EditProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="EditProject:Make">
+    <MSBuild Projects="EditProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="QueryAllPagesProject;QueryAllUsersProject;QueryBackLinksProject;QueryBlocksProject;QueryCategoryMembersProject;EditProject" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="QueryAllPagesProject:Clean;QueryAllUsersProject:Clean;QueryBackLinksProject:Clean;QueryBlocksProject:Clean;QueryCategoryMembersProject:Clean;EditProject:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="QueryAllPagesProject:Make;QueryAllUsersProject:Make;QueryBackLinksProject:Make;QueryBlocksProject:Make;QueryCategoryMembersProject:Make;EditProject:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
