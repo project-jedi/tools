@@ -17,7 +17,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure ButtonQuerySyncClick(Sender: TObject);
     procedure ButtonQueryAsyncClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
     procedure MediaWikiSiteInfoUserGroupsDone(Sender: TMediaWikiApi; Infos: TStrings);
@@ -47,6 +47,16 @@ begin
   FMediaWikiApi.QuerySiteInfoUserGroups(CheckBoxUserCount.Checked, MemoResult.Lines);
 end;
 
+procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if Action = caFree then
+  begin
+    // logout is not required
+    //FMediaWikiApi.Logout;
+    FMediaWikiApi.Free;
+  end;
+end;
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   FMediaWikiApi := TMediaWikiApi.Create;
@@ -55,13 +65,6 @@ begin
   FMediaWikiApi.FollowRelocation := False;
   // login is not mandatory
   //FMediaWikiApi.Login()
-end;
-
-procedure TMainForm.FormDestroy(Sender: TObject);
-begin
-  // logout is not required
-  //FMediaWikiApi.Logout;
-  FMediaWikiApi.Free;
 end;
 
 procedure TMainForm.MediaWikiSiteInfoUserGroupsDone(Sender: TMediaWikiApi; Infos: TStrings);
