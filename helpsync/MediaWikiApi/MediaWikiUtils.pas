@@ -39,7 +39,12 @@ type
 
   TMediaWikiID = Integer;
 
-procedure MediaWikiCheckXML(XML: TJclSimpleXML);
+type
+  TMediaWikiXMLWarningCallback = procedure (const AInfo, AQuery: string) of object;
+  TMediaWikiXMLErrorCallback = procedure (const AInfo, ACode: string) of object;
+
+procedure MediaWikiCheckXML(XML: TJclSimpleXML; WarningCallback: TMediaWikiXMLWarningCallback;
+  ErrorCallback: TMediaWikiXMLErrorCallback);
 
 type
   TMediaWikiOutputFormat = (mwoJSON,      // JSON format
@@ -541,28 +546,32 @@ begin
   Message := Format('MediaWiki error code "%s" with info "%s"', [Code, Info]);
 end;
 
-procedure MediaWikiCheckXML(XML: TJclSimpleXML);
+procedure MediaWikiCheckXML(XML: TJclSimpleXML; WarningCallback: TMediaWikiXMLWarningCallback;
+  ErrorCallback: TMediaWikiXMLErrorCallback);
 var
-  Elem: TJclSimpleXMLElem;
-  Info, Code, Query: string;
+  ErrorElem, WarningsElem, WarningElem: TJclSimpleXMLElem;
+  Info, Code: string;
+  Index: Integer;
 begin
   XML.Options := XML.Options - [sxoAutoCreate];
   // check errors and warnings
-  Elem := XML.Root.Items.ItemNamed['error'];
-  if Assigned(Elem) then
+  ErrorElem := XML.Root.Items.ItemNamed['error'];
+  WarningsElem := XML.Root.Items.ItemNamed['warnings'];
+  if Assigned(ErrorElem) then
   begin
     XML.Options := XML.Options + [sxoAutoCreate];
-    Info := Elem.Properties.ItemNamed['info'].Value;
-    Code := Elem.Properties.ItemNamed['code'].Value;
-    raise EMediaWikiError.Create(Info, Code);
+    Info := ErrorElem.Properties.ItemNamed['info'].Value;
+    Code := ErrorElem.Properties.ItemNamed['code'].Value;
+    ErrorCallback(Info, Code);
   end;
-  Elem := XML.Root.Items.ItemNamed['warnings'];
-  if Assigned(Elem) then
+  if Assigned(WarningsElem) then
   begin
-    XML.Options := XML.Options + [sxoAutoCreate];
-    Info := Elem.Items.ItemNamed['info'].Value;
-    Query := Elem.Items.ItemNamed['warning'].Value;
-    raise EMediaWikiWarning.Create(Info, Query);
+    XML.Options := XML.Options - [sxoAutoCreate];
+    for Index := 0 to WarningsElem.Items.Count - 1 do
+    begin
+      WarningElem := WarningsElem.Items.Item[Index];
+      WarningCallback(WarningElem.Value, WarningElem.Name);
+    end;
   end;
 end;
 

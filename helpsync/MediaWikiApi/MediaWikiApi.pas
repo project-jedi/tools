@@ -31,6 +31,8 @@ type
                        mwrEdit);
 
   TMediaWikiCallback = procedure (Sender: TMediaWikiApi) of object;
+  TMediaWikiWarningCallback = procedure (Sender: TMediaWikiApi; const AInfo, AQuery: string; var Ignore: Boolean);
+  TMediaWikiErrorCallback = procedure (Sender: TMediaWikiApi; const AInfo, ACode: string; var Ignore: Boolean);
   TMediaWikiXMLCallback = procedure (Sender: TMediaWikiApi; XML: TJclSimpleXML) of object;
   TMediaWikiStringCallback = procedure (Sender: TMediaWikiApi; const Value: string) of object;
   TMediaWikiStringsCallback = procedure (Sender: TMediaWikiApi; AStrings: TStrings) of object;
@@ -88,6 +90,19 @@ type
     property URL: string read GetURL write SetURL;
     property UserAgent: string read GetUserAgent write SetUserAgent;
     property FollowRelocation: Boolean read GetFollowRelocation write SetFollowRelocation;
+  // error handling
+  private
+    FIgnoreWarnings: Boolean;
+    FIgnoreErrors: Boolean;
+    FOnWarning: TMediaWikiWarningCallback;
+    FOnError: TMediaWikiErrorCallback;
+    procedure ProcessXMLWarning(const AInfo, AQuery: string);
+    procedure ProcessXMLError(const AInfo, ACode: string);
+  public
+    property IgnoreWarnings: Boolean read FIgnoreWarnings write FIgnoreWarnings;
+    property IgnoreErrors: Boolean read FIgnoreErrors write FIgnoreErrors;
+    property OnWarning: TMediaWikiWarningCallback read FOnWarning write FOnWarning;
+    property OnError: TMediaWikiErrorCallback read FOnError write FOnError;
     //property OutputFormat: TMediaWikiOutputFormat;
   // login stuff
   private
@@ -649,6 +664,8 @@ uses
 constructor TMediaWikiApi.Create;
 begin
   inherited Create;
+  FIgnoreWarnings := True;
+  FIgnoreErrors := False;
   FHttpCli := THttpCli.Create(nil);
   FHttpCli.OnRequestDone := RequestDone;
   FSendStream := TMemoryStream.Create;
@@ -690,6 +707,28 @@ end;
 function TMediaWikiApi.GetUserAgent: string;
 begin
   Result := FHttpCli.Agent;
+end;
+
+procedure TMediaWikiApi.ProcessXMLError(const AInfo, ACode: string);
+var
+  Ignore: Boolean;
+begin
+  Ignore := IgnoreErrors;
+  if Assigned(FOnError) then
+    FOnError(Self, AInfo, ACode, Ignore);
+  if not Ignore then
+    raise EMediaWikiError.Create(AInfo, ACode);
+end;
+
+procedure TMediaWikiApi.ProcessXMLWarning(const AInfo, AQuery: string);
+var
+  Ignore: Boolean;
+begin
+  Ignore := IgnoreWarnings;
+  if Assigned(FOnWarning) then
+    FOnWarning(Self, AInfo, AQuery, Ignore);
+  if not Ignore then
+    raise EMediaWikiWarning.Create(AInfo, AQuery);
 end;
 
 function TMediaWikiApi.QueryExecute: AnsiString;
@@ -739,7 +778,7 @@ begin
   FReceiveStream.Position := 0;
   XML.LoadFromStream(FReceiveStream, seUTF8);
 
-  MediaWikiCheckXML(XML);
+  MediaWikiCheckXML(XML, ProcessXMLWarning, ProcessXMLError);
 end;
 
 function TMediaWikiApi.Login(const lgName, lgPassword, lgToken: string;
@@ -2582,7 +2621,7 @@ var
       FReceiveStream.Position := 0;
       XML.LoadFromStream(FReceiveStream, seUTF8);
 
-      MediaWikiCheckXML(XML);
+      MediaWikiCheckXML(XML, ProcessXMLWarning, ProcessXMLError);
 
       Result := XML;
     end;
