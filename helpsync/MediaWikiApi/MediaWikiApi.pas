@@ -926,7 +926,8 @@ begin
   FQueryStrings.Clear;
   for Request := mwrQuerySiteInfoGeneral to High(TMediaWikiRequest) do
     FRequestCallbacks[Request] := nil;
-  MediaWikiQueryAdd(FQueryStrings, 'sessionid', SessionID);
+  if SessionID <> '' then
+    MediaWikiQueryAdd(FQueryStrings, 'sessionid', SessionID);
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoGeneral(Infos: TStrings);

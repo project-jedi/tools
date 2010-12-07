@@ -309,9 +309,7 @@ procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out S
 // query, page info, link info
 type
   TMediaWikiPageLinkInfo = record
-    LinkSourceTitle: string;
-    LinkSourceNamespace: Integer;
-    LinkSourceID: TMediaWikiID;
+    LinkSourceBasics: TMediaWikiPageBasics;
     LinkTargetTitle: string;
     LinkTargetNameSpace: Integer;
   end;
@@ -646,9 +644,12 @@ begin
   else
   if AValue = '' then
   begin
-    NamePos := Queries.Add(AName);
+    Queries.Values[AName] := 'true';
     if RawValue then
+    begin
+      NamePos := Queries.IndexOfName(AName);
       Queries.Objects[NamePos] := TObject(1);
+    end;
   end
   else
   begin
@@ -1762,9 +1763,9 @@ begin
 
       K := Length(Infos);
       SetLength(Infos, K + 1);
-      Infos[K].LinkSourceTitle := PageTitle.Value;
-      Infos[K].LinkSourceNamespace := PageNamespace.IntValue;
-      Infos[K].LinkSourceID := PageID.IntValue;
+      Infos[K].LinkSourceBasics.PageTitle := PageTitle.Value;
+      Infos[K].LinkSourceBasics.PageNamespace := PageNamespace.IntValue;
+      Infos[K].LinkSourceBasics.PageID := PageID.IntValue;
       Infos[K].LinkTargetTitle := TargetTitle.Value;
       Infos[K].LinkTargetNameSpace := TargetNamespace.IntValue;
     end;
@@ -2291,13 +2292,15 @@ begin
   if StartBackLink <> '' then
     MediaWikiQueryAdd(Queries, 'blcontinue', StartBackLink, True);
 
+  if mwfIncludeBackLinksFromRedirect in Flags then
+    MediaWikiQueryAdd(Queries, 'blredirect');
+
   if mwfExcludeBackLinkRedirect in Flags then
     MediaWikiQueryAdd(Queries, 'blfilterredir', 'nonredirects')
   else
-  if mwfExcludeBackLinkRedirect in Flags then
+  if mwfExcludeBackLinkNonRedirect in Flags then
     MediaWikiQueryAdd(Queries, 'blfilterredir', 'redirects')
   else
-  if mwfExcludeBackLinkRedirect in Flags then
     MediaWikiQueryAdd(Queries, 'blfilterredir', 'all');
 
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);

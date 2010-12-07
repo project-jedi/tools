@@ -5,11 +5,18 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="EditProject.dproj" />
+    <Projects Include="QueryAllCategoriesProject.dproj" />
     <Projects Include="QueryAllPagesProject.dproj" />
     <Projects Include="QueryAllUsersProject.dproj" />
     <Projects Include="QueryBackLinksProject.dproj" />
     <Projects Include="QueryBlocksProject.dproj" />
     <Projects Include="QueryCategoryMembersProject.dproj" />
+    <Projects Include="QueryPageBackLinkInfosProject.dproj" />
+    <Projects Include="QueryPageCategoryInfosProject.dproj" />
+    <Projects Include="QueryPageExternalLinkInfosProject.dproj" />
+    <Projects Include="QueryPageInfosProject.dproj" />
+    <Projects Include="QueryPageLinkInfosProject.dproj" />
+    <Projects Include="QueryPageTemplateInfosProject.dproj" />
     <Projects Include="QuerySiteInfoDBReplLagProject.dproj" />
     <Projects Include="QuerySiteInfoExtensionsProject.dproj" />
     <Projects Include="QuerySiteInfoGeneralProject.dproj" />
@@ -21,7 +28,10 @@
     <Projects Include="QuerySiteInfoStatisticsProject.dproj" />
     <Projects Include="QuerySiteInfoUserGroupsProject.dproj" />
     <Projects Include="QueryUserInfoBlockInfoProject.dproj" />
+    <Projects Include="QueryUserInfoChangeableGroupsProject.dproj" />
     <Projects Include="QueryUserInfoGroupsProject.dproj" />
+    <Projects Include="QueryUserInfoOptionsProject.dproj" />
+    <Projects Include="QueryUserInfoRateLimitsProject.dproj" />
     <Projects Include="QueryUserInfoRightsProject.dproj" />
   </ItemGroup>
   <ProjectExtensions>
@@ -201,14 +211,104 @@
   <Target Name="QueryUserInfoRightsProject:Make">
     <MSBuild Projects="QueryUserInfoRightsProject.dproj" Targets="Make" />
   </Target>
+  <Target Name="QueryUserInfoChangeableGroupsProject">
+    <MSBuild Projects="QueryUserInfoChangeableGroupsProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryUserInfoChangeableGroupsProject:Clean">
+    <MSBuild Projects="QueryUserInfoChangeableGroupsProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryUserInfoChangeableGroupsProject:Make">
+    <MSBuild Projects="QueryUserInfoChangeableGroupsProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryUserInfoOptionsProject">
+    <MSBuild Projects="QueryUserInfoOptionsProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryUserInfoOptionsProject:Clean">
+    <MSBuild Projects="QueryUserInfoOptionsProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryUserInfoOptionsProject:Make">
+    <MSBuild Projects="QueryUserInfoOptionsProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryUserInfoRateLimitsProject">
+    <MSBuild Projects="QueryUserInfoRateLimitsProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryUserInfoRateLimitsProject:Clean">
+    <MSBuild Projects="QueryUserInfoRateLimitsProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryUserInfoRateLimitsProject:Make">
+    <MSBuild Projects="QueryUserInfoRateLimitsProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageInfosProject">
+    <MSBuild Projects="QueryPageInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageInfosProject:Clean">
+    <MSBuild Projects="QueryPageInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageInfosProject:Make">
+    <MSBuild Projects="QueryPageInfosProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageCategoryInfosProject">
+    <MSBuild Projects="QueryPageCategoryInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageCategoryInfosProject:Clean">
+    <MSBuild Projects="QueryPageCategoryInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageCategoryInfosProject:Make">
+    <MSBuild Projects="QueryPageCategoryInfosProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageLinkInfosProject">
+    <MSBuild Projects="QueryPageLinkInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageLinkInfosProject:Clean">
+    <MSBuild Projects="QueryPageLinkInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageLinkInfosProject:Make">
+    <MSBuild Projects="QueryPageLinkInfosProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageTemplateInfosProject">
+    <MSBuild Projects="QueryPageTemplateInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageTemplateInfosProject:Clean">
+    <MSBuild Projects="QueryPageTemplateInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageTemplateInfosProject:Make">
+    <MSBuild Projects="QueryPageTemplateInfosProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageExternalLinkInfosProject">
+    <MSBuild Projects="QueryPageExternalLinkInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageExternalLinkInfosProject:Clean">
+    <MSBuild Projects="QueryPageExternalLinkInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageExternalLinkInfosProject:Make">
+    <MSBuild Projects="QueryPageExternalLinkInfosProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryAllCategoriesProject">
+    <MSBuild Projects="QueryAllCategoriesProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryAllCategoriesProject:Clean">
+    <MSBuild Projects="QueryAllCategoriesProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryAllCategoriesProject:Make">
+    <MSBuild Projects="QueryAllCategoriesProject.dproj" Targets="Make" />
+  </Target>
+  <Target Name="QueryPageBackLinkInfosProject">
+    <MSBuild Projects="QueryPageBackLinkInfosProject.dproj" Targets="" />
+  </Target>
+  <Target Name="QueryPageBackLinkInfosProject:Clean">
+    <MSBuild Projects="QueryPageBackLinkInfosProject.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="QueryPageBackLinkInfosProject:Make">
+    <MSBuild Projects="QueryPageBackLinkInfosProject.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="QueryAllPagesProject;QueryAllUsersProject;QueryBackLinksProject;QueryBlocksProject;QueryCategoryMembersProject;EditProject;QuerySiteInfoGeneralProject;QuerySiteInfoNamespacesProject;QuerySiteInfoNamespaceAliasesProject;QuerySiteInfoSpecialPageAliasesProject;QuerySiteInfoMagicWordsProject;QuerySiteInfoStatisticsProject;QuerySiteInfoInterWikiMapProject;QuerySiteInfoDBReplLagProject;QuerySiteInfoUserGroupsProject;QuerySiteInfoExtensionsProject;QueryUserInfoBlockInfoProject;QueryUserInfoGroupsProject;QueryUserInfoRightsProject" />
+    <CallTarget Targets="QueryAllPagesProject;QueryAllUsersProject;QueryBackLinksProject;QueryBlocksProject;QueryCategoryMembersProject;EditProject;QuerySiteInfoGeneralProject;QuerySiteInfoNamespacesProject;QuerySiteInfoNamespaceAliasesProject;QuerySiteInfoSpecialPageAliasesProject;QuerySiteInfoMagicWordsProject;QuerySiteInfoStatisticsProject;QuerySiteInfoInterWikiMapProject;QuerySiteInfoDBReplLagProject;QuerySiteInfoUserGroupsProject;QuerySiteInfoExtensionsProject;QueryUserInfoBlockInfoProject;QueryUserInfoGroupsProject;QueryUserInfoRightsProject;QueryUserInfoChangeableGroupsProject;QueryUserInfoOptionsProject;QueryUserInfoRateLimitsProject;QueryPageInfosProject;QueryPageCategoryInfosProject;QueryPageLinkInfosProject;QueryPageTemplateInfosProject;QueryPageExternalLinkInfosProject;QueryAllCategoriesProject;QueryPageBackLinkInfosProject" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="QueryAllPagesProject:Clean;QueryAllUsersProject:Clean;QueryBackLinksProject:Clean;QueryBlocksProject:Clean;QueryCategoryMembersProject:Clean;EditProject:Clean;QuerySiteInfoGeneralProject:Clean;QuerySiteInfoNamespacesProject:Clean;QuerySiteInfoNamespaceAliasesProject:Clean;QuerySiteInfoSpecialPageAliasesProject:Clean;QuerySiteInfoMagicWordsProject:Clean;QuerySiteInfoStatisticsProject:Clean;QuerySiteInfoInterWikiMapProject:Clean;QuerySiteInfoDBReplLagProject:Clean;QuerySiteInfoUserGroupsProject:Clean;QuerySiteInfoExtensionsProject:Clean;QueryUserInfoBlockInfoProject:Clean;QueryUserInfoGroupsProject:Clean;QueryUserInfoRightsProject:Clean" />
+    <CallTarget Targets="QueryAllPagesProject:Clean;QueryAllUsersProject:Clean;QueryBackLinksProject:Clean;QueryBlocksProject:Clean;QueryCategoryMembersProject:Clean;EditProject:Clean;QuerySiteInfoGeneralProject:Clean;QuerySiteInfoNamespacesProject:Clean;QuerySiteInfoNamespaceAliasesProject:Clean;QuerySiteInfoSpecialPageAliasesProject:Clean;QuerySiteInfoMagicWordsProject:Clean;QuerySiteInfoStatisticsProject:Clean;QuerySiteInfoInterWikiMapProject:Clean;QuerySiteInfoDBReplLagProject:Clean;QuerySiteInfoUserGroupsProject:Clean;QuerySiteInfoExtensionsProject:Clean;QueryUserInfoBlockInfoProject:Clean;QueryUserInfoGroupsProject:Clean;QueryUserInfoRightsProject:Clean;QueryUserInfoChangeableGroupsProject:Clean;QueryUserInfoOptionsProject:Clean;QueryUserInfoRateLimitsProject:Clean;QueryPageInfosProject:Clean;QueryPageCategoryInfosProject:Clean;QueryPageLinkInfosProject:Clean;QueryPageTemplateInfosProject:Clean;QueryPageExternalLinkInfosProject:Clean;QueryAllCategoriesProject:Clean;QueryPageBackLinkInfosProject:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="QueryAllPagesProject:Make;QueryAllUsersProject:Make;QueryBackLinksProject:Make;QueryBlocksProject:Make;QueryCategoryMembersProject:Make;EditProject:Make;QuerySiteInfoGeneralProject:Make;QuerySiteInfoNamespacesProject:Make;QuerySiteInfoNamespaceAliasesProject:Make;QuerySiteInfoSpecialPageAliasesProject:Make;QuerySiteInfoMagicWordsProject:Make;QuerySiteInfoStatisticsProject:Make;QuerySiteInfoInterWikiMapProject:Make;QuerySiteInfoDBReplLagProject:Make;QuerySiteInfoUserGroupsProject:Make;QuerySiteInfoExtensionsProject:Make;QueryUserInfoBlockInfoProject:Make;QueryUserInfoGroupsProject:Make;QueryUserInfoRightsProject:Make" />
+    <CallTarget Targets="QueryAllPagesProject:Make;QueryAllUsersProject:Make;QueryBackLinksProject:Make;QueryBlocksProject:Make;QueryCategoryMembersProject:Make;EditProject:Make;QuerySiteInfoGeneralProject:Make;QuerySiteInfoNamespacesProject:Make;QuerySiteInfoNamespaceAliasesProject:Make;QuerySiteInfoSpecialPageAliasesProject:Make;QuerySiteInfoMagicWordsProject:Make;QuerySiteInfoStatisticsProject:Make;QuerySiteInfoInterWikiMapProject:Make;QuerySiteInfoDBReplLagProject:Make;QuerySiteInfoUserGroupsProject:Make;QuerySiteInfoExtensionsProject:Make;QueryUserInfoBlockInfoProject:Make;QueryUserInfoGroupsProject:Make;QueryUserInfoRightsProject:Make;QueryUserInfoChangeableGroupsProject:Make;QueryUserInfoOptionsProject:Make;QueryUserInfoRateLimitsProject:Make;QueryPageInfosProject:Make;QueryPageCategoryInfosProject:Make;QueryPageLinkInfosProject:Make;QueryPageTemplateInfosProject:Make;QueryPageExternalLinkInfosProject:Make;QueryAllCategoriesProject:Make;QueryPageBackLinkInfosProject:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
