@@ -28,7 +28,7 @@ type
                        mwrQueryPageLinkInfo, mwrQueryPageTemplateInfo, mwrQueryPageExtLinkInfo,
                        mwrQueryAllPageInfo, mwrQueryAllLinkInfo, mwrQueryAllCategoryInfo,
                        mwrQueryAllUserInfo, mwrQueryBackLinkInfo, mwrQueryBlockInfo, mwrQueryCategoryMemberInfo,
-                       mwrEdit);
+                       mwrEdit, mwrMove, mwrDelete);
 
   TMediaWikiCallback = procedure (Sender: TMediaWikiApi) of object;
   TMediaWikiWarningCallback = procedure (Sender: TMediaWikiApi; const AInfo, AQuery: string; var Ignore: Boolean);
@@ -54,6 +54,8 @@ type
   TMediaWikiBlockCallback = procedure (Sender: TMediaWikiApi; const Blocks: TMediaWikiBlockInfos) of object;
   TMediaWikiCategoryMemberCallback = procedure (Sender: TMediaWikiApi; const CategoryMembers: TMediaWikiCategoryMemberInfos) of object;
   TMediaWikiEditCallback = procedure (Sender: TMediaWikiApi; const EditInfo: TMediaWikiEditInfo) of object;
+  TMediaWikiMoveCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiMoveInfo) of object;
+  TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiDeleteInfo) of object;
 
   TMediaWikiXMLRequestCallbacks = array [TMediaWikiRequest] of TMediaWikiXMLCallback;
 
@@ -651,6 +653,54 @@ type
       const BaseDateTime: TDateTime = 0.0; const StartDateTime: TDateTime = 0.0;
       UndoRevisionID: TMediaWikiID = -1; Flags: TMediaWikiEditFlags = []);
     property OnEditDone: TMediaWikiEditCallback read FOnEditDone write FOnEditDone;
+
+  // Move
+  private
+    FOnMoveDone: TMediaWikiMoveCallback;
+    FMoveInfo: TMediaWikiMoveInfo;
+    procedure MoveParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
+  public
+    procedure Move(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+      FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; out MoveInfo: TMediaWikiMoveInfo); overload;
+    function Move(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+      FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+    procedure MoveAsync(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+      FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags);
+    property OnMoveDone: TMediaWikiMoveCallback read FOnMoveDone write FOnMoveDone;
+
+  // Rollback TODO
+
+  // Delete
+  private
+    FOnDeleteDone: TMediaWikiDeleteCallback;
+    FDeleteInfo: TMediaWikiDeleteInfo;
+    procedure DeleteParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
+  public
+    procedure Delete(const PageTitle, DeleteToken, Reason: string;
+      FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo); overload;
+    function Delete(const PageTitle, DeleteToken, Reason: string;
+      FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+    procedure DeleteAsync(const PageTitle, DeleteToken, Reason: string;
+      FromPageID: TMediaWikiID);
+    property OnDeleteDone: TMediaWikiDeleteCallback read FOnDeleteDone write FOnDeleteDone;
+
+  // restore deleted revisions TODO
+
+  // (un)protect pages TODO
+
+  // (Un)block users TODO
+
+  // (Un)watch pages TODO
+
+  // Send e-mail TODO
+
+  // Patrol changes TODO
+
+  // Import pages TODO
+
+  // Change user group membership TODO
+
+  // Upload files TODO
   end;
 
 implementation
@@ -2605,6 +2655,88 @@ begin
 
   if Assigned(FOnEditDone) then
     FOnEditDone(Self, FEditInfo);
+end;
+
+procedure TMediaWikiApi.Move(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+  FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; out MoveInfo: TMediaWikiMoveInfo);
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, mwoXML);
+    QueryExecuteXML(XML);
+    MoveParseXmlResult(Self, XML);
+  finally
+    MoveInfo := FMoveInfo;
+    XML.Free;
+  end;
+end;
+
+function TMediaWikiApi.Move(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+  FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat): AnsiString;
+begin
+  QueryInit;
+  MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, OutputFormat);
+  Result := QueryExecute;
+end;
+
+procedure TMediaWikiApi.MoveAsync(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+  FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags);
+begin
+  MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, mwoXML);
+  FRequestCallbacks[mwrMove] := MoveParseXmlResult;
+end;
+
+procedure TMediaWikiApi.MoveParseXmlResult(
+  Sender: TMediaWikiApi; XML: TJclSimpleXML);
+begin
+  MediaWikiMoveParseXmlResult(XML, FMoveInfo);
+
+  if Assigned(FOnMoveDone) then
+    FOnMoveDone(Self, FMoveInfo);
+end;
+
+procedure TMediaWikiApi.Delete(const PageTitle, DeleteToken, Reason: string;
+  FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo);
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
+    QueryExecuteXML(XML);
+    DeleteParseXmlResult(Self, XML);
+  finally
+    DeleteInfo := FDeleteInfo;
+    XML.Free;
+  end;
+end;
+
+function TMediaWikiApi.Delete(const PageTitle, DeleteToken, Reason: string;
+  FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString;
+begin
+  QueryInit;
+  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, OutputFormat);
+  Result := QueryExecute;
+end;
+
+procedure TMediaWikiApi.DeleteAsync(const PageTitle, DeleteToken, Reason: string;
+  FromPageID: TMediaWikiID);
+begin
+  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
+  FRequestCallbacks[mwrDelete] := DeleteParseXmlResult;
+end;
+
+procedure TMediaWikiApi.DeleteParseXmlResult(
+  Sender: TMediaWikiApi; XML: TJclSimpleXML);
+begin
+  MediaWikiDeleteParseXmlResult(XML, FDeleteInfo);
+
+  if Assigned(FOnDeleteDone) then
+    FOnDeleteDone(Self, FDeleteInfo);
 end;
 
 procedure TMediaWikiApi.RequestDone(Sender: TObject; RqType: THttpRequest;

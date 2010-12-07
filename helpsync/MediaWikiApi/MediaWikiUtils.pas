@@ -243,11 +243,12 @@ type
     PageEditURL: string;                        // on request, mwfIncludeURL
     PageEditToken: string;                      // on request, mwfIncludeEditToken
     PageMoveToken: string;                      // on request, mwfIncludeMoveToken
+    PageDeleteToken: string;                    // on request, mwfIncludeDeleteToken
   end;
   TMediaWikiPageInfos = array of TMediaWikiPageInfo;
 
   TMediaWikiPageInfoFlag = (mwfIncludeProtection, mwfIncludeTalkID, mwfIncludeSubjectID,
-    mwfIncludeURL, mwfIncludeEditToken, mwfIncludeMoveToken);
+    mwfIncludeURL, mwfIncludeEditToken, mwfIncludeMoveToken, mwfIncludeDeleteToken);
   TMediaWikiPageInfoFlags = set of TMediaWikiPageInfoFlag;
 
 procedure MediaWikiQueryPageInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean; Flags: TMediaWikiPageInfoFlags;
@@ -497,6 +498,34 @@ procedure MediaWikiEditAdd(Queries: TStrings; const PageTitle, Section, Text, Pr
   const BaseDateTime, StartDateTime: TDateTime; UndoRevisionID: TMediaWikiID;
   Flags: TMediaWikiEditFlags; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiEditParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiEditInfo);
+
+type
+  TMediaWikiMoveFlag = (mwfMoveTalk, mwfMoveSubPages, mwfMoveNoRedirect, mwfMoveAddToWatch, mwfMoveNoWatch);
+  TMediaWikiMoveFlags = set of TMediaWikiMoveFlag;
+
+  TMediaWikiMoveInfo = record
+    MoveSuccess: Boolean;
+    MoveFromPage: string;
+    MoveToPage: string;
+    MoveReason: string;
+    MoveFromTalk: string;
+    MoveToTalk: string;
+  end;
+
+procedure MediaWikiMoveAdd(Queries: TStrings; const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+  FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiMoveParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiMoveInfo);
+
+type
+  TMediaWikiDeleteInfo = record
+    DeleteSuccess: Boolean;
+    DeletePage: string;
+    DeleteReason: string;
+  end;
+
+procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
+  PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiDeleteParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteInfo);
 
 implementation
 
@@ -1391,6 +1420,8 @@ begin
     MediaWikiQueryAdd(Queries, 'intoken', 'edit');
   if mwfIncludeMoveToken in Flags then
     MediaWikiQueryAdd(Queries, 'intoken', 'move');
+  if mwfIncludeDeleteToken in Flags then
+    MediaWikiQueryAdd(Queries, 'intoken', 'delete');
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
@@ -1399,7 +1430,8 @@ var
   Query, Pages, Page, Protections, Protection: TJclSimpleXMLElem;
   I, J: Integer;
   ID, Namespace, Title, LastTouched, RevID, Views, Size, Redirect, New,
-  TalkID, SubjectID, FullURL, EditURL, TypeProp, Level, Expiry, EditToken, MoveToken: TJclSimpleXMLProp;
+  TalkID, SubjectID, FullURL, EditURL, TypeProp, Level, Expiry,
+  EditToken, MoveToken, DeleteToken: TJclSimpleXMLProp;
 begin
   XML.Options := XML.Options + [sxoAutoCreate];
   Query := XML.Root.Items.ItemNamed['query'];
@@ -1425,6 +1457,7 @@ begin
     EditURL := Page.Properties.ItemNamed['editurl'];
     EditToken := Page.Properties.ItemNamed['edittoken'];
     MoveToken := Page.Properties.ItemNamed['movetoken'];
+    DeleteToken := Page.Properties.ItemNamed['deletetoken'];
 
     XML.Options := XML.Options + [sxoAutoCreate];
     Infos[I].PageBasics.PageID := ID.IntValue;
@@ -1464,6 +1497,8 @@ begin
       Infos[I].PageEditToken := EditToken.Value;
     if Assigned(MoveToken) then
       Infos[I].PageMoveToken := MoveToken.Value;
+    if Assigned(DeleteToken) then
+      Infos[I].PageDeleteToken := DeleteToken.Value;
   end;
 end;
 
@@ -2729,6 +2764,99 @@ begin
   Info.EditCaptchaMime := CaptchaMimeProp.Value;
   Info.EditCaptchaID := CaptchaIDProp.Value;
   Info.EditCaptchaQuestion := CaptchaQuestionProp.Value;
+end;
+
+procedure MediaWikiMoveAdd(Queries: TStrings; const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
+  FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat);
+begin
+  MediaWikiQueryAdd(Queries, 'action', 'move');
+
+  if FromPageTitle <> '' then
+    MediaWikiQueryAdd(Queries, 'from', FromPageTitle);
+
+  if ToPageTitle <> '' then
+    MediaWikiQueryAdd(Queries, 'to', ToPageTitle);
+
+  if MoveToken <> '' then
+    MediaWikiQueryAdd(Queries, 'token', MoveToken);
+
+  if Reason <> '' then
+    MediaWikiQueryAdd(Queries, 'reason', Reason);
+
+  if (FromPageID >= 0) and (FromPageTitle = '') then
+    MediaWikiQueryAdd(Queries, 'fromid', IntToStr(FromPageID));
+
+  if mwfMoveTalk in Flags then
+    MediaWikiQueryAdd(Queries, 'movetalk');
+  if mwfMoveSubPages in Flags then
+    MediaWikiQueryAdd(Queries, 'movesubpages');
+  if mwfMoveNoRedirect in Flags then
+    MediaWikiQueryAdd(Queries, 'noredirect');
+  if mwfMoveAddToWatch in Flags then
+    MediaWikiQueryAdd(Queries, 'watch')
+  else
+  if mwfMoveNoWatch in Flags then
+    MediaWikiQueryAdd(Queries, 'unwatch');
+
+  MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
+end;
+
+procedure MediaWikiMoveParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiMoveInfo);
+var
+  MoveNode: TJclSimpleXMLElem;
+  FromProp, ToProp, ReasonProp, TalkFromProp, TalkToProp: TJclSimpleXMLProp;
+begin
+  XML.Options := XML.Options + [sxoAutoCreate];
+  MoveNode := XML.Root.Items.ItemNamed['move'];
+
+  FromProp := MoveNode.Properties.ItemNamed['from'];
+  ToProp := MoveNode.Properties.ItemNamed['to'];
+  ReasonProp := MoveNode.Properties.ItemNamed['reason'];
+  TalkFromProp := MoveNode.Properties.ItemNamed['talkfrom'];
+  TalkToProp := MoveNode.Properties.ItemNamed['talkto'];
+
+  Info.MoveSuccess := ToProp.Value <> '';
+  Info.MoveFromPage := FromProp.Value;
+  Info.MoveToPage := ToProp.Value;
+  Info.MoveReason := ReasonProp.Value;
+  Info.MoveFromTalk := TalkFromProp.Value;
+  Info.MoveToTalk := TalkToProp.Value;
+end;
+
+procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
+  PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+begin
+  MediaWikiQueryAdd(Queries, 'action', 'delete');
+
+  if PageTitle <> '' then
+    MediaWikiQueryAdd(Queries, 'title', PageTitle);
+
+  if DeleteToken <> '' then
+    MediaWikiQueryAdd(Queries, 'token', DeleteToken);
+
+  if Reason <> '' then
+    MediaWikiQueryAdd(Queries, 'reason', Reason);
+
+  if (PageID >= 0) and (PageTitle = '') then
+    MediaWikiQueryAdd(Queries, 'pageid', IntToStr(PageID));
+
+  MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
+end;
+
+procedure MediaWikiDeleteParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteInfo);
+var
+  DeleteNode: TJclSimpleXMLElem;
+  TitleProp, ReasonProp: TJclSimpleXMLProp;
+begin
+  XML.Options := XML.Options + [sxoAutoCreate];
+  DeleteNode := XML.Root.Items.ItemNamed['delete'];
+
+  TitleProp := DeleteNode.Properties.ItemNamed['title'];
+  ReasonProp := DeleteNode.Properties.ItemNamed['reason'];
+
+  Info.DeleteSuccess := TitleProp.Value <> '';
+  Info.DeletePage := TitleProp.Value;
+  Info.DeleteReason := ReasonProp.Value;
 end;
 
 end.
