@@ -26,13 +26,13 @@ type
                        mwrQueryPageLinkInfo, mwrQueryPageTemplateInfo, mwrQueryPageExtLinkInfo,
                        mwrQueryAllPageInfo, mwrQueryAllLinkInfo, mwrQueryAllCategoryInfo,
                        mwrQueryAllUserInfo, mwrQueryBackLinkInfo, mwrQueryBlockInfo, mwrQueryCategoryMemberInfo,
-                       mwrEdit, mwrMove, mwrDelete);
+                       mwrEdit, mwrMove, mwrDelete, mwrUpload);
 
   TMediaWikiRequests = set of TMediaWikiRequest;
 
 const
   MediaWikiExclusiveRequests: TMediaWikiRequests =
-    [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete];
+    [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete, mwrUpload];
 
 type
   TMediaWikiApi = class;
@@ -63,6 +63,7 @@ type
   TMediaWikiEditCallback = procedure (Sender: TMediaWikiApi; const EditInfo: TMediaWikiEditInfo) of object;
   TMediaWikiMoveCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiMoveInfo) of object;
   TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiDeleteInfo) of object;
+  TMediaWikiUploadCallback = procedure (Sender: TMediaWikiApi; const UploadInfo: TMediaWikiUploadInfo) of object;
 
   TMediaWikiXMLRequestCallbacks = array [TMediaWikiRequest] of TMediaWikiXMLCallback;
 
@@ -710,6 +711,20 @@ type
   // Change user group membership TODO
 
   // Upload files TODO
+  private
+    FOnUploadDone: TMediaWikiUploadCallback;
+    FUploadInfo: TMediaWikiUploadInfo;
+    procedure UploadParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
+  public
+    procedure Upload(const FileName, Comment, Text, EditToken: string;
+      Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string;
+      out UploadInfo: TMediaWikiUploadInfo); overload;
+    function Upload(const FileName, Comment, Text, EditToken: string;
+      Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string;
+      OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+    procedure UploadAsync(const FileName, Comment, Text, EditToken: string;
+      Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string);
+    property OnUploadDone: TMediaWikiUploadCallback read FOnUploadDone write FOnUploadDone;
   end;
 
 implementation
@@ -747,7 +762,7 @@ procedure TMediaWikiApi.CheckRequest(Request: TMediaWikiRequest);
 begin
   // check socket ready state, done by httpcli
 
-  if FPendingRequests * MediaWikiExclusiveRequests = [] then
+  if FPendingRequests * MediaWikiExclusiveRequests <> [] then
     raise EMediaWikiError.Create('execute exclusive request first', '');
 
   Include(FPendingRequests, Request);  
@@ -797,11 +812,12 @@ end;
 
 function TMediaWikiApi.QueryExecute: AnsiString;
 var
-  APost: AnsiString;
+  ContentType: string;
 begin
-  APost := MediaWikiQueryPost(FQueryStrings);
   FSendStream.Size := 0;
-  FSendStream.WriteBuffer(APost[1], Length(APost));
+  MediaWikiQueryPost(FQueryStrings, FSendStream, ContentType);
+  FHttpCli.ContentTypePost := ContentType;
+
   FSendStream.Position := 0;
   FReceiveStream.Size := 0;
 
@@ -815,12 +831,12 @@ end;
 
 procedure TMediaWikiApi.QueryExecuteAsync;
 var
-  APost: AnsiString;
+  ContentType: AnsiString;
 begin
-  APost := MediaWikiQueryPost(FQueryStrings);
-
   FSendStream.Size := 0;
-  FSendStream.WriteBuffer(APost[1], Length(APost));
+  MediaWikiQueryPost(FQueryStrings, FSendStream, ContentType);
+  FHttpCli.ContentTypePost := ContentType;
+
   FSendStream.Position := 0;
   FReceiveStream.Size := 0;
 
@@ -829,12 +845,11 @@ end;
 
 procedure TMediaWikiApi.QueryExecuteXML(XML: TJclSimpleXML);
 var
-  APost: AnsiString;
+  ContentType: string;
 begin
-  APost := MediaWikiQueryPost(FQueryStrings);
-
   FSendStream.Size := 0;
-  FSendStream.WriteBuffer(APost[1], Length(APost));
+  MediaWikiQueryPost(FQueryStrings, FSendStream, ContentType);
+  FHttpCli.ContentTypePost := ContentType;
   FSendStream.Position := 0;
   FReceiveStream.Size := 0;
 
@@ -2857,6 +2872,52 @@ begin
 
   if Assigned(FOnDeleteDone) then
     FOnDeleteDone(Self, FDeleteInfo);
+end;
+
+procedure TMediaWikiApi.Upload(const FileName, Comment, Text, EditToken: string;
+  Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string;
+  out UploadInfo: TMediaWikiUploadInfo);
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    CheckRequest(mwrUpload);
+    MediaWikiUploadAdd(FQueryStrings, FileName, Comment, Text, EditToken, Flags, Content, URL, mwoXML);
+    QueryExecuteXML(XML);
+    UploadParseXmlResult(Self, XML);
+  finally
+    UploadInfo := FUploadInfo;
+    XML.Free;
+  end;
+end;
+
+function TMediaWikiApi.Upload(const FileName, Comment, Text, EditToken: string;
+  Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string;
+  OutputFormat: TMediaWikiOutputFormat): AnsiString;
+begin
+  QueryInit;
+  CheckRequest(mwrUpload);
+  MediaWikiUploadAdd(FQueryStrings, FileName, Comment, Text, EditToken, Flags, Content, URL, OutputFormat);
+  Result := QueryExecute;
+end;
+
+procedure TMediaWikiApi.UploadAsync(const FileName, Comment, Text, EditToken: string;
+  Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string);
+begin
+  CheckRequest(mwrUpload);
+  MediaWikiUploadAdd(FQueryStrings, FileName, Comment, Text, EditToken, Flags, Content, URL, mwoXML);
+  FRequestCallbacks[mwrUpload] := UploadParseXmlResult;
+end;
+
+procedure TMediaWikiApi.UploadParseXmlResult(
+  Sender: TMediaWikiApi; XML: TJclSimpleXML);
+begin
+  MediaWikiUploadParseXmlResult(XML, FUploadInfo);
+
+  if Assigned(FOnUploadDone) then
+    FOnUploadDone(Self, FUploadInfo);
 end;
 
 procedure TMediaWikiApi.RequestDone(Sender: TObject; RqType: THttpRequest;

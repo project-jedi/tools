@@ -100,8 +100,9 @@ function StrISO8601ToDateTime(const When: string): TDateTime;
 function DateTimeToStrISO8601(When: TDateTime): string;
 
 // post stuff
-procedure MediaWikiQueryAdd(Queries: TStrings; const AName: string; const AValue: string = ''; RawValue: Boolean = False);
-function MediaWikiQueryPost(Queries: TStrings): AnsiString;
+procedure MediaWikiQueryAdd(Queries: TStrings; const AName: string; const AValue: string = '';
+  RawValue: Boolean = False; Content: TStream = nil);
+procedure MediaWikiQueryPost(Queries: TStrings; ASendStream: TStream; out ContentType: string);
 
 // login stuff
 procedure MediaWikiQueryLoginAdd(Queries: TStrings; const lgName, lgPassword, lgToken: string; OutputFormat: TMediaWikiOutputFormat);
@@ -527,11 +528,38 @@ procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Re
   PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiDeleteParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteInfo);
 
+type
+  TMediaWikiUploadFlag = (mwfUploadWatch, mwfUploadIgnoreWarnings);
+  TMediaWikiUploadFlags = set of TMediaWikiUploadFlag;
+
+  TMediaWikiUploadInfo = record
+    UploadSuccess: Boolean;
+    UploadFileName: string;
+    UploadImageDataTime: TDateTime;
+    UploadImageUser: string;
+    UploadImageSize: Int64;
+    UploadImageWidth: Int64;
+    UploadImageHeight: Int64;
+    UploadImageURL: string;
+    UploadImageDescriptionURL: string;
+    UploadImageComment: string;
+    UploadImageSHA1: string;
+    UploadImageMetaData: string;
+    UploadImageMime: string;
+    UploadImageBitDepth: Int64;
+  end;
+
+procedure MediaWikiUploadAdd(Queries: TStrings; const FileName, Comment, Text, EditToken: string;
+  Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiUploadParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiUploadInfo);
+
 implementation
 
 uses
   DateUtils,
   OverbyteIcsUrl,
+  JclAnsiStrings,
+  JclMime,
   JclStrings;
 
 //=== { EMediaWikiException } ================================================
@@ -659,13 +687,25 @@ begin
 end;
 
 // post stuff
-procedure MediaWikiQueryAdd(Queries: TStrings; const AName, AValue: AnsiString; RawValue: Boolean);
+procedure MediaWikiQueryAdd(Queries: TStrings; const AName, AValue: AnsiString; RawValue: Boolean; Content: TStream);
 var
   NamePos: Integer;
   CurrentValue: string;
   Values: TStringList;
 begin
   NamePos := Queries.IndexOfName(string(AName));
+  if Assigned(Content) then
+  begin
+    if NamePos >= 0 then
+      Queries.Delete(NamePos);
+    NamePos := Queries.IndexOf(string(AName));
+    if NamePos >= 0 then
+      Queries.Delete(NamePos);
+    Queries.Values[AName] := AValue;
+    NamePos := Queries.IndexOfName(AName);
+    Queries.Objects[NamePos] := Content;
+  end
+  else
   if (NamePos >= 0) and (AValue <> '') then
   begin
     // avoid duplicate values
@@ -685,7 +725,7 @@ begin
     if CurrentValue <> AValue then
       Queries.Values[AName] := CurrentValue + '|' + AValue;
     if RawValue then
-      Queries.Objects[NamePos] := TObject(1);
+      Queries.Objects[NamePos] := Queries;
   end
   else
   if AValue = '' then
@@ -694,7 +734,7 @@ begin
     if RawValue then
     begin
       NamePos := Queries.IndexOfName(AName);
-      Queries.Objects[NamePos] := TObject(1);
+      Queries.Objects[NamePos] := Queries;
     end;
   end
   else
@@ -703,27 +743,32 @@ begin
     if RawValue then
     begin
       NamePos := Queries.IndexOfName(AName);
-      Queries.Objects[NamePos] := TObject(1);
+      Queries.Objects[NamePos] := Queries;
     end;
   end;
 end;
 
-function MediaWikiQueryPost(Queries: TStrings): AnsiString;
+procedure MediaWikiQueryPostAdd(ASendStream: TStream; const Data: AnsiString);
+begin
+  if Length(Data) > 0 then
+    ASendStream.WriteBuffer(Data[1], Length(Data));
+end;
+
+procedure MediaWikiQueryPostWWWFormUrlEncoded(Queries: TStrings; ASendStream: TStream);
 var
   AName: string;
   I, J: Integer;
   Values: TStrings;
 begin
-  Result := '';
   Values := TStringList.Create;
   try
     for I := 0 to Queries.Count - 1 do
     begin
-      if Result <> '' then
-        Result := Result + '&';
+      if I > 0 then
+        MediaWikiQueryPostAdd(ASendStream, '&');
       AName := Queries.Names[I];
       if AName = '' then
-        Result := Result + AnsiString(Queries.Strings[I])
+        MediaWikiQueryPostAdd(ASendStream, AnsiString(Queries.Strings[I]))
       else
       begin
         if Queries.Objects[I] = nil then
@@ -732,16 +777,76 @@ begin
           StrToStrings(Queries.ValueFromIndex[I], '|', Values, False);
           for J := 0 to Values.Count - 1 do
             Values.Strings[J] := UrlEncodeToA(Values.Strings[J]);
-          Result := Result + AnsiString(AName) + '=' + AnsiString(StringsToStr(Values, '|', False));
+          MediaWikiQueryPostAdd(ASendStream, AnsiString(AName) + '=' + AnsiString(StringsToStr(Values, '|', False)));
         end
         else
           // skip UrlEncodeToA
-          Result := Result + AnsiString(Queries.Strings[I]);
+          MediaWikiQueryPostAdd(ASendStream, AnsiString(Queries.Strings[I]));
       end;
     end;
   finally
     Values.Free;
   end;
+end;
+
+procedure MediaWikiQueryPostFormData(Queries: TStrings; ASendStream: TStream);
+var
+  AName: string;
+  Boundary: AnsiString;
+  Index: Integer;
+  Content: TStream;
+begin
+  Boundary := Format('--%.4x%.4x%.8x', [Cardinal(Queries), Cardinal(ASendStream), DateTimeToUnix(Now)]);
+  for Index := 0 to Queries.Count - 1 do
+  begin
+    MediaWikiQueryPostAdd(ASendStream, Boundary + AnsiLineBreak);
+    MediaWikiQueryPostAdd(ASendStream, 'Content-Disposition: form-data; ');
+    AName := Queries.Names[Index];
+
+    if Queries.Objects[Index] is TStream then
+    begin
+      Content := TStream(Queries.Objects[Index]);
+
+      MediaWikiQueryPostAdd(ASendStream, 'name="' + AnsiString(AName) + '"; filename="' + Queries.Values[AName] + '"' + AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, 'content-type: application/octet-stream' + AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, 'Content-Transfer-Encoding: base64' + AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, AnsiLineBreak);
+      MimeEncodeStream(Content, ASendStream);
+      //ASendStream.CopyFrom(Content, Content.Size);
+      MediaWikiQueryPostAdd(ASendStream, AnsiLineBreak);
+    end
+    else
+    if AName = '' then
+    begin
+      MediaWikiQueryPostAdd(ASendStream, 'name="' + AnsiString(Queries.Strings[Index]) + '"' + AnsiLineBreak);
+      //MediaWikiQueryPostAdd(ASendStream, 'content-type: text/plain' + AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, AnsiLineBreak);
+    end
+    else
+    begin
+      MediaWikiQueryPostAdd(ASendStream, 'name="' + AnsiString(AName) + '"' + AnsiLineBreak);
+      //MediaWikiQueryPostAdd(ASendStream, 'content-type: text/plain' + AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, AnsiLineBreak);
+      MediaWikiQueryPostAdd(ASendStream, AnsiString(Queries.Values[AName]) + AnsiLineBreak);
+    end;
+  end;
+  MediaWikiQueryPostAdd(ASendStream, Boundary + '--' + AnsiLineBreak);
+end;
+
+procedure MediaWikiQueryPost(Queries: TStrings; ASendStream: TStream; out ContentType: string);
+var
+  Index: Integer;
+begin
+  for Index := 0 to Queries.Count - 1 do
+    if Queries.Objects[Index] is TStream then
+  begin
+    ContentType := 'multipart/form-data';
+    MediaWikiQueryPostFormData(Queries, ASendStream);
+    Exit;
+  end;
+  ContentType := 'application/x-www-form-urlencoded';
+  MediaWikiQueryPostWWWFormUrlEncoded(Queries, ASendStream);
 end;
 
 // login stuff
@@ -2874,6 +2979,77 @@ begin
   Info.DeleteSuccess := TitleProp.Value <> '';
   Info.DeletePage := TitleProp.Value;
   Info.DeleteReason := ReasonProp.Value;
+end;
+
+procedure MediaWikiUploadAdd(Queries: TStrings; const FileName, Comment, Text, EditToken: string;
+  Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string; OutputFormat: TMediaWikiOutputFormat);
+begin
+  MediaWikiQueryAdd(Queries, 'action', 'upload');
+
+  if FileName <> '' then
+    MediaWikiQueryAdd(Queries, 'filename', FileName);
+
+  if Comment <> '' then
+    MediaWikiQueryAdd(Queries, 'comment', Comment);
+
+  if Text <> '' then
+    MediaWikiQueryAdd(Queries, 'text', Text);
+
+  if EditToken <> '' then
+    MediaWikiQueryAdd(Queries, 'token', EditToken);
+
+  if mwfUploadWatch in Flags then
+    MediaWikiQueryAdd(Queries, 'watch');
+  if mwfUploadIgnoreWarnings in Flags then
+    MediaWikiQueryAdd(Queries, 'ignorewarnings');
+
+  if Assigned(Content) then
+    MediaWikiQueryAdd(Queries, 'file', FileName, False, Content)
+  else
+    MediaWikiQueryAdd(Queries, 'url', URL);
+
+  MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
+end;
+
+procedure MediaWikiUploadParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiUploadInfo);
+var
+  UploadNode, ImageNode: TJclSimpleXMLElem;
+  ResultProp, FileNameProp, TimeStampProp, UserProp, SizeProp, WidthProp, HeightProp,
+  URLProp, DescriptionURLProp, CommentProp, SHA1Prop, MetaDataProp, MimeProp, BitDepthProp: TJclSimpleXMLProp;
+begin
+  XML.Options := XML.Options + [sxoAutoCreate];
+  UploadNode := XML.Root.Items.ItemNamed['upload'];
+  ImageNode := UploadNode.Items.ItemNamed['imageinfo'];
+
+  ResultProp := UploadNode.Properties.ItemNamed['result'];
+  FileNameProp := UploadNode.Properties.ItemNamed['filename'];
+  TimeStampProp := ImageNode.Properties.ItemNamed['timestamp'];
+  UserProp := ImageNode.Properties.ItemNamed['user'];
+  SizeProp := ImageNode.Properties.ItemNamed['size'];
+  WidthProp := ImageNode.Properties.ItemNamed['width'];
+  HeightProp := ImageNode.Properties.ItemNamed['height'];
+  URLProp := ImageNode.Properties.ItemNamed['url'];
+  DescriptionURLProp := ImageNode.Properties.ItemNamed['descriptionurl'];
+  CommentProp := ImageNode.Properties.ItemNamed['comment'];
+  SHA1Prop := ImageNode.Properties.ItemNamed['sha1'];
+  MetaDataProp := ImageNode.Properties.ItemNamed['metadata'];
+  MimeProp := ImageNode.Properties.ItemNamed['mime'];
+  BitDepthProp := ImageNode.Properties.ItemNamed['bitdepth'];
+
+  Info.UploadSuccess := ResultProp.Value = 'Success';
+  Info.UploadFileName := FileNameProp.Value;
+  Info.UploadImageDataTime := StrISO8601ToDateTime(TimeStampProp.Value);
+  Info.UploadImageUser := UserProp.Value;
+  Info.UploadImageSize := SizeProp.IntValue;
+  Info.UploadImageWidth := WidthProp.IntValue;
+  Info.UploadImageHeight := HeightProp.IntValue;
+  Info.UploadImageURL := URLProp.Value;
+  Info.UploadImageDescriptionURL := DescriptionURLProp.Value;
+  Info.UploadImageComment := CommentProp.Value;
+  Info.UploadImageSHA1 := SHA1Prop.Value;
+  Info.UploadImageMetaData := MetaDataProp.Value;
+  Info.UploadImageMime := MimeProp.Value;
+  Info.UploadImageBitDepth := BitDepthProp.IntValue;
 end;
 
 end.
