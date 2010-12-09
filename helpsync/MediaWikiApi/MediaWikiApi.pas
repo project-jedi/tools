@@ -806,6 +806,7 @@ begin
   FReceiveStream.Size := 0;
 
   FHttpCli.Post;
+  FPendingRequests := [];
 
   SetLength(Result, FReceiveStream.Size);
   FReceiveStream.Position := 0;
@@ -838,6 +839,7 @@ begin
   FReceiveStream.Size := 0;
 
   FHttpCli.Post;
+  FPendingRequests := [];
 
   FReceiveStream.Position := 0;
   XML.LoadFromStream(FReceiveStream, seUTF8);
@@ -2882,6 +2884,8 @@ var
   Request: TMediaWikiRequest;
   Callback: TMediaWikiXMLCallback;
 begin
+  FPendingRequests := [];
+
   if ErrCode <> 0 then
     raise EMediaWikiException.Create('request error')
   else
