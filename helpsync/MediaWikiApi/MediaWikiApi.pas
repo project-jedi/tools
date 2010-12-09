@@ -13,8 +13,6 @@ uses
   MediaWikiUtils;
 
 type
-  TMediaWikiApi = class;
-
   TMediaWikiRequest = (mwrLogin, mwrLogout,
                        mwrQuerySiteInfoGeneral, mwrQuerySiteInfoNamespaces, mwrQuerySiteInfoNamespaceAliases,
                        mwrQuerySiteInfoSpecialPageAliases, mwrQuerySiteInfoMagicWords, mwrQuerySiteInfoStatistics,
@@ -29,6 +27,15 @@ type
                        mwrQueryAllPageInfo, mwrQueryAllLinkInfo, mwrQueryAllCategoryInfo,
                        mwrQueryAllUserInfo, mwrQueryBackLinkInfo, mwrQueryBlockInfo, mwrQueryCategoryMemberInfo,
                        mwrEdit, mwrMove, mwrDelete);
+
+  TMediaWikiRequests = set of TMediaWikiRequest;
+
+const
+  MediaWikiExclusiveRequests: TMediaWikiRequests =
+    [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete];
+
+type
+  TMediaWikiApi = class;
 
   TMediaWikiCallback = procedure (Sender: TMediaWikiApi) of object;
   TMediaWikiWarningCallback = procedure (Sender: TMediaWikiApi; const AInfo, AQuery: string; var Ignore: Boolean);
@@ -67,6 +74,7 @@ type
     FReceiveStream: TMemoryStream;
     FRequestCallbacks: TMediaWikiXMLRequestCallbacks;
     FQueryStrings: TStrings;
+    FPendingRequests: TMediaWikiRequests;
     function GetFollowRelocation: Boolean;
     function GetReady: Boolean;
     function GetURL: string;
@@ -78,7 +86,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure CheckReady;
+    procedure CheckRequest(Request: TMediaWikiRequest);
 
     procedure QueryInit;
     // synchronous post
@@ -87,6 +95,7 @@ type
     // asynchronous post
     procedure QueryExecuteAsync;
 
+    property PendingRequests: TMediaWikiRequests read FPendingRequests;
     property HttpCli: THttpCli read FHttpCli;
     property Ready: Boolean read GetReady;
     property URL: string read GetURL write SetURL;
@@ -734,9 +743,14 @@ begin
   inherited Destroy;
 end;
 
-procedure TMediaWikiApi.CheckReady;
+procedure TMediaWikiApi.CheckRequest(Request: TMediaWikiRequest);
 begin
-  // done by httpcli
+  // check socket ready state, done by httpcli
+
+  if FPendingRequests * MediaWikiExclusiveRequests = [] then
+    raise EMediaWikiError.Create('execute exclusive request first', '');
+
+  Include(FPendingRequests, Request);  
 end;
 
 function TMediaWikiApi.GetFollowRelocation: Boolean;
@@ -834,8 +848,8 @@ end;
 function TMediaWikiApi.Login(const lgName, lgPassword, lgToken: string;
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
-  CheckReady;
   QueryInit;
+  CheckRequest(mwrLogin);
   MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, lgToken, OutputFormat);
   Result := QueryExecute;
 end;
@@ -845,10 +859,10 @@ function TMediaWikiApi.Login(const lgName, lgPassword,
 var
   XML: TJclSimpleXML;
 begin
-  CheckReady;
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrLogin);
     MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, lgToken, mwoXML);
     QueryExecuteXml(XML);
     LoginParseXmlResult(Self, XML);
@@ -863,16 +877,17 @@ function TMediaWikiApi.Login(const lgName, lgPassword: string;
 var
   XML: TJclSimpleXML;
 begin
-  CheckReady;
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrLogin);
     MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, '', mwoXML);
     QueryExecuteXML(XML);
     LoginParseXmlResult(Self, XML);
     if LoginResult = mwlNeedToken then
     begin
       QueryInit;
+      CheckRequest(mwrLogin);
       MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, LoginToken, mwoXML);
       QueryExecuteXML(XML);
       LoginParseXmlResult(Self, XML);
@@ -885,16 +900,14 @@ end;
 
 procedure TMediaWikiApi.LoginAsync(const lgName, lgPassword, lgToken: string);
 begin
-  CheckReady;
   FRequestCallbacks[mwrLogin] := LoginParseXmlResult;
-  QueryInit;
+  CheckRequest(mwrLogin);
   MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, lgToken, mwoXML);
 end;
 
 procedure TMediaWikiApi.LoginAsync(const lgName, lgPassword: string;
   AutoConfirmToken: Boolean);
 begin
-  CheckReady;
   if AutoConfirmToken then
   begin
     FLoginPassword := lgPassword;
@@ -902,7 +915,7 @@ begin
   end
   else
     FRequestCallbacks[mwrLogin] := LoginParseXmlResult;
-  QueryInit;
+  CheckRequest(mwrLogin);
   MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, '', mwoXML);
 end;
 
@@ -940,10 +953,10 @@ procedure TMediaWikiApi.Logout;
 var
   XML: TJclSimpleXML;
 begin
-  CheckReady;
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrLogout);
     MediaWikiQueryLogoutAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     LogoutParseXmlResult(Self, XML);
@@ -954,9 +967,8 @@ end;
 
 procedure TMediaWikiApi.LogoutAsync;
 begin
-  CheckReady;
   FRequestCallbacks[mwrLogout] := LogoutParseXmlResult;
-  QueryInit;
+  CheckRequest(mwrLogout);
   MediaWikiQueryLogoutAdd(FQueryStrings, mwoXML);
 end;
 
@@ -978,6 +990,7 @@ begin
     FRequestCallbacks[Request] := nil;
   if SessionID <> '' then
     MediaWikiQueryAdd(FQueryStrings, 'sessionid', SessionID);
+  FPendingRequests := [];
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoGeneral(Infos: TStrings);
@@ -989,6 +1002,7 @@ begin
   FQuerySiteInfoGeneralStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoGeneral);
     MediaWikiQuerySiteInfoGeneralAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoGeneralParseXmlResult(Self, XML);
@@ -1001,12 +1015,14 @@ function TMediaWikiApi.QuerySiteInfoGeneral(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoGeneral);
   MediaWikiQuerySiteInfoGeneralAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoGeneralAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoGeneral);
   MediaWikiQuerySiteInfoGeneralAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoGeneral] := QuerySiteInfoGeneralParseXmlResult;
 end;
@@ -1041,6 +1057,7 @@ begin
   FQuerySiteInfoNamespacesStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoNamespaces);
     MediaWikiQuerySiteInfoNamespacesAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoNamespacesParseXmlResult(Self, XML);
@@ -1053,12 +1070,14 @@ function TMediaWikiApi.QuerySiteInfoNamespaces(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoNamespaces);
   MediaWikiQuerySiteInfoNamespacesAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoNamespacesAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoNamespaces);
   MediaWikiQuerySiteInfoNamespacesAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoNamespaces] := QuerySiteInfoNamespacesParseXmlResult;
 end;
@@ -1093,6 +1112,7 @@ begin
   FQuerySiteInfoNamespaceAliasesStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoNamespaceAliases);
     MediaWikiQuerySiteInfoNamespaceAliasesAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoNamespaceAliasesParseXmlResult(Self, XML);
@@ -1105,12 +1125,14 @@ function TMediaWikiApi.QuerySiteInfoNamespaceAliases(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoNamespaceAliases);
   MediaWikiQuerySiteInfoNamespaceAliasesAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoNamespaceAliasesAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoNamespaceAliases);
   MediaWikiQuerySiteInfoNamespaceAliasesAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoNamespaceAliases] := QuerySiteInfoNamespaceAliasesParseXmlResult;
 end;
@@ -1145,6 +1167,7 @@ begin
   FQuerySiteInfoSpecialPageAliasesStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoSpecialPageAliases);
     MediaWikiQuerySiteInfoSpecialPageAliasesAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoSpecialPageAliasesParseXmlResult(Self, XML);
@@ -1157,12 +1180,14 @@ function TMediaWikiApi.QuerySiteInfoSpecialPageAliases(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoSpecialPageAliases);
   MediaWikiQuerySiteInfoSpecialPageAliasesAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoSpecialPageAliasesAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoSpecialPageAliases);
   MediaWikiQuerySiteInfoSpecialPageAliasesAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoSpecialPageAliases] := QuerySiteInfoSpecialPageAliasesParseXmlResult;
 end;
@@ -1197,6 +1222,7 @@ begin
   FQuerySiteInfoMagicWordsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoMagicWords);
     MediaWikiQuerySiteInfoMagicWordsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoMagicWordsParseXmlResult(Self, XML);
@@ -1209,12 +1235,14 @@ function TMediaWikiApi.QuerySiteInfoMagicWords(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoMagicWords);
   MediaWikiQuerySiteInfoMagicWordsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoMagicWordsAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoMagicWords);
   MediaWikiQuerySiteInfoMagicWordsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoMagicWords] := QuerySiteInfoMagicWordsParseXmlResult;
 end;
@@ -1249,6 +1277,7 @@ begin
   FQuerySiteInfoStatisticsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoStatistics);
     MediaWikiQuerySiteInfoStatisticsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoStatisticsParseXmlResult(Self, XML);
@@ -1261,12 +1290,14 @@ function TMediaWikiApi.QuerySiteInfoStatistics(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoStatistics);
   MediaWikiQuerySiteInfoStatisticsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoStatisticsAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoStatistics);
   MediaWikiQuerySiteInfoStatisticsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoStatistics] := QuerySiteInfoStatisticsParseXmlResult;
 end;
@@ -1301,6 +1332,7 @@ begin
   FQuerySiteInfoInterWikiMapStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoInterWikiMap);
     MediaWikiQuerySiteInfoInterWikiMapAdd(FQueryStrings, Local, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoInterWikiMapParseXmlResult(Self, XML);
@@ -1313,12 +1345,14 @@ function TMediaWikiApi.QuerySiteInfoInterWikiMap(Local: Boolean;
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoInterWikiMap);
   MediaWikiQuerySiteInfoInterWikiMapAdd(FQueryStrings, Local, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoInterWikiMapAsync(Local: Boolean);
 begin
+  CheckRequest(mwrQuerySiteInfoInterWikiMap);
   MediaWikiQuerySiteInfoInterWikiMapAdd(FQueryStrings, Local, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoInterWikiMap] := QuerySiteInfoInterWikiMapParseXmlResult;
 end;
@@ -1353,6 +1387,7 @@ begin
   FQuerySiteInfoDBReplLagStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoDBReplLag);
     MediaWikiQuerySiteInfoDBReplLagAdd(FQueryStrings, ShowAllDB, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoDBReplLagParseXmlResult(Self, XML);
@@ -1365,12 +1400,14 @@ function TMediaWikiApi.QuerySiteInfoDBReplLag(ShowAllDB: Boolean;
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoDBReplLag);
   MediaWikiQuerySiteInfoDBReplLagAdd(FQueryStrings, ShowAllDB, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoDBReplLagAsync(ShowAllDB: Boolean);
 begin
+  CheckRequest(mwrQuerySiteInfoDBReplLag);
   MediaWikiQuerySiteInfoDBReplLagAdd(FQueryStrings, ShowAllDB, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoDBReplLag] := QuerySiteInfoDBReplLagParseXmlResult;
 end;
@@ -1405,6 +1442,7 @@ begin
   FQuerySiteInfoUserGroupsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoUserGroups);
     MediaWikiQuerySiteInfoUserGroupsAdd(FQueryStrings, IncludeUserCount, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoUserGroupsParseXmlResult(Self, XML);
@@ -1417,12 +1455,14 @@ function TMediaWikiApi.QuerySiteInfoUserGroups(IncludeUserCount: Boolean;
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoUserGroups);
   MediaWikiQuerySiteInfoUserGroupsAdd(FQueryStrings, IncludeUserCount, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoUserGroupsAsync(IncludeUserCount: Boolean);
 begin
+  CheckRequest(mwrQuerySiteInfoUserGroups);
   MediaWikiQuerySiteInfoUserGroupsAdd(FQueryStrings, IncludeUserCount, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoUserGroups] := QuerySiteInfoUserGroupsParseXmlResult;
 end;
@@ -1456,6 +1496,7 @@ begin
   SetLength(FQuerySiteInfoExtensions, 0);
   try
     QueryInit;
+    CheckRequest(mwrQuerySiteInfoExtensions);
     MediaWikiQuerySiteInfoExtensionsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QuerySiteInfoExtensionsParseXmlResult(Self, XML);
@@ -1470,12 +1511,14 @@ function TMediaWikiApi.QuerySiteInfoExtensions(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQuerySiteInfoExtensions);
   MediaWikiQuerySiteInfoExtensionsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QuerySiteInfoExtensionsAsync;
 begin
+  CheckRequest(mwrQuerySiteInfoExtensions);
   MediaWikiQuerySiteInfoExtensionsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQuerySiteInfoExtensions] := QuerySiteInfoExtensionsParseXmlResult;
 end;
@@ -1498,6 +1541,7 @@ begin
   FQueryUserInfoBlockInfoStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoBlockInfo);
     MediaWikiQueryUserInfoBlockInfoAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoBlockInfoParseXmlResult(Self, XML);
@@ -1510,12 +1554,14 @@ function TMediaWikiApi.QueryUserInfoBlockInfo(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoBlockInfo);
   MediaWikiQueryUserInfoBlockInfoAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoBlockInfoAsync;
 begin
+  CheckRequest(mwrQueryUserInfoBlockInfo);
   MediaWikiQueryUserInfoBlockInfoAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoBlockInfo] := QueryUserInfoBlockInfoParseXmlResult;
 end;
@@ -1548,6 +1594,7 @@ begin
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoHasMsg);
     MediaWikiQueryUserInfoHasMsgAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoHasMsgParseXmlResult(Self, XML);
@@ -1562,12 +1609,14 @@ function TMediaWikiApi.QueryUserInfoHasMsg(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoHasMsg);
   MediaWikiQueryUserInfoHasMsgAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoHasMsgAsync;
 begin
+  CheckRequest(mwrQueryUserInfoHasMsg);
   MediaWikiQueryUserInfoHasMsgAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoHasMsg] := QueryUserInfoHasMsgParseXmlResult;
 end;
@@ -1590,6 +1639,7 @@ begin
   FQueryUserInfoGroupsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoGroups);
     MediaWikiQueryUserInfoGroupsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoGroupsParseXmlResult(Self, XML);
@@ -1602,12 +1652,14 @@ function TMediaWikiApi.QueryUserInfoGroups(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoGroups);
   MediaWikiQueryUserInfoGroupsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoGroupsAsync;
 begin
+  CheckRequest(mwrQueryUserInfoGroups);
   MediaWikiQueryUserInfoGroupsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoGroups] := QueryUserInfoGroupsParseXmlResult;
 end;
@@ -1642,6 +1694,7 @@ begin
   FQueryUserInfoRightsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoRights);
     MediaWikiQueryUserInfoRightsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoRightsParseXmlResult(Self, XML);
@@ -1654,12 +1707,14 @@ function TMediaWikiApi.QueryUserInfoRights(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoRights);
   MediaWikiQueryUserInfoRightsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoRightsAsync;
 begin
+  CheckRequest(mwrQueryUserInfoRights);
   MediaWikiQueryUserInfoRightsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoRights] := QueryUserInfoRightsParseXmlResult;
 end;
@@ -1694,6 +1749,7 @@ begin
   FQueryUserInfoChangeableGroupsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoChangeableGroups);
     MediaWikiQueryUserInfoChangeableGroupsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoChangeableGroupsParseXmlResult(Self, XML);
@@ -1706,12 +1762,14 @@ function TMediaWikiApi.QueryUserInfoChangeableGroups(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoChangeableGroups);
   MediaWikiQueryUserInfoChangeableGroupsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoChangeableGroupsAsync;
 begin
+  CheckRequest(mwrQueryUserInfoChangeableGroups);
   MediaWikiQueryUserInfoChangeableGroupsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoChangeableGroups] := QueryUserInfoChangeableGroupsParseXmlResult;
 end;
@@ -1746,6 +1804,7 @@ begin
   FQueryUserInfoOptionsStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoOptions);
     MediaWikiQueryUserInfoOptionsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoOptionsParseXmlResult(Self, XML);
@@ -1758,12 +1817,14 @@ function TMediaWikiApi.QueryUserInfoOptions(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoOptions);
   MediaWikiQueryUserInfoOptionsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoOptionsAsync;
 begin
+  CheckRequest(mwrQueryUserInfoOptions);
   MediaWikiQueryUserInfoOptionsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoOptions] := QueryUserInfoOptionsParseXmlResult;
 end;
@@ -1796,6 +1857,7 @@ begin
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoEditCount);
     MediaWikiQueryUserInfoEditCountAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoEditCountParseXmlResult(Self, XML);
@@ -1810,12 +1872,14 @@ function TMediaWikiApi.QueryUserInfoEditCount(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoEditCount);
   MediaWikiQueryUserInfoEditCountAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoEditCountAsync;
 begin
+  CheckRequest(mwrQueryUserInfoEditCount);
   MediaWikiQueryUserInfoEditCountAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoEditCount] := QueryUserInfoEditCountParseXmlResult;
 end;
@@ -1837,6 +1901,7 @@ begin
   SetLength(FQueryUserInfoRateLimits, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryUserInfoRateLimits);
     MediaWikiQueryUserInfoRateLimitsAdd(FQueryStrings, mwoXML);
     QueryExecuteXML(XML);
     QueryUserInfoRateLimitsParseXmlResult(Self, XML);
@@ -1851,12 +1916,14 @@ function TMediaWikiApi.QueryUserInfoRateLimits(
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryUserInfoRateLimits);
   MediaWikiQueryUserInfoRateLimitsAdd(FQueryStrings, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryUserInfoRateLimitsAsync;
 begin
+  CheckRequest(mwrQueryUserInfoRateLimits);
   MediaWikiQueryUserInfoRateLimitsAdd(FQueryStrings, mwoXML);
   FRequestCallbacks[mwrQueryUserInfoRateLimits] := QueryUserInfoRateLimitsParseXmlResult;
 end;
@@ -1880,6 +1947,7 @@ begin
   FQueryMessagesStrings := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryMessages);
     MediaWikiQueryMessagesAdd(FQueryStrings, NameFilter, ContentFilter, Lang, mwoXML);
     QueryExecuteXML(XML);
     QueryMessagesParseXmlResult(Self, XML);
@@ -1892,12 +1960,14 @@ function TMediaWikiApi.QueryMessages(const NameFilter, ContentFilter, Lang: stri
   OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryMessages);
   MediaWikiQueryMessagesAdd(FQueryStrings, NameFilter, ContentFilter, Lang, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryMessagesAsync(const NameFilter, ContentFilter, Lang: string);
 begin
+  CheckRequest(mwrQueryMessages);
   MediaWikiQueryMessagesAdd(FQueryStrings, NameFilter, ContentFilter, Lang, mwoXML);
   FRequestCallbacks[mwrQueryMessages] := QueryMessagesParseXmlResult;
 end;
@@ -1932,6 +2002,7 @@ begin
   SetLength(FQueryPageInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageInfo);
     MediaWikiQueryPageInfoAdd(FQueryStrings, Titles, PageID, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryPageInfoParseXmlResult(Self, XML);
@@ -1946,6 +2017,7 @@ function TMediaWikiApi.QueryPageInfo(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageInfoFlags; OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageInfo);
   MediaWikiQueryPageInfoAdd(FQueryStrings, Titles, PageID, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -1953,6 +2025,7 @@ end;
 procedure TMediaWikiApi.QueryPageInfoAsync(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageInfoFlags);
 begin
+  CheckRequest(mwrQueryPageInfo);
   MediaWikiQueryPageInfoAdd(FQueryStrings, Titles, PageID, Flags, mwoXML);
   FRequestCallbacks[mwrQueryPageInfo] := QueryPageInfoParseXmlResult;
 end;
@@ -1977,6 +2050,7 @@ begin
   SetLength(FQueryPageRevisionInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageRevisionInfo);
     MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
       EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, mwoXML);
     QueryExecuteXML(XML);
@@ -1994,6 +2068,7 @@ function TMediaWikiApi.QueryPageRevisionInfo(const Titles: string; PageID: Boole
   const StartDateTime, EndDateTime: TDateTime; const IncludeUser, ExcludeUser: string): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageRevisionInfo);
   MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
     EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, OutputFormat);
   Result := QueryExecute;
@@ -2004,6 +2079,7 @@ procedure TMediaWikiApi.QueryPageRevisionInfoAsync(const Titles: string; PageID:
   StartRevisionID, EndRevisionID: TMediaWikiID; const StartDateTime, EndDateTime: TDateTime;
   const IncludeUser, ExcludeUser: string);
 begin
+  CheckRequest(mwrQueryPageRevisionInfo);
   MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
     EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, mwoXML);
   FRequestCallbacks[mwrQueryPageRevisionInfo] := QueryPageRevisionInfoParseXmlResult;
@@ -2035,6 +2111,7 @@ begin
   SetLength(FQueryPageCategoryInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageCategoryInfo);
     MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, mwoXML);
     QueryExecuteXML(XML);
     QueryPageCategoryInfoParseXmlResult(Self, XML);
@@ -2050,6 +2127,7 @@ function TMediaWikiApi.QueryPageCategoryInfo(const Titles: string; PageID: Boole
   MaxCategories: Integer; const CategoryTitles, CategoryStart: string): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageCategoryInfo);
   MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2058,6 +2136,7 @@ procedure TMediaWikiApi.QueryPageCategoryInfoAsync(const Titles: string; PageID:
   Flags: TMediaWikiPageCategoryInfoFlags; MaxCategories: Integer;
   const CategoryTitles, CategoryStart: string);
 begin
+  CheckRequest(mwrQueryPageCategoryInfo);
   MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, mwoXML);
   FRequestCallbacks[mwrQueryPageCategoryInfo] := QueryPageCategoryInfoParseXmlResult;
 end;
@@ -2087,6 +2166,7 @@ begin
   SetLength(FQueryPageLinkInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageLinkInfo);
     MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, Namespace, LinkStart, mwoXML);
     QueryExecuteXML(XML);
     QueryPageLinkInfoParseXmlResult(Self, XML);
@@ -2101,6 +2181,7 @@ function TMediaWikiApi.QueryPageLinkInfo(const Titles: string; PageID: Boolean;
   OutputFormat: TMediaWikiOutputFormat; MaxLinks, Namespace: Integer; const LinkStart: string): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageLinkInfo);
   MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, NameSpace, LinkStart, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2108,6 +2189,7 @@ end;
 procedure TMediaWikiApi.QueryPageLinkInfoAsync(const Titles: string; PageID: Boolean;
   MaxLinks, Namespace: Integer; const LinkStart: string);
 begin
+  CheckRequest(mwrQueryPageLinkInfo);
   MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, Namespace, LinkStart, mwoXML);
   FRequestCallbacks[mwrQueryPageLinkInfo] := QueryPageLinkInfoParseXmlResult;
 end;
@@ -2137,6 +2219,7 @@ begin
   SetLength(FQueryPageTemplateInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageTemplateInfo);
     MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, mwoXML);
     QueryExecuteXML(XML);
     QueryPageTemplateInfoParseXmlResult(Self, XML);
@@ -2151,12 +2234,14 @@ function TMediaWikiApi.QueryPageTemplateInfo(const Titles: string; PageID: Boole
   OutputFormat: TMediaWikiOutputFormat; MaxTemplates, Namespace: Integer; TemplateStart: string): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageTemplateInfo);
   MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryPageTemplateInfoAsync;
 begin
+  CheckRequest(mwrQueryPageTemplateInfo);
   MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, mwoXML);
   FRequestCallbacks[mwrQueryPageTemplateInfo] := QueryPageTemplateInfoParseXmlResult;
 end;
@@ -2186,6 +2271,7 @@ begin
   SetLength(FQueryPageExtLinkInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryPageExtLinkInfo);
     MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, mwoXML);
     QueryExecuteXML(XML);
     QueryPageExtLinkInfoParseXmlResult(Self, XML);
@@ -2200,6 +2286,7 @@ function TMediaWikiApi.QueryPageExtLinkInfo(const Titles: string; PageID: Boolea
   OutputFormat: TMediaWikiOutputFormat; MaxLinks: Integer; const StartLink: string): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryPageExtLinkInfo);
   MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2207,6 +2294,7 @@ end;
 procedure TMediaWikiApi.QueryPageExtLinkInfoAsync(const Titles: string; PageID: Boolean;
   MaxLinks: Integer; const StartLink: string);
 begin
+  CheckRequest(mwrQueryPageExtLinkInfo);
   MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, mwoXML);
   FRequestCallbacks[mwrQueryPageExtLinkInfo] := QueryPageExtLinkInfoParseXmlResult;
 end;
@@ -2239,6 +2327,7 @@ begin
   SetLength(FQueryAllPageInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryAllPageInfo);
     MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
       LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, mwoXML);
     QueryExecuteXML(XML);
@@ -2257,6 +2346,7 @@ function TMediaWikiApi.QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; co
   Direction: TMediaWikiAllPageDirection): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryAllPageInfo);
   MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
     LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, OutputFormat);
   Result := QueryExecute;
@@ -2268,6 +2358,7 @@ procedure TMediaWikiApi.QueryAllPageInfoAsync(const StartPage, Prefix: string;
   ProtectionFilter: TMediaWikiAllPageFilterProtection; LevelFilter: TMediaWikiAllPageFilterLevel;
   Direction: TMediaWikiAllPageDirection);
 begin
+  CheckRequest(mwrQueryAllPageInfo);
   MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
     LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, mwoXML);
   FRequestCallbacks[mwrQueryAllPageInfo] := QueryAllPageInfoParseXmlResult;
@@ -2299,6 +2390,7 @@ begin
   SetLength(FQueryAllLinkInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryAllLinkInfo);
     MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
       Flags, mwoXML);
     QueryExecuteXML(XML);
@@ -2315,6 +2407,7 @@ function TMediaWikiApi.QueryAllLinkInfo(OutputFormat: TMediaWikiOutputFormat;
   Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryAllLinkInfo);
   MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
     Flags, OutputFormat);
   Result := QueryExecute;
@@ -2323,6 +2416,7 @@ end;
 procedure TMediaWikiApi.QueryAllLinkInfoAsync(const StartLink, Prefix: string;
   MaxLink: Integer; const ContinueLink: string; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags);
 begin
+  CheckRequest(mwrQueryAllLinkInfo);
   MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
     Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllLinkInfo] := QueryAllLinkInfoParseXmlResult;
@@ -2354,6 +2448,7 @@ begin
   FQueryAllCategoryInfos := Infos;
   try
     QueryInit;
+    CheckRequest(mwrQueryAllCategoryInfo);
     MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
       Flags, mwoXML);
     QueryExecuteXML(XML);
@@ -2368,6 +2463,7 @@ function TMediaWikiApi.QueryAllCategoryInfo(
   MaxCategory: Integer; Flags: TMediaWikiAllCategoryInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryAllCategoryInfo);
   MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
     Flags, OutputFormat);
   Result := QueryExecute;
@@ -2377,6 +2473,7 @@ procedure TMediaWikiApi.QueryAllCategoryInfoAsync(const StartCategory,
   Prefix: string; MaxCategory: Integer;
   Flags: TMediaWikiAllCategoryInfoFlags);
 begin
+  CheckRequest(mwrQueryAllCategoryInfo);
   MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
     Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllCategoryInfo] := QueryAllCategoryInfoParseXmlResult;
@@ -2418,6 +2515,7 @@ begin
   SetLength(FQueryAllUserInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryAllUserInfo);
     MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryAllUserInfoParseXmlResult(Self, XML);
@@ -2433,6 +2531,7 @@ function TMediaWikiApi.QueryAllUserInfo(
   MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryAllUserInfo);
   MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2440,6 +2539,7 @@ end;
 procedure TMediaWikiApi.QueryAllUserInfoAsync(const StartUser, Prefix,
   Group: string; MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags);
 begin
+  CheckRequest(mwrQueryAllUserInfo);
   MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllUserInfo] := QueryAllUserInfoParseXmlResult;
 end;
@@ -2469,6 +2569,7 @@ begin
   SetLength(FQueryBackLinkInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryBackLinkInfo);
     MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryBackLinkInfoParseXmlResult(Self, XML);
@@ -2483,6 +2584,7 @@ function TMediaWikiApi.QueryBackLinkInfo(const BackLinkTitle: string; OutputForm
   Namespace, MaxLink: Integer; const StartBackLink: string; Flags: TMediaWikiBackLinkInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryBackLinkInfo);
   MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2490,6 +2592,7 @@ end;
 procedure TMediaWikiApi.QueryBackLinkInfoAsync(const BackLinkTitle: string;
   Namespace, MaxLink: Integer; const StartBackLink: string; Flags: TMediaWikiBackLinkInfoFlags);
 begin
+  CheckRequest(mwrQueryBackLinkInfo);
   MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, mwoXML);
   FRequestCallbacks[mwrQueryBackLinkInfo] := QueryBackLinkInfoParseXmlResult;
 end;
@@ -2519,6 +2622,7 @@ begin
   SetLength(FQueryBlockInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryBlockInfo);
     MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryBlockInfoParseXmlResult(Self, XML);
@@ -2533,6 +2637,7 @@ function TMediaWikiApi.QueryBlockInfo(OutputFormat: TMediaWikiOutputFormat; cons
   const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string; Flags: TMediaWikiBlockInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryBlockInfo);
   MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2540,6 +2645,7 @@ end;
 procedure TMediaWikiApi.QueryBlockInfoAsync(const StartDateTime, StopDateTime: TDateTime;
   const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string; Flags: TMediaWikiBlockInfoFlags);
 begin
+  CheckRequest(mwrQueryBlockInfo);
   MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, mwoXML);
   FRequestCallbacks[mwrQueryBlockInfo] := QueryBlockInfoParseXmlResult;
 end;
@@ -2570,6 +2676,7 @@ begin
   SetLength(FQueryCategoryMemberInfos, 0);
   try
     QueryInit;
+    CheckRequest(mwrQueryCategoryMemberInfo);
     MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryCategoryMemberInfoParseXmlResult(Self, XML);
@@ -2585,6 +2692,7 @@ function TMediaWikiApi.QueryCategoryMemberInfo(const CategoryTitle: string; Outp
   MaxCategoryMember: Integer; const StartCategoryMember: string; Flags: TMediaWikiCategoryMemberInfoFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrQueryCategoryMemberInfo);
   MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2593,6 +2701,7 @@ procedure TMediaWikiApi.QueryCategoryMemberInfoAsync(const CategoryTitle: string
   PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
   MaxCategoryMember: Integer; const StartCategoryMember: string; Flags: TMediaWikiCategoryMemberInfoFlags);
 begin
+  CheckRequest(mwrQueryCategoryMemberInfo);
   MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, mwoXML);
   FRequestCallbacks[mwrQueryCategoryMemberInfo] := QueryCategoryMemberInfoParseXmlResult;
 end;
@@ -2622,6 +2731,7 @@ begin
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrEdit);
     MediaWikiEditAdd(FQueryStrings, PageTitle, Section, Text, PrependText, AppendText, EditToken, Summary, MD5, CaptchaID, CaptchaWord, BaseDateTime, StartDateTime, UndoRevisionID, Flags, mwoXML);
     QueryExecuteXML(XML);
     EditParseXmlResult(Self, XML);
@@ -2636,6 +2746,7 @@ function TMediaWikiApi.Edit(const PageTitle, Section, Text, PrependText, AppendT
   const BaseDateTime, StartDateTime: TDateTime; UndoRevisionID: TMediaWikiID; Flags: TMediaWikiEditFlags): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrEdit);
   MediaWikiEditAdd(FQueryStrings, PageTitle, Section, Text, PrependText, AppendText, EditToken, Summary, MD5, CaptchaID, CaptchaWord, BaseDateTime, StartDateTime, UndoRevisionID, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2644,6 +2755,7 @@ procedure TMediaWikiApi.EditAsync(const PageTitle, Section, Text, PrependText, A
   MD5, CaptchaID, CaptchaWord: string; const BaseDateTime, StartDateTime: TDateTime;
   UndoRevisionID: TMediaWikiID; Flags: TMediaWikiEditFlags);
 begin
+  CheckRequest(mwrEdit);
   MediaWikiEditAdd(FQueryStrings, PageTitle, Section, Text, PrependText, AppendText, EditToken, Summary, MD5, CaptchaID, CaptchaWord, BaseDateTime, StartDateTime, UndoRevisionID, Flags, mwoXML);
   FRequestCallbacks[mwrEdit] := EditParseXmlResult;
 end;
@@ -2665,6 +2777,7 @@ begin
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrMove);
     MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, mwoXML);
     QueryExecuteXML(XML);
     MoveParseXmlResult(Self, XML);
@@ -2678,6 +2791,7 @@ function TMediaWikiApi.Move(const FromPageTitle, ToPageTitle, MoveToken, Reason:
   FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrMove);
   MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2685,6 +2799,7 @@ end;
 procedure TMediaWikiApi.MoveAsync(const FromPageTitle, ToPageTitle, MoveToken, Reason: string;
   FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags);
 begin
+  CheckRequest(mwrMove);
   MediaWikiMoveAdd(FQueryStrings, FromPageTitle, ToPageTitle, MoveToken, Reason, FromPageID, Flags, mwoXML);
   FRequestCallbacks[mwrMove] := MoveParseXmlResult;
 end;
@@ -2706,6 +2821,7 @@ begin
   XML := TJclSimpleXML.Create;
   try
     QueryInit;
+    CheckRequest(mwrDelete);
     MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
     QueryExecuteXML(XML);
     DeleteParseXmlResult(Self, XML);
@@ -2719,6 +2835,7 @@ function TMediaWikiApi.Delete(const PageTitle, DeleteToken, Reason: string;
   FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString;
 begin
   QueryInit;
+  CheckRequest(mwrDelete);
   MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, OutputFormat);
   Result := QueryExecute;
 end;
@@ -2726,6 +2843,7 @@ end;
 procedure TMediaWikiApi.DeleteAsync(const PageTitle, DeleteToken, Reason: string;
   FromPageID: TMediaWikiID);
 begin
+  CheckRequest(mwrDelete);
   MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
   FRequestCallbacks[mwrDelete] := DeleteParseXmlResult;
 end;
