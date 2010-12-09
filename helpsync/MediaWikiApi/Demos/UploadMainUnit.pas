@@ -121,10 +121,8 @@ begin
   FMediaWikiApi.UserAgent := 'MediaWiki JEDI bot';
   FMediaWikiApi.FollowRelocation := False;
   // login is mandatory
-  //InputQuery('Login information', 'login name', LoginName);
-  //InputQuery('Login information', 'login password', LoginPassword);
-  LoginName := 'Outchy';
-  LoginPassword := 'jedi2007PASS';
+  InputQuery('Login information', 'login name', LoginName);
+  InputQuery('Login information', 'login password', LoginPassword);
   FMediaWikiApi.Login(LoginName, LoginPassword, True);
 end;
 
