@@ -662,11 +662,28 @@ end;
 procedure MediaWikiQueryAdd(Queries: TStrings; const AName, AValue: AnsiString; RawValue: Boolean);
 var
   NamePos: Integer;
+  CurrentValue: string;
+  Values: TStringList;
 begin
   NamePos := Queries.IndexOfName(string(AName));
   if (NamePos >= 0) and (AValue <> '') then
   begin
-    Queries.Values[AName] := Queries.Values[AName] + '|' + AValue;
+    // avoid duplicate values
+    CurrentValue := Queries.Values[AName];
+    if (CurrentValue <> AValue) and (Pos('|', CurrentValue) > 0) then
+    begin
+      Values := TStringList.Create;
+      try
+        StrToStrings(CurrentValue, '|', Values, True);
+        if Values.IndexOf(AValue) < 0 then
+          Queries.Values[AName] := CurrentValue + '|' + AValue;
+      finally
+        Values.Free;
+      end;
+    end
+    else
+    if CurrentValue <> AValue then
+      Queries.Values[AName] := CurrentValue + '|' + AValue;
     if RawValue then
       Queries.Objects[NamePos] := TObject(1);
   end
