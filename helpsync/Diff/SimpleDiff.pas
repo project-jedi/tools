@@ -30,6 +30,8 @@ uses
   JclContainerIntf;
 
 type
+  ESimpleDiffError = class(Exception);
+  
   TSimpleDiffFlag = (dfDelete, dfInsert);
   TSimpleDiffFlags = set of TSimpleDiffFlag;
 
@@ -62,7 +64,12 @@ type
                        StrCompare: TStrEqualityCompare = nil);
     destructor Destroy; override;
     procedure Clear;
+    procedure Delete(Index: Integer);
     procedure Diff(LeftStrings, RightStrings: TStrings);
+    procedure Check(LeftStrings: TStrings);
+    procedure Merge(LeftStrings, RightStrings: TStrings); overload;
+    procedure Merge(Strings: TStrings); overload;
+    procedure Reverse;
     property Count: Integer read FCount;
     property StringDiffs[Index: Integer]: TStringSimpleDiff read GetStringDiff write SetStringDiff;
     property LeftName: string read FLeftName write FLeftName;
@@ -74,6 +81,8 @@ type
 function IsDelete(Flags: TSimpleDiffFlags): Boolean; inline;
 function IsInsert(Flags: TSimpleDiffFlags): Boolean; inline;
 function IsModify(Flags: TSimpleDiffFlags): Boolean; inline;
+
+procedure IncOffset(var Offset: Integer; Flags: TSimpleDiffFlags);
 
 implementation
 
@@ -94,6 +103,14 @@ end;
 function IsModify(Flags: TSimpleDiffFlags): Boolean; inline;
 begin
   Result := Flags * [dfDelete, dfInsert] = [dfDelete, dfInsert];
+end;
+
+procedure IncOffset(var Offset: Integer; Flags: TSimpleDiffFlags);
+begin
+  if dfDelete in Flags then
+    Dec(Offset);
+  if dfInsert in Flags then
+    Inc(Offset);
 end;
 
 //=== { TStringsDiff } =======================================================
@@ -117,10 +134,62 @@ begin
   inherited Destroy;
 end;
 
+procedure TStringsSimpleDiff.Check(LeftStrings: TStrings);
+var
+  LeftCount, RightCount, Index: Integer;
+begin
+  LeftCount := LeftStrings.Count;
+  RightCount := LeftStrings.Count;
+  for Index := 0 to Count - 1 do
+  begin
+    if IsModify(FStringDiffs[Index].Flags) then
+    begin
+      if (FStringDiffs[Index].LeftIndex >= LeftCount) or
+         (FStringDiffs[Index].RightIndex > RightCount) or
+         not FStrCompare(FStringDiffs[Index].LeftValue, LeftStrings.Strings[FStringDiffs[Index].LeftIndex]) then
+        raise ESimpleDiffError.Create('inconsistent source');
+    end
+    else
+    if IsInsert(FStringDiffs[Index].Flags) then
+    begin
+      if FStringDiffs[Index].RightIndex > RightCount then
+        raise ESimpleDiffError.Create('inconsistent source');
+      Inc(RightCount);
+    end
+    else
+    if IsDelete(FStringDiffs[Index].Flags) then
+    begin
+      if FStringDiffs[Index].RightIndex >= RightCount then
+        raise ESimpleDiffError.Create('inconsistent source');
+      Dec(RightCount);
+    end;
+  end;
+end;
+
 procedure TStringsSimpleDiff.Clear;
 begin
   FCount := 0;
   SetLength(FStringDiffs, 0);
+end;
+
+procedure TStringsSimpleDiff.Delete(Index: Integer);
+var
+  StringDiff: TStringSimpleDiff;
+  RightOffset: Integer;
+begin
+  StringDiff := GetStringDiff(Index);
+  RightOffset := 0;
+  IncOffset(RightOffset, StringDiff.Flags);
+  // offset is opposed since the item is deleted
+  RightOffset := -RightOffset;
+  Dec(FCount);
+  while Index < FCount do
+  begin
+    FStringDiffs[Index] := FStringDiffs[Index + 1];
+    Inc(FStringDiffs[Index].RightIndex, RightOffset);
+    Inc(Index);
+  end;
+  Finalize(FStringDiffs[FCount]);
 end;
 
 procedure TStringsSimpleDiff.Diff(LeftStrings, RightStrings: TStrings);
@@ -296,6 +365,81 @@ begin
     end;
     LeftContinue := LeftStart <= LeftStop;
     RightContinue := RightStart <= RightStop;
+  end;
+end;
+
+procedure TStringsSimpleDiff.Merge(Strings: TStrings);
+var
+  Index: Integer;
+begin
+  for Index := 0 to Count - 1 do
+  begin
+    if IsModify(FStringDiffs[Index].Flags) then
+      Strings.Strings[FStringDiffs[Index].RightIndex] := FStringDiffs[Index].RightValue
+    else
+    if IsInsert(FStringDiffs[Index].Flags) then
+      Strings.Insert(FStringDiffs[Index].RightIndex, FStringDiffs[Index].RightValue)
+    else
+    if IsDelete(FStringDiffs[Index].Flags) then
+      Strings.Delete(FStringDiffs[Index].RightIndex);
+  end;
+end;
+
+procedure TStringsSimpleDiff.Reverse;
+var
+  Index, TmpIndex: Integer;
+  TmpValue: string;
+begin
+  for Index := 0 to Count - 1 do
+  begin
+    if IsInsert(FStringDiffs[Index].Flags) then
+      FStringDiffs[Index].Flags := [dfDelete]
+    else
+    if IsDelete(FStringDiffs[Index].Flags) then
+      FStringDiffs[Index].Flags := [dfInsert];
+    TmpIndex := FStringDiffs[Index].LeftIndex;
+    FStringDiffs[Index].LeftIndex := FStringDiffs[Index].RightIndex;
+    FStringDiffs[Index].RightIndex := TmpIndex;
+    TmpValue := FStringDiffs[Index].LeftValue;
+    FStringDiffs[Index].LeftValue := FStringDiffs[Index].RightValue;
+    FStringDiffs[Index].RightValue := TmpValue;
+  end;
+end;
+
+procedure TStringsSimpleDiff.Merge(LeftStrings, RightStrings: TStrings);
+var
+  I, J, LeftCount, DiffCount: Integer;
+  AddLine: Boolean;
+begin
+  J := 0;
+  LeftCount := LeftStrings.Count;
+  DiffCount := Count;
+  RightStrings.Clear;
+  RightStrings.BeginUpdate;
+  try
+    for I := 0 to LeftCount - 1 do
+    begin
+      AddLine := (J >= DiffCount) or (I < FStringDiffs[J].LeftIndex);
+      while (J < DiffCount) and (FStringDiffs[J].LeftIndex = I) do
+      begin
+        if IsModify(FStringDiffs[J].Flags) then
+        begin
+          AddLine := False;
+          RightStrings.Add(FStringDiffs[J].RightValue);
+        end
+        else
+        if IsInsert(FStringDiffs[J].Flags) then
+        begin
+          AddLine := True;
+          RightStrings.Add(FStringDiffs[J].RightValue);
+        end;
+        Inc(J);
+      end;
+      if AddLine then
+        RightStrings.Add(LeftStrings.Strings[I]);      
+    end;
+  finally
+    RightStrings.EndUpdate;
   end;
 end;
 

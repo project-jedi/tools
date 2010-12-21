@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{84bea47b-3627-4f78-9dc3-42918447befe}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="DiffDemo.dproj" />
+    <Projects Include="MergeDemo.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="DiffDemo">
+    <MSBuild Projects="DiffDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="DiffDemo:Clean">
+    <MSBuild Projects="DiffDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="DiffDemo:Make">
+    <MSBuild Projects="DiffDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="MergeDemo">
+    <MSBuild Projects="MergeDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="MergeDemo:Clean">
+    <MSBuild Projects="MergeDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="MergeDemo:Make">
+    <MSBuild Projects="MergeDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="DiffDemo;MergeDemo" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="DiffDemo:Clean;MergeDemo:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="DiffDemo:Make;MergeDemo:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>
