@@ -354,14 +354,15 @@ begin
     Inc(FCount);
     while J > I do
     begin
-      FStringDiffs[J + 1] := FStringDiffs[J];
+      FStringDiffs[J] := FStringDiffs[J - 1];
       case Position of
         mpAfter:
-          Inc(FStringDiffs[J + 1].RightIndex, NewOffset);
+          Inc(FStringDiffs[J].RightIndex, NewOffset);
         mpSame,
         mpBefore:
-          Dec(FStringDiffs[J + 1].LeftIndex, NewOffset);
+          Dec(FStringDiffs[J].LeftIndex, NewOffset);
       end;
+      Dec(J);
     end;
     FStringDiffs[I] := NewStringDiff;
   end;
