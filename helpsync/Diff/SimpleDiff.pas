@@ -30,14 +30,15 @@ uses
   JclContainerIntf;
 
 type
-  TSimpleDiffKind = (dkModify, dkInsert, dkDelete);
+  TSimpleDiffFlag = (dfDelete, dfInsert);
+  TSimpleDiffFlags = set of TSimpleDiffFlag;
 
   TStringSimpleDiff = record
     LeftIndex: Integer;
     RightIndex: Integer;
     LeftValue: string;
     RightValue: string;
-    Kind: TSimpleDiffKind;
+    Flags: TSimpleDiffFlags;
   end;
   TStringSimpleDiffs = array of TStringSimpleDiff;
 
@@ -70,11 +71,30 @@ type
     property RightVersion: string read FRightVersion write FRightVersion;
   end;
 
+function IsDelete(Flags: TSimpleDiffFlags): Boolean; inline;
+function IsInsert(Flags: TSimpleDiffFlags): Boolean; inline;
+function IsModify(Flags: TSimpleDiffFlags): Boolean; inline;
+
 implementation
 
 uses
   SysConst,
   JclAlgorithms;
+
+function IsDelete(Flags: TSimpleDiffFlags): Boolean; inline;
+begin
+  Result := Flags * [dfDelete, dfInsert] = [dfDelete];
+end;
+
+function IsInsert(Flags: TSimpleDiffFlags): Boolean; inline;
+begin
+  Result := Flags * [dfDelete, dfInsert] = [dfInsert];
+end;
+
+function IsModify(Flags: TSimpleDiffFlags): Boolean; inline;
+begin
+  Result := Flags * [dfDelete, dfInsert] = [dfDelete, dfInsert];
+end;
 
 //=== { TStringsDiff } =======================================================
 
@@ -184,7 +204,7 @@ begin
         FStringDiffs[FCount].RightIndex := RightStart;
         FStringDiffs[FCount].LeftValue := '';
         FStringDiffs[FCount].RightValue := RightStrings.Strings[RightStart];
-        FStringDiffs[FCount].Kind := dkInsert;
+        FStringDiffs[FCount].Flags := [dfInsert];
         Inc(FCount);
         Inc(RightStart);
       end;
@@ -202,7 +222,7 @@ begin
         FStringDiffs[FCount].RightIndex := RightStart;
         FStringDiffs[FCount].LeftValue := LeftStrings.Strings[LeftStart];
         FStringDiffs[FCount].RightValue := '';
-        FStringDiffs[FCount].Kind := dkDelete;
+        FStringDiffs[FCount].Flags := [dfDelete];
         Inc(FCount);
         Inc(LeftStart);
       end;
@@ -225,7 +245,7 @@ begin
             FStringDiffs[FCount].RightIndex := RightStart;
             FStringDiffs[FCount].LeftValue := '';
             FStringDiffs[FCount].RightValue := RightStrings.Strings[RightStart];
-            FStringDiffs[FCount].Kind := dkInsert;
+            FStringDiffs[FCount].Flags := [dfInsert];
             Inc(FCount);
             Inc(RightStart);
           end;
@@ -247,7 +267,7 @@ begin
             FStringDiffs[FCount].RightIndex := RightStart;
             FStringDiffs[FCount].LeftValue := LeftStrings.Strings[LeftStart];
             FStringDiffs[FCount].RightValue := '';
-            FStringDiffs[FCount].Kind := dkDelete;
+            FStringDiffs[FCount].Flags := [dfDelete];
             Inc(FCount);
             Inc(LeftStart);
           end;
@@ -269,7 +289,7 @@ begin
       FStringDiffs[FCount].RightIndex := RightStart;
       FStringDiffs[FCount].LeftValue := LeftStrings.Strings[LeftStart];
       FStringDiffs[FCount].RightValue := RightStrings.Strings[RightStart];
-      FStringDiffs[FCount].Kind := dkModify;
+      FStringDiffs[FCount].Flags := [dfDelete, dfInsert];
       Inc(FCount);
       Inc(LeftStart);
       Inc(RightStart);
