@@ -5,6 +5,7 @@
   <ItemGroup />
   <ItemGroup>
     <Projects Include="DiffDemo.dproj" />
+    <Projects Include="Merge3Demo.dproj" />
     <Projects Include="MergeDemo.dproj" />
   </ItemGroup>
   <ProjectExtensions>
@@ -31,14 +32,23 @@
   <Target Name="MergeDemo:Make">
     <MSBuild Projects="MergeDemo.dproj" Targets="Make" />
   </Target>
+  <Target Name="Merge3Demo">
+    <MSBuild Projects="Merge3Demo.dproj" Targets="" />
+  </Target>
+  <Target Name="Merge3Demo:Clean">
+    <MSBuild Projects="Merge3Demo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="Merge3Demo:Make">
+    <MSBuild Projects="Merge3Demo.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="DiffDemo;MergeDemo" />
+    <CallTarget Targets="DiffDemo;MergeDemo;Merge3Demo" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="DiffDemo:Clean;MergeDemo:Clean" />
+    <CallTarget Targets="DiffDemo:Clean;MergeDemo:Clean;Merge3Demo:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="DiffDemo:Make;MergeDemo:Make" />
+    <CallTarget Targets="DiffDemo:Make;MergeDemo:Make;Merge3Demo:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
