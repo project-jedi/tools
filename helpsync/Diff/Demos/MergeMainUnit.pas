@@ -19,6 +19,10 @@ type
     ButtonMergeOutOfPlace: TButton;
     MemoDiff: TMemo;
     ButtonSaveDiff: TButton;
+    LabelLeft: TLabel;
+    LabelRight: TLabel;
+    LabelMerge: TLabel;
+    LabelDiff: TLabel;
     procedure ButtonDiffClick(Sender: TObject);
     procedure ButtonLoadLeftClick(Sender: TObject);
     procedure ButtonLoadRightClick(Sender: TObject);

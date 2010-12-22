@@ -22,45 +22,45 @@ object FormMain: TFormMain
     Caption = '&Left:'
     FocusControl = MemoLeft
   end
-  object LabelRight1: TLabel
+  object LabelMiddle: TLabel
     Left = 231
     Top = 20
-    Width = 38
-    Height = 13
-    Caption = 'Right &1:'
-    FocusControl = MemoRight1
-  end
-  object LabelRight2: TLabel
-    Left = 454
-    Top = 20
-    Width = 38
-    Height = 13
-    Caption = 'Right &2:'
-    FocusControl = MemoRight2
-  end
-  object LabelMerge: TLabel
-    Left = 8
-    Top = 314
     Width = 34
     Height = 13
-    Caption = '&Merge:'
+    Caption = '&Middle:'
+    FocusControl = MemoMiddle
+  end
+  object LabelRight: TLabel
+    Left = 454
+    Top = 20
+    Width = 29
+    Height = 13
+    Caption = '&Right:'
+    FocusControl = MemoRight
+  end
+  object LabelLeftRight: TLabel
+    Left = 8
+    Top = 314
+    Width = 64
+    Height = 13
+    Caption = '&Left to Right:'
     FocusControl = MemoMerge
   end
-  object LabelDiff1: TLabel
+  object LabelLeftMiddle: TLabel
     Left = 231
     Top = 314
-    Width = 30
+    Width = 69
     Height = 13
-    Caption = '&Diff 1:'
-    FocusControl = MemoDiff1
+    Caption = 'Left to &Middle:'
+    FocusControl = MemoDiffMiddle
   end
-  object LabelDiff2: TLabel
+  object LabelMiddleRight: TLabel
     Left = 454
     Top = 314
-    Width = 30
+    Width = 75
     Height = 13
-    Caption = 'D&iff 2:'
-    FocusControl = MemoDiff2
+    Caption = 'Middle to &Right:'
+    FocusControl = MemoDiffRight
   end
   object MemoLeft: TMemo
     Left = 8
@@ -68,54 +68,50 @@ object FormMain: TFormMain
     Width = 217
     Height = 257
     Lines.Strings = (
-      'The text 1 begins here'
-      'This is some text 1'
-      'Some lines are deleted from text 1'
-      'This is some other text 1'
-      'This is still text 1'
-      'This text 1 will be replaced'
-      'The text 1 ends here'
-      'The text 2 begins here'
-      'This is some text 2'
-      'Some lines are deleted from text 2'
-      'This is some other text 2'
-      'This is still text 2'
-      'This text 2 will be replaced'
-      'The text 2 ends here')
+      'The text begins here'
+      'The text continues here'
+      'This line 1 will be deleted'
+      'This is a text marker'
+      'This line 2 will be deleted'
+      'This is an other text marker'
+      'This line 3 will be deleted'
+      'The text is still here'
+      'This line 1 will be replaced'
+      'This line 2 will be replaced'
+      'This line 3 will be replaced'
+      'This is the end of the text')
     TabOrder = 0
     WordWrap = False
   end
-  object MemoRight1: TMemo
+  object MemoMiddle: TMemo
     Left = 231
     Top = 39
     Width = 217
     Height = 257
     Lines.Strings = (
-      'The text 1 begins here'
-      'This is some text 1'
-      'This is some other text 1'
-      'Some lines are added to text 1'
-      'This is still text 1'
-      'This text 1 is replaced'
-      'The text 1 ends here'
-      'The text 2 begins here'
-      'This is some text 2'
-      'Some lines are deleted from text 2'
-      'This is some other text 2'
-      'This is still text 2'
-      'This text 2 will be replaced'
-      'The text 2 ends here')
+      'The text begins here'
+      'This line 1 is just added'
+      'This line 2 is just added and will be replaced'
+      'This line 3 is just added and will be deleted'
+      'The text continues here'
+      'This is a text marker'
+      'This is an other text marker'
+      'The text is still here'
+      'This line 1 is replaced'
+      'This line 2 is replaced and will be replaced again'
+      'This line 3 is replaced and will be deleted'
+      'This is the end of the text')
     TabOrder = 1
     WordWrap = False
   end
-  object ButtonDiff1: TButton
+  object ButtonDiffMiddle: TButton
     Left = 302
     Top = 302
     Width = 75
     Height = 25
     Caption = 'Diff'
     TabOrder = 2
-    OnClick = ButtonDiff1Click
+    OnClick = ButtonDiffMiddleClick
   end
   object MemoMerge: TMemo
     Left = 8
@@ -134,14 +130,14 @@ object FormMain: TFormMain
     TabOrder = 4
     OnClick = ButtonLoadLeftClick
   end
-  object ButtonLoadRight1: TButton
+  object ButtonLoadMiddle: TButton
     Left = 302
     Top = 8
     Width = 75
     Height = 25
     Caption = 'Load...'
     TabOrder = 5
-    OnClick = ButtonLoadRight1Click
+    OnClick = ButtonLoadMiddleClick
   end
   object ButtonSaveMerge: TButton
     Left = 79
@@ -170,7 +166,7 @@ object FormMain: TFormMain
     TabOrder = 8
     OnClick = ButtonMergeOutOfPlaceClick
   end
-  object MemoDiff1: TMemo
+  object MemoDiffMiddle: TMemo
     Left = 231
     Top = 333
     Width = 217
@@ -178,57 +174,56 @@ object FormMain: TFormMain
     TabOrder = 9
     WordWrap = False
   end
-  object ButtonSaveDiff1: TButton
+  object ButtonSaveDiffMiddle: TButton
     Left = 302
     Top = 500
     Width = 75
     Height = 25
     Caption = 'Save...'
     TabOrder = 10
-    OnClick = ButtonSaveDiff1Click
+    OnClick = ButtonSaveDiffMiddleClick
   end
-  object MemoRight2: TMemo
+  object MemoRight: TMemo
     Left = 454
     Top = 39
     Width = 217
     Height = 257
     Lines.Strings = (
-      'The text 1 begins here'
-      'This is some text 1'
-      'Some lines are deleted from text 1'
-      'This is some other text 1'
-      'This is still text 1'
-      'This text 1 will be replaced'
-      'The text 1 ends here'
-      'The text 2 begins here'
-      'This is some text 2'
-      'This is some other text 2'
-      'Some lines are added to text 2'
-      'This is still text 2'
-      'This text 2 is replaced'
-      'The text 2 ends here')
+      'The text begins here'
+      'This line 0 is just added'
+      'This line 1 is just added'
+      'This line 2 is replaced'
+      'The text continues here'
+      'This line was deleted and is added again'
+      'This is a text marker'
+      'This is an other text marker'
+      'The text is still here'
+      'This line 0 is added'
+      'This line 1 is replaced'
+      'This line 2 is replaced again'
+      'This is the end of the text')
     TabOrder = 11
     WordWrap = False
   end
-  object ButtonLoadRight2: TButton
+  object ButtonLoadRight: TButton
     Left = 525
     Top = 8
     Width = 75
     Height = 25
     Caption = 'Load...'
     TabOrder = 12
-    OnClick = ButtonLoadRight2Click
+    OnClick = ButtonLoadRightClick
   end
-  object ButtonDiff2: TButton
+  object ButtonDiffRight: TButton
     Left = 525
     Top = 302
     Width = 75
     Height = 25
     Caption = 'Diff'
     TabOrder = 13
-    OnClick = ButtonDiff2Click
+    OnClick = ButtonDiffRightClick
   end
-  object MemoDiff2: TMemo
+  object MemoDiffRight: TMemo
     Left = 454
     Top = 333
     Width = 217
@@ -236,19 +231,19 @@ object FormMain: TFormMain
     TabOrder = 14
     WordWrap = False
   end
-  object ButtonSaveDiff2: TButton
+  object ButtonSaveDiffRight: TButton
     Left = 525
     Top = 500
     Width = 75
     Height = 25
     Caption = 'Save...'
     TabOrder = 15
-    OnClick = ButtonSaveDiff2Click
+    OnClick = ButtonSaveDiffRightClick
   end
   object ButtonDiffAll: TButton
-    Left = 64
+    Left = 72
     Top = 302
-    Width = 34
+    Width = 26
     Height = 25
     Caption = 'Diff'
     TabOrder = 16

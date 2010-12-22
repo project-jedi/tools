@@ -15,6 +15,9 @@ type
     ButtonLoadLeft: TButton;
     ButtonLoadRight: TButton;
     ButtonSaveDiff: TButton;
+    LabelLeft: TLabel;
+    LabelRight: TLabel;
+    LabelDiff: TLabel;
     procedure ButtonDiffClick(Sender: TObject);
     procedure ButtonLoadLeftClick(Sender: TObject);
     procedure ButtonLoadRightClick(Sender: TObject);

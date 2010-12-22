@@ -1,4 +1,4 @@
-unit Merge3MainUnit;
+unit MergeAfterMainUnit;
 
 interface
 
@@ -9,38 +9,38 @@ uses
 type
   TFormMain = class(TForm)
     MemoLeft: TMemo;
-    MemoRight1: TMemo;
-    ButtonDiff1: TButton;
+    MemoMiddle: TMemo;
+    ButtonDiffMiddle: TButton;
     MemoMerge: TMemo;
     ButtonLoadLeft: TButton;
-    ButtonLoadRight1: TButton;
+    ButtonLoadMiddle: TButton;
     ButtonSaveMerge: TButton;
     ButtonMergeInPlace: TButton;
     ButtonMergeOutOfPlace: TButton;
-    MemoDiff1: TMemo;
-    ButtonSaveDiff1: TButton;
-    MemoRight2: TMemo;
-    ButtonLoadRight2: TButton;
-    ButtonDiff2: TButton;
-    MemoDiff2: TMemo;
-    ButtonSaveDiff2: TButton;
+    MemoDiffMiddle: TMemo;
+    ButtonSaveDiffMiddle: TButton;
+    MemoRight: TMemo;
+    ButtonLoadRight: TButton;
+    ButtonDiffRight: TButton;
+    MemoDiffRight: TMemo;
+    ButtonSaveDiffRight: TButton;
     ButtonDiffAll: TButton;
     LabelLeft: TLabel;
-    LabelRight1: TLabel;
-    LabelRight2: TLabel;
-    LabelMerge: TLabel;
-    LabelDiff1: TLabel;
-    LabelDiff2: TLabel;
-    procedure ButtonDiff1Click(Sender: TObject);
+    LabelMiddle: TLabel;
+    LabelRight: TLabel;
+    LabelLeftRight: TLabel;
+    LabelLeftMiddle: TLabel;
+    LabelMiddleRight: TLabel;
+    procedure ButtonDiffMiddleClick(Sender: TObject);
     procedure ButtonLoadLeftClick(Sender: TObject);
-    procedure ButtonLoadRight1Click(Sender: TObject);
+    procedure ButtonLoadMiddleClick(Sender: TObject);
     procedure ButtonSaveMergeClick(Sender: TObject);
     procedure ButtonMergeInPlaceClick(Sender: TObject);
     procedure ButtonMergeOutOfPlaceClick(Sender: TObject);
-    procedure ButtonSaveDiff1Click(Sender: TObject);
-    procedure ButtonLoadRight2Click(Sender: TObject);
-    procedure ButtonDiff2Click(Sender: TObject);
-    procedure ButtonSaveDiff2Click(Sender: TObject);
+    procedure ButtonSaveDiffMiddleClick(Sender: TObject);
+    procedure ButtonLoadRightClick(Sender: TObject);
+    procedure ButtonDiffRightClick(Sender: TObject);
+    procedure ButtonSaveDiffRightClick(Sender: TObject);
     procedure ButtonDiffAllClick(Sender: TObject);
   private
     procedure Diff(StringsDiff: TStringsSimpleDiff; MemoDiff: TMemo);
@@ -81,27 +81,27 @@ begin
   end;
 end;
 
-procedure TFormMain.ButtonDiff1Click(Sender: TObject);
+procedure TFormMain.ButtonDiffMiddleClick(Sender: TObject);
 var
   StringsDiff: TStringsSimpleDiff;
 begin
   StringsDiff := TStringsSimpleDiff.Create;
   try
-    StringsDiff.Diff(MemoLeft.Lines, MemoRight1.Lines);
-    Diff(StringsDiff, MemoDiff1);
+    StringsDiff.Diff(MemoLeft.Lines, MemoMiddle.Lines);
+    Diff(StringsDiff, MemoDiffMiddle);
   finally
     StringsDiff.Free;
   end;
 end;
 
-procedure TFormMain.ButtonDiff2Click(Sender: TObject);
+procedure TFormMain.ButtonDiffRightClick(Sender: TObject);
 var
   StringsDiff: TStringsSimpleDiff;
 begin
   StringsDiff := TStringsSimpleDiff.Create;
   try
-    StringsDiff.Diff(MemoLeft.Lines, MemoRight2.Lines);
-    Diff(StringsDiff, MemoDiff2);
+    StringsDiff.Diff(MemoMiddle.Lines, MemoRight.Lines);
+    Diff(StringsDiff, MemoDiffRight);
   finally
     StringsDiff.Free;
   end;
@@ -114,13 +114,13 @@ begin
   StringsDiff1 := TStringsSimpleDiff.Create;
   StringsDiff2 := TStringsSimpleDiff.Create;
   try
-    StringsDiff1.Diff(MemoLeft.Lines, MemoRight1.Lines);
-    StringsDiff2.Diff(MemoLeft.Lines, MemoRight2.Lines);
+    StringsDiff1.Diff(MemoLeft.Lines, MemoMiddle.Lines);
+    StringsDiff2.Diff(MemoMiddle.Lines, MemoRight.Lines);
 
-    StringsDiff2.DefaultConflictResolution := crAutomatic;
-    StringsDiff2.Add(StringsDiff1, mpSame);
+    StringsDiff1.DefaultConflictResolution := crAutomatic;
+    StringsDiff1.Add(StringsDiff2, mpAfter);
 
-    Diff(StringsDiff2, MemoMerge);
+    Diff(StringsDiff1, MemoMerge);
   finally
     StringsDiff1.Free;
     StringsDiff2.Free;
@@ -136,22 +136,22 @@ begin
     MemoLeft.Lines.LoadFromFile(AFileName);
 end;
 
-procedure TFormMain.ButtonLoadRight1Click(Sender: TObject);
+procedure TFormMain.ButtonLoadMiddleClick(Sender: TObject);
 var
   AFileName: string;
 begin
   AFileName := '';
   if PromptForFileName(AFileName, '', '', 'Choose the right file 1...') then
-    MemoRight1.Lines.LoadFromFile(AFileName);
+    MemoMiddle.Lines.LoadFromFile(AFileName);
 end;
 
-procedure TFormMain.ButtonLoadRight2Click(Sender: TObject);
+procedure TFormMain.ButtonLoadRightClick(Sender: TObject);
 var
   AFileName: string;
 begin
   AFileName := '';
   if PromptForFileName(AFileName, '', '', 'Choose the right file 2...') then
-    MemoRight2.Lines.LoadFromFile(AFileName);
+    MemoRight.Lines.LoadFromFile(AFileName);
 end;
 
 procedure TFormMain.ButtonMergeInPlaceClick(Sender: TObject);
@@ -161,11 +161,11 @@ begin
   StringsDiff1 := TStringsSimpleDiff.Create;
   StringsDiff2 := TStringsSimpleDiff.Create;
   try
-    StringsDiff1.Diff(MemoLeft.Lines, MemoRight1.Lines);
-    StringsDiff2.Diff(MemoLeft.Lines, MemoRight2.Lines);
+    StringsDiff1.Diff(MemoLeft.Lines, MemoMiddle.Lines);
+    StringsDiff2.Diff(MemoMiddle.Lines, MemoRight.Lines);
 
     StringsDiff1.DefaultConflictResolution := crAutomatic;
-    StringsDiff1.Add(StringsDiff2, mpSame);
+    StringsDiff1.Add(StringsDiff2, mpAfter);
 
     MemoMerge.Lines.Assign(MemoLeft.Lines);
     StringsDiff1.Check(MemoMerge.Lines);
@@ -183,11 +183,11 @@ begin
   StringsDiff1 := TStringsSimpleDiff.Create;
   StringsDiff2 := TStringsSimpleDiff.Create;
   try
-    StringsDiff1.Diff(MemoLeft.Lines, MemoRight1.Lines);
-    StringsDiff2.Diff(MemoLeft.Lines, MemoRight2.Lines);
+    StringsDiff1.Diff(MemoLeft.Lines, MemoMiddle.Lines);
+    StringsDiff2.Diff(MemoMiddle.Lines, MemoRight.Lines);
 
     StringsDiff1.DefaultConflictResolution := crAutomatic;
-    StringsDiff1.Add(StringsDiff2, mpSame);
+    StringsDiff1.Add(StringsDiff2, mpAfter);
 
     StringsDiff1.Check(MemoLeft.Lines);
     StringsDiff1.Merge(MemoLeft.Lines, MemoMerge.Lines);
@@ -197,22 +197,22 @@ begin
   end;
 end;
 
-procedure TFormMain.ButtonSaveDiff1Click(Sender: TObject);
+procedure TFormMain.ButtonSaveDiffMiddleClick(Sender: TObject);
 var
   AFileName: string;
 begin
   AFileName := '';
   if PromptForFileName(AFileName, '', '', 'Choose the diff file 1...', '', True) then
-    MemoDiff1.Lines.SaveToFile(AFileName);
+    MemoDiffMiddle.Lines.SaveToFile(AFileName);
 end;
 
-procedure TFormMain.ButtonSaveDiff2Click(Sender: TObject);
+procedure TFormMain.ButtonSaveDiffRightClick(Sender: TObject);
 var
   AFileName: string;
 begin
   AFileName := '';
   if PromptForFileName(AFileName, '', '', 'Choose the diff file 2...', '', True) then
-    MemoDiff2.Lines.SaveToFile(AFileName);
+    MemoDiffRight.Lines.SaveToFile(AFileName);
 end;
 
 procedure TFormMain.ButtonSaveMergeClick(Sender: TObject);

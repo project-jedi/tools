@@ -14,6 +14,38 @@ object FormMain: TFormMain
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object LabelLeft: TLabel
+    Left = 8
+    Top = 20
+    Width = 23
+    Height = 13
+    Caption = '&Left:'
+    FocusControl = MemoLeft
+  end
+  object LabelRight: TLabel
+    Left = 231
+    Top = 20
+    Width = 29
+    Height = 13
+    Caption = '&Right:'
+    FocusControl = MemoRight
+  end
+  object LabelMerge: TLabel
+    Left = 8
+    Top = 314
+    Width = 34
+    Height = 13
+    Caption = '&Merge:'
+    FocusControl = MemoMerge
+  end
+  object LabelDiff: TLabel
+    Left = 231
+    Top = 314
+    Width = 21
+    Height = 13
+    Caption = '&Diff:'
+    FocusControl = MemoDiff
+  end
   object MemoLeft: TMemo
     Left = 8
     Top = 39
@@ -91,7 +123,7 @@ object FormMain: TFormMain
     OnClick = ButtonSaveMergeClick
   end
   object ButtonMergeInPlace: TButton
-    Left = 119
+    Left = 150
     Top = 302
     Width = 75
     Height = 25
@@ -100,7 +132,7 @@ object FormMain: TFormMain
     OnClick = ButtonMergeInPlaceClick
   end
   object ButtonMergeOutOfPlace: TButton
-    Left = 38
+    Left = 69
     Top = 302
     Width = 75
     Height = 25

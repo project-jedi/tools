@@ -6,13 +6,14 @@
   <ItemGroup>
     <Projects Include="DiffDemo.dproj" />
     <Projects Include="Merge3Demo.dproj" />
+    <Projects Include="MergeAfterDemo.dproj" />
     <Projects Include="MergeDemo.dproj" />
   </ItemGroup>
   <ProjectExtensions>
     <Borland.Personality>Default.Personality</Borland.Personality>
     <Borland.ProjectType />
     <BorlandProject>
-  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
   <Target Name="DiffDemo">
     <MSBuild Projects="DiffDemo.dproj" Targets="" />
@@ -41,14 +42,23 @@
   <Target Name="Merge3Demo:Make">
     <MSBuild Projects="Merge3Demo.dproj" Targets="Make" />
   </Target>
+  <Target Name="MergeAfterDemo">
+    <MSBuild Projects="MergeAfterDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="MergeAfterDemo:Clean">
+    <MSBuild Projects="MergeAfterDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="MergeAfterDemo:Make">
+    <MSBuild Projects="MergeAfterDemo.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="DiffDemo;MergeDemo;Merge3Demo" />
+    <CallTarget Targets="DiffDemo;MergeDemo;Merge3Demo;MergeAfterDemo" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="DiffDemo:Clean;MergeDemo:Clean;Merge3Demo:Clean" />
+    <CallTarget Targets="DiffDemo:Clean;MergeDemo:Clean;Merge3Demo:Clean;MergeAfterDemo:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="DiffDemo:Make;MergeDemo:Make;Merge3Demo:Make" />
+    <CallTarget Targets="DiffDemo:Make;MergeDemo:Make;Merge3Demo:Make;MergeAfterDemo:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>
