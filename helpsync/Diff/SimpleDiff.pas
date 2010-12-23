@@ -44,7 +44,7 @@ type
   end;
   TStringSimpleDiffs = array of TStringSimpleDiff;
 
-  TMergePosition = (mpSame, mpAfter, mpBefore);
+  TMergePosition = (mpSame, mpAfter); // mpBefore not supported yet
 
   TStringsSimpleDiff = class;
 
@@ -52,7 +52,7 @@ type
 
   TMergeConflictEvent = procedure (Sender: TStringsSimpleDiff;
     MyIndex: Integer; var NewStringDiff: TStringSimpleDiff;
-    var MergePosition: TMergePosition; var Resolution: TConflictResolution) of object;
+    MergePosition: TMergePosition; var Resolution: TConflictResolution) of object;
 
   TStringsSimpleDiff = class
   private
@@ -291,8 +291,6 @@ end;
 procedure TStringsSimpleDiff.InternalAdd(var NewStringDiff: TStringSimpleDiff;
   Position: TMergePosition);
   function CheckIndexes(MyIndex, NewIndex: Integer; var I: Integer): Boolean;
-  var
-    OldPosition: TMergePosition;
   begin
     Result := False;
     if MyIndex > NewIndex then
@@ -302,11 +300,7 @@ procedure TStringsSimpleDiff.InternalAdd(var NewStringDiff: TStringSimpleDiff;
     if MyIndex = NewIndex then
     begin
       // merge possible conflicts at the same position
-      OldPosition := Position;
       Result := MergeConflict(I, NewStringDiff, Position);
-      // the insertion order changed, restart from the beginning
-      if OldPosition <> Position then
-        I := -1;
     end;
   end;
 var
@@ -328,13 +322,13 @@ begin
           Break;
         Inc(I);
       end;
-    mpBefore:
+    {mpBefore:
       while I < Count do
       begin
         if CheckIndexes(FStringDiffs[I].LeftIndex, NewStringDiff.RightIndex, I) then
           Break;
         Inc(I);
-      end;
+      end;}
   end;
 
   if not IsNone(NewStringDiff.Flags) then
@@ -353,9 +347,9 @@ begin
     case Position of
       mpAfter:
         NewStringDiff.LeftIndex := NewStringDiff.RightIndex - SelfOffset;
-      mpSame,
-      mpBefore:
+      mpSame:
         NewStringDiff.RightIndex := NewStringDiff.LeftIndex + SelfOffset;
+      // mpBefore:
     end;
 
     J := FCount;
@@ -366,9 +360,9 @@ begin
       case Position of
         mpAfter:
           Inc(FStringDiffs[J].RightIndex, NewOffset);
-        mpSame,
-        mpBefore:
+        mpSame:
           Dec(FStringDiffs[J].LeftIndex, NewOffset);
+        // mpBefore:
       end;
       Dec(J);
     end;
@@ -570,7 +564,6 @@ begin
              IsInsert(NewStringDiff.Flags) then
           begin
             // the new insertion must be inserted before the previous one
-            NewStringDiff.RightIndex := FStringDiffs[MyIndex].RightIndex;
             Resolution := crDone;
           end
           else
@@ -620,7 +613,84 @@ begin
             Resolution := crDone;
           end;
         end;
-      mpBefore: ; // TODO
+      {mpBefore:
+        begin
+          // merge deletion followed by an insertion
+          if IsDelete(NewStringDiff.Flags) and IsInsert(FStringDiffs[MyIndex].Flags) then
+          begin
+            // change existing diff to be a modification, discard new diff
+            Include(FStringDiffs[MyIndex].Flags, dfDelete);
+            FStringDiffs[MyIndex].LeftValue := NewStringDiff.LeftValue;
+            for I := MyIndex + 1 to Count - 1 do
+              Inc(FStringDiffs[I].LeftIndex);
+            NewStringDiff.Flags := [];
+            Resolution := crDone;
+          end
+          else
+          // merge modifications followed by a deletion
+          if IsModify(NewStringDiff.Flags) and IsDelete(FStringDiffs[MyIndex].Flags) and
+             FStrCompare(NewStringDiff.RightValue, FStringDiffs[MyIndex].LeftValue) then
+          begin
+            // change the existing diff left value and discard new diff
+            FStringDiffs[MyIndex].LeftValue := NewStringDiff.LeftValue;
+            NewStringDiff.Flags := [];
+            Resolution := crDone;
+          end
+          else
+          // merge insertion followed by a deletion
+          if IsInsert(NewStringDiff.Flags) and IsDelete(FStringDiffs[MyIndex].Flags) and
+             FStrCompare(NewStringDiff.RightValue, FStringDiffs[MyIndex].LeftValue) then
+          begin
+            // delete existing and new diffs
+            Delete(MyIndex);
+            // fix right indexes: they were shifted by the call to delete()
+            for I := MyIndex to Count - 1 do
+              Dec(FStringDiffs[I].RightIndex);
+            NewStringDiff.Flags := [];
+            Resolution := crDone;
+          end
+          else
+          // merge successive modifications
+          if IsModify(NewStringDiff.Flags) and IsModify(FStringDiffs[MyIndex].Flags) and
+             FStrCompare(NewStringDiff.RightValue, FStringDiffs[MyIndex].LeftValue) then
+          begin
+            // change existing diff from the old value and discard the new diff
+            FStringDiffs[MyIndex].LeftValue := NewStringDiff.LeftValue;
+            NewStringDiff.Flags := []; // change to nop
+            Resolution := crDone;
+          end
+          else
+          // merge insertion followed by a modification
+          if IsInsert(NewStringDiff.Flags) and IsModify(FStringDiffs[MyIndex].Flags) and
+             FStrCompare(NewStringDiff.RightValue, FStringDiffs[MyIndex].LeftValue) then
+          begin
+            // change existing diff to become an insertion and discard the new diff
+            Exclude(FStringDiffs[MyIndex].Flags, dfDelete);
+            FStringDiffs[MyIndex].LeftValue := '';
+            for I := MyIndex + 1 to Count - 1 do
+              Dec(FStringDiffs[I].LeftIndex);
+            NewStringDiff.Flags := []; // change to nop
+            Resolution := crDone;
+          end
+          else
+          // merge successive insertions or modification followed by an insertion
+          if (IsInsert(NewStringDiff.Flags) or IsModify(NewStringDiff.Flags)) and
+             IsInsert(FStringDiffs[MyIndex].Flags) then
+          begin
+            // the new insertion must be inserted after the next one
+            //Inc(NewStringDiff.RightIndex);
+            Resolution := crAutomatic;
+          end
+          else
+          // merge successive deletions or deletion followed by a modification
+          if IsDelete(NewStringDiff.Flags) and
+             (IsDelete(FStringDiffs[MyIndex].Flags) or IsModify(FStringDiffs[MyIndex].Flags)) then
+          begin
+            // the deletion must be inserted before the next deletion or modification
+            Resolution := crDone;
+          end
+          else
+        end;}
     end;
   end
   else
