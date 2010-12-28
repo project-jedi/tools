@@ -103,13 +103,11 @@ end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if Action = caFree then
-  begin
-    FreeAndNil(FFileStream);
-    // logout is required
-    FMediaWikiApi.Logout;
-    FMediaWikiApi.Free;
-  end;
+  Action := caFree;
+  FreeAndNil(FFileStream);
+  // logout is required
+  FMediaWikiApi.Logout;
+  FMediaWikiApi.Free;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
