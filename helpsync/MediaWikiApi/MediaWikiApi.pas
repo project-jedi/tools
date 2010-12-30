@@ -62,25 +62,25 @@ type
   TMediaWikiWarningCallback = procedure (Sender: TMediaWikiApi; const AInfo, AQuery: string; var Ignore: Boolean);
   TMediaWikiErrorCallback = procedure (Sender: TMediaWikiApi; const AInfo, ACode: string; var Ignore: Boolean);
   TMediaWikiXMLCallback = procedure (Sender: TMediaWikiApi; XML: TJclSimpleXML) of object;
-  TMediaWikiStringCallback = procedure (Sender: TMediaWikiApi; const Value: string) of object;
   TMediaWikiStringsCallback = procedure (Sender: TMediaWikiApi; AStrings: TStrings) of object;
   TMediaWikiExtensionsCallback = procedure (Sender: TMediaWikiApi; const Extensions: TMediaWikiExtensions) of object;
   TMediaWikiBooleanCallback = procedure (Sender: TMediaWikiApi; Value: Boolean) of object;
   TMediaWikiIntegerCallback = procedure (Sender: TMediaWikiApi; Value: Integer) of object;
   TMediaWikiRateLimitsCallback = procedure (Sender: TMediaWikiApi; const RateLimits: TMediaWikiRateLimits) of object;
   TMediaWikiPageInfosCallback = procedure (Sender: TMediaWikiApi; const PageInfos: TMediaWikiPageInfos) of object;
-  TMediaWikiPageRevisionInfosCallback = procedure (Sender: TMediaWikiApi; const PageRevisionInfos: TMediaWikiPageRevisionInfos) of object;
+  TMediaWikiPageRevisionInfosCallback = procedure (Sender: TMediaWikiApi; const PageRevisionInfos: TMediaWikiPageRevisionInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
   TMediaWikiRevisionRangeCallback = procedure (Sender: TMediaWikiApi; StartRevID, EndRevID: TMediaWikiID) of object;
-  TMediaWikiPageCategoryCallback = procedure (Sender: TMediaWikiApi; const PageCategoryInfos: TMediaWikiPageCategoryInfos) of object;
-  TMediaWikiPageLinkCallback = procedure (Sender: TMediaWikiApi; const PageLinkInfos: TMediaWikiPageLinkInfos) of object;
-  TMediaWikiPageTemplateCallback = procedure (Sender: TMediaWikiApi; const PageTemplateInfos: TMediaWikiPageTemplateInfos) of object;
-  TMediaWikiPageExtLinkCallback = procedure (Sender: TMediaWikiApi; const PageExtLinkInfos: TMediaWikiPageExtLinkInfos) of object;
-  TMediaWikiAllPageCallback = procedure (Sender: TMediaWikiApi; const AllPages: TMediaWikiAllPageInfos) of object;
-  TMediaWikiAllLinkCallback = procedure (Sender: TMediaWikiApi; const AllLinks: TMediaWikiAllLinkInfos) of object;
-  TMediaWikiAllUserCallback = procedure (Sender: TMediaWikiApi; const AllUsers: TMediaWikiAllUserInfos) of object;
-  TMediaWikiBackLinkCallback = procedure (Sender: TMediaWikiApi; const BackLinks: TMediaWikiBackLinkInfos) of object;
-  TMediaWikiBlockCallback = procedure (Sender: TMediaWikiApi; const Blocks: TMediaWikiBlockInfos) of object;
-  TMediaWikiCategoryMemberCallback = procedure (Sender: TMediaWikiApi; const CategoryMembers: TMediaWikiCategoryMemberInfos) of object;
+  TMediaWikiPageCategoryCallback = procedure (Sender: TMediaWikiApi; const PageCategoryInfos: TMediaWikiPageCategoryInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiPageLinkCallback = procedure (Sender: TMediaWikiApi; const PageLinkInfos: TMediaWikiPageLinkInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiPageTemplateCallback = procedure (Sender: TMediaWikiApi; const PageTemplateInfos: TMediaWikiPageTemplateInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiPageExtLinkCallback = procedure (Sender: TMediaWikiApi; const PageExtLinkInfos: TMediaWikiPageExtLinkInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiAllPageCallback = procedure (Sender: TMediaWikiApi; const AllPages: TMediaWikiAllPageInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiAllLinkCallback = procedure (Sender: TMediaWikiApi; const AllLinks: TMediaWikiAllLinkInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiAllCategoriesCallback = procedure (Sender: TMediaWikiApi; ACategories: TStrings; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiAllUserCallback = procedure (Sender: TMediaWikiApi; const AllUsers: TMediaWikiAllUserInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiBackLinkCallback = procedure (Sender: TMediaWikiApi; const BackLinks: TMediaWikiBackLinkInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiBlockCallback = procedure (Sender: TMediaWikiApi; const Blocks: TMediaWikiBlockInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
+  TMediaWikiCategoryMemberCallback = procedure (Sender: TMediaWikiApi; const CategoryMembers: TMediaWikiCategoryMemberInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
   TMediaWikiEditCallback = procedure (Sender: TMediaWikiApi; const EditInfo: TMediaWikiEditInfo) of object;
   TMediaWikiMoveCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiMoveInfo) of object;
   TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiDeleteInfo) of object;
@@ -388,51 +388,52 @@ type
   // Queries, revisions / rv: Returns revisions for a given page
   private
     FOnQueryPageRevisionInfoDone: TMediaWikiPageRevisionInfosCallback;
-    FOnQueryPageRevisionInfoContinue: TMediaWikiRevisionRangeCallback;
     FQueryPageRevisionInfos: TMediaWikiPageRevisionInfos;
+    FQueryPageRevisionContinueInfo: TMediaWikiContinueInfo;
     procedure QueryPageRevisionInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryPageRevisionInfo(const Titles: string; PageID: Boolean;
       Flags: TMediaWikiPageRevisionInfoFlags; out Infos: TMediaWikiPageRevisionInfos;
+      var ContinueInfo: TMediaWikiContinueInfo;
       MaxRevisions: Integer = 0; Section: Integer = -1; StartRevisionID: TMediaWikiID = -1;
       EndRevisionID: TMediaWikiID = -1; const StartDateTime: TDateTime = 0.0;
       const EndDateTime: TDateTime = 0.0; const IncludeUser: string = '';
       const ExcludeUser: string = ''); overload;
     function QueryPageRevisionInfo(const Titles: string; PageID: Boolean;
       Flags: TMediaWikiPageRevisionInfoFlags; OutputFormat: TMediaWikiOutputFormat;
+      const ContinueInfo: TMediaWikiContinueInfo;
       MaxRevisions: Integer = 0; Section: Integer = -1; StartRevisionID: TMediaWikiID = -1;
       EndRevisionID: TMediaWikiID = -1; const StartDateTime: TDateTime = 0.0;
       const EndDateTime: TDateTime = 0.0; const IncludeUser: string = '';
       const ExcludeUser: string = ''): AnsiString; overload;
     procedure QueryPageRevisionInfoAsync(const Titles: string; PageID: Boolean;
-      Flags: TMediaWikiPageRevisionInfoFlags; MaxRevisions: Integer = 0;
+      Flags: TMediaWikiPageRevisionInfoFlags; const ContinueInfo: TMediaWikiContinueInfo;
+      MaxRevisions: Integer = 0;
       Section: Integer = -1; StartRevisionID: TMediaWikiID = -1;
       EndRevisionID: TMediaWikiID = -1; const StartDateTime: TDateTime = 0.0;
       const EndDateTime: TDateTime = 0.0; const IncludeUser: string = '';
       const ExcludeUser: string = '');
     property OnQueryPageRevisionInfoDone: TMediaWikiPageRevisionInfosCallback read FOnQueryPageRevisionInfoDone write FOnQueryPageRevisionInfoDone;
-    property OnQueryPageRevisionInfoContinue: TMediaWikiRevisionRangeCallback read FOnQueryPageRevisionInfoContinue write FOnQueryPageRevisionInfoContinue;
 
   // Queries, categories / cl: Gets a list of all categories
   private
     FOnQueryPageCategoryInfoDone: TMediaWikiPageCategoryCallback;
-    FOnQueryPageCategoryInfoContinue: TMediaWikiStringCallback;
     FQueryPageCategoryInfos: TMediaWikiPageCategoryInfos;
+    FQueryPageCategoryContinueInfo: TMediaWikiContinueInfo;
     procedure QueryPageCategoryInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryPageCategoryInfo(const Titles: string; PageID: Boolean;
       Flags: TMediaWikiPageCategoryInfoFlags; out Infos: TMediaWikiPageCategoryInfos;
-      MaxCategories: Integer = 0; const CategoryTitles: string = '';
-      const CategoryStart: string = ''); overload;
+      var ContinueInfo: TMediaWikiContinueInfo;
+      MaxCategories: Integer = 0; const CategoryTitles: string = ''); overload;
     function QueryPageCategoryInfo(const Titles: string; PageID: Boolean;
       Flags: TMediaWikiPageCategoryInfoFlags; OutputFormat: TMediaWikiOutputFormat;
-      MaxCategories: Integer; const CategoryTitles: string;
-      const CategoryStart: string = ''): AnsiString; overload;
+      const ContinueInfo: TMediaWikiContinueInfo;
+      MaxCategories: Integer = 0; const CategoryTitles: string = ''): AnsiString; overload;
     procedure QueryPageCategoryInfoAsync(const Titles: string; PageID: Boolean;
-      Flags: TMediaWikiPageCategoryInfoFlags; MaxCategories: Integer = 0;
-      const CategoryTitles: string = ''; const CategoryStart: string = '');
+      Flags: TMediaWikiPageCategoryInfoFlags; const ContinueInfo: TMediaWikiContinueInfo;
+      MaxCategories: Integer = 0; const CategoryTitles: string = '');
     property OnQueryPageCategoryInfoDone: TMediaWikiPageCategoryCallback read FOnQueryPageCategoryInfoDone write FOnQueryPageCategoryInfoDone;
-    property OnQueryPageCategoryInfoContinue: TMediaWikiStringCallback read FOnQueryPageCategoryInfoContinue write FOnQueryPageCategoryInfoContinue;
 
   // Queries, imageinfo / ii: Gets image information TODO
 
@@ -441,52 +442,49 @@ type
   // Queries, links / pl: Gets a list of all links
   private
     FOnQueryPageLinkInfoDone: TMediaWikiPageLinkCallback;
-    FOnQueryPageLinkInfoContinue: TMediaWikiStringCallback;
     FQueryPageLinkInfos: TMediaWikiPageLinkInfos;
+    FQueryPageLinkContinueInfo: TMediaWikiContinueInfo;
     procedure QueryPageLinkInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryPageLinkInfo(const Titles: string; PageID: Boolean; out Infos: TMediaWikiPageLinkInfos;
-      MaxLinks: Integer = 0; Namespace: Integer = -1; const LinkStart: string = ''); overload;
+      var ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0; Namespace: Integer = -1); overload;
     function QueryPageLinkInfo(const Titles: string; PageID: Boolean; OutputFormat: TMediaWikiOutputFormat;
-      MaxLinks: Integer = 0; Namespace: Integer = -1; const LinkStart: string = ''): AnsiString; overload;
+      const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0; Namespace: Integer = -1): AnsiString; overload;
     procedure QueryPageLinkInfoAsync(const Titles: string; PageID: Boolean;
-      MaxLinks: Integer = 0; Namespace: Integer = -1; const LinkStart: string = '');
+      const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0; Namespace: Integer = -1);
     property OnQueryPageLinkInfoDone: TMediaWikiPageLinkCallback read FOnQueryPageLinkInfoDone write FOnQueryPageLinkInfoDone;
-    property OnQueryPageLinkInfoContinue: TMediaWikiStringCallback read FOnQueryPageLinkInfoContinue write FOnQueryPageLinkInfoContinue;
 
   // Queries, templates / tl: Gets a list of all pages included in the provided pages
   private
     FOnQueryPageTemplateInfoDone: TMediaWikiPageTemplateCallback;
-    FOnQueryPageTemplateInfoContinue: TMediaWikiStringCallback;
     FQueryPageTemplateInfos: TMediaWikiPageTemplateInfos;
+    FQueryPageTemplateContinueInfo: TMediaWikiContinueInfo;
     procedure QueryPageTemplateInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryPageTemplateInfo(const Titles: string; PageID: Boolean; out Infos: TMediaWikiPageTemplateInfos;
-      MaxTemplates: Integer = 0; Namespace: Integer = -1; TemplateStart: string = ''); overload;
+      var ContinueInfo: TMediaWikiContinueInfo; MaxTemplates: Integer = 0; Namespace: Integer = -1); overload;
     function QueryPageTemplateInfo(const Titles: string; PageID: Boolean; OutputFormat: TMediaWikiOutputFormat;
-      MaxTemplates: Integer = 0; Namespace: Integer = -1; TemplateStart: string = ''): AnsiString; overload;
+      const ContinueInfo: TMediaWikiContinueInfo; MaxTemplates: Integer = 0; Namespace: Integer = -1): AnsiString; overload;
     procedure QueryPageTemplateInfoAsync(const Titles: string; PageID: Boolean;
-      MaxTemplates: Integer = 0; Namespace: Integer = -1; TemplateStart: string = '');
+      const ContinueInfo: TMediaWikiContinueInfo; MaxTemplates: Integer = 0; Namespace: Integer = -1);
     property OnQueryPageTemplateInfoDone: TMediaWikiPageTemplateCallback read FOnQueryPageTemplateInfoDone write FOnQueryPageTemplateInfoDone;
-    property OnQueryPageTemplateInfoContinue: TMediaWikiStringCallback read FOnQueryPageTemplateInfoContinue write FOnQueryPageTemplateInfoContinue;
 
   // Queries, images / im: Gets a list of all images used on the provided pages TODO
 
   // Queries, extlinks / el: Gets a list of all external links on the provided pages
   private
     FOnQueryPageExtLinkInfoDone: TMediaWikiPageExtLinkCallback;
-    FOnQueryPageExtLinkInfoContinue: TMediaWikiStringCallback;
     FQueryPageExtLinkInfos: TMediaWikiPageExtLinkInfos;
+    FQueryPageExtLinkContinueInfo: TMediaWikiContinueInfo;
     procedure QueryPageExtLinkInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryPageExtLinkInfo(const Titles: string; PageID: Boolean; out Infos: TMediaWikiPageExtLinkInfos;
-      MaxLinks: Integer = 0; const StartLink: string = ''); overload;
+      var ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0); overload;
     function QueryPageExtLinkInfo(const Titles: string; PageID: Boolean; OutputFormat: TMediaWikiOutputFormat;
-      MaxLinks: Integer = 0; const StartLink: string = ''): AnsiString; overload;
+      const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0): AnsiString; overload;
     procedure QueryPageExtLinkInfoAsync(const Titles: string; PageID: Boolean;
-      MaxLinks: Integer = 0; const StartLink: string = '');
+      const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer = 0);
     property OnQueryPageExtLinkInfoDone: TMediaWikiPageExtLinkCallback read FOnQueryPageExtLinkInfoDone write FOnQueryPageExtLinkInfoDone;
-    property OnQueryPageExtLinkInfoContinue: TMediaWikiStringCallback read FOnQueryPageExtLinkInfoContinue write FOnQueryPageExtLinkInfoContinue;
 
   // Queries, categoryinfo / ci: Gets information about categories TODO
 
@@ -496,148 +494,147 @@ type
   // Queries, list, all pages: Returns a list of pages in a given namespace, ordered by page title.
   private
     FOnQueryAllPageInfoDone: TMediaWikiAllPageCallback;
-    FOnQueryAllPageInfoContinue: TMediaWikiStringCallback;
     FQueryAllPageInfos: TMediaWikiAllPageInfos;
+    FQueryAllPageContinueInfo: TMediaWikiContinueInfo;
     procedure QueryAllPageInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
-    procedure QueryAllPageInfo(out Infos: TMediaWikiAllPageInfos; const StartPage: string = '';
+    procedure QueryAllPageInfo(out Infos: TMediaWikiAllPageInfos; var ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; MaxPage: Integer = 0; Namespace: Integer = -1;
       RedirFilter: TMediaWikiAllPageFilterRedir = mwfAllPageFilterAll;
       LangFilter: TMediaWikiAllPageFilterLang = mwfAllPageLangAll; MinSize: Integer = -1; MaxSize: Integer = -1;
       ProtectionFilter: TMediaWikiAllPageFilterProtection = mwfAllPageProtectionNone;
       LevelFilter: TMediaWikiAllPageFilterLevel = mwfAllPageLevelNone;
       Direction: TMediaWikiAllPageDirection = mwfAllPageAscending); overload;
-    function QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; const StartPage: string = '';
+    function QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; MaxPage: Integer = 0; Namespace: Integer = -1;
       RedirFilter: TMediaWikiAllPageFilterRedir = mwfAllPageFilterAll;
       LangFilter: TMediaWikiAllPageFilterLang = mwfAllPageLangAll; MinSize: Integer = -1; MaxSize: Integer = -1;
       ProtectionFilter: TMediaWikiAllPageFilterProtection = mwfAllPageProtectionNone;
       LevelFilter: TMediaWikiAllPageFilterLevel = mwfAllPageLevelNone;
       Direction: TMediaWikiAllPageDirection = mwfAllPageAscending): AnsiString; overload;
-    procedure QueryAllPageInfoAsync(const StartPage: string = ''; const Prefix: string = ''; MaxPage: Integer = 0;
+    procedure QueryAllPageInfoAsync(const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string = ''; MaxPage: Integer = 0;
       Namespace: Integer = -1; RedirFilter: TMediaWikiAllPageFilterRedir = mwfAllPageFilterAll;
       LangFilter: TMediaWikiAllPageFilterLang = mwfAllPageLangAll; MinSize: Integer = -1; MaxSize: Integer = -1;
       ProtectionFilter: TMediaWikiAllPageFilterProtection = mwfAllPageProtectionNone;
       LevelFilter: TMediaWikiAllPageFilterLevel = mwfAllPageLevelNone;
       Direction: TMediaWikiAllPageDirection = mwfAllPageAscending);
     property OnQueryAllPageInfoDone: TMediaWikiAllPageCallback read FOnQueryAllPageInfoDone write FOnQueryAllPageInfoDone;
-    property OnQueryAllPageInfoContinue: TMediaWikiStringCallback read FOnQueryAllPageInfoContinue write FOnQueryAllPageInfoContinue;
 
   // Queries, list, all links: Returns a list of (unique) links to pages in a given namespace starting ordered by link title.
   private
     FOnQueryAllLinkInfoDone: TMediaWikiAllLinkCallback;
-    FOnQueryAllLinkInfoContinue: TMediaWikiStringCallback;
     FQueryAllLinkInfos: TMediaWikiAllLinkInfos;
+    FQueryAllLinkContinueInfo: TMediaWikiContinueInfo;
     procedure QueryAllLinkInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
-    procedure QueryAllLinkInfo(out Infos: TMediaWikiAllLinkInfos; const StartLink: string = '';
-      const Prefix: string = ''; MaxLink: Integer = 0; const ContinueLink: string = ''; Namespace: Integer = -1;
+    procedure QueryAllLinkInfo(out Infos: TMediaWikiAllLinkInfos; var ContinueInfo: TMediaWikiContinueInfo;
+      const Prefix: string = ''; MaxLink: Integer = 0; Namespace: Integer = -1;
       Flags: TMediaWikiAllLinkInfoFlags = []); overload;
-    function QueryAllLinkInfo(OutputFormat: TMediaWikiOutputFormat; const StartLink: string = '';
-      const Prefix: string = ''; MaxLink: Integer = 0; const ContinueLink: string = ''; Namespace: Integer = -1;
+    function QueryAllLinkInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+      const Prefix: string = ''; MaxLink: Integer = 0; Namespace: Integer = -1;
       Flags: TMediaWikiAllLinkInfoFlags = []): AnsiString; overload;
-    procedure QueryAllLinkInfoAsync(const StartLink: string = '';
-      const Prefix: string = ''; MaxLink: Integer = 0; const ContinueLink: string = ''; Namespace: Integer = -1;
+    procedure QueryAllLinkInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+      const Prefix: string = ''; MaxLink: Integer = 0; Namespace: Integer = -1;
       Flags: TMediaWikiAllLinkInfoFlags = []);
     property OnQueryAllLinkInfoDone: TMediaWikiAllLinkCallback read FOnQueryAllLinkInfoDone write FOnQueryAllLinkInfoDone;
-    property OnQueryAllLinkInfoContinue: TMediaWikiStringCallback read FOnQueryAllLinkInfoContinue write FOnQueryAllLinkInfoContinue;
 
   // Queries, list, all categories: Get a list of all categories.
   private
-    FOnQueryAllCategoryInfoDone: TMediaWikiStringsCallback;
-    FOnQueryAllCategoryInfoContinue: TMediaWikiStringCallback;
+    FOnQueryAllCategoryInfoDone: TMediaWikiAllCategoriesCallback;
     FQueryAllCategoryInfos: TStrings;
+    FQueryAllCategoryContinueInfo: TMediaWikiContinueInfo;
     procedure QueryAllCategoryInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
-    procedure QueryAllCategoryInfo(Infos: TStrings; const StartCategory: string = '';
+    procedure QueryAllCategoryInfo(Infos: TStrings; var ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; MaxCategory: Integer = 0; Flags: TMediaWikiAllCategoryInfoFlags = []); overload;
-    function QueryAllCategoryInfo(OutputFormat: TMediaWikiOutputFormat; const StartCategory: string = '';
+    function QueryAllCategoryInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; MaxCategory: Integer = 0; Flags: TMediaWikiAllCategoryInfoFlags = []): AnsiString; overload;
-    procedure QueryAllCategoryInfoAsync(const StartCategory: string = '';
+    procedure QueryAllCategoryInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; MaxCategory: Integer = 0; Flags: TMediaWikiAllCategoryInfoFlags = []);
-    property OnQueryAllCategoryInfoDone: TMediaWikiStringsCallback read FOnQueryAllCategoryInfoDone write FOnQueryAllCategoryInfoDone;
-    property OnQueryAllCategoryInfoContinue: TMediaWikiStringCallback read FOnQueryAllCategoryInfoContinue write FOnQueryAllCategoryInfoContinue;
+    property OnQueryAllCategoryInfoDone: TMediaWikiAllCategoriesCallback read FOnQueryAllCategoryInfoDone write FOnQueryAllCategoryInfoDone;
 
   // Queries, list, all users: Get a list of registered users, ordered by username.
   private
     FOnQueryAllUserInfoDone: TMediaWikiAllUserCallback;
-    FOnQueryAllUserInfoContinue: TMediaWikiStringCallback;
     FQueryAllUserInfos: TMediaWikiAllUserInfos;
+    FQueryAllUserContinueInfo: TMediaWikiContinueInfo;
     procedure QueryAllUserInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
-    procedure QueryAllUserInfo(out Infos: TMediaWikiAllUserInfos; const StartUser: string = '';
+    procedure QueryAllUserInfo(out Infos: TMediaWikiAllUserInfos; var ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; const Group: string = ''; MaxUser: Integer = 0;
       Flags: TMediaWikiAllUserInfoFlags = []); overload;
-    function QueryAllUserInfo(OutputFormat: TMediaWikiOutputFormat; const StartUser: string = '';
+    function QueryAllUserInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; const Group: string = ''; MaxUser: Integer = 0;
       Flags: TMediaWikiAllUserInfoFlags = []): AnsiString; overload;
-    procedure QueryAllUserInfoAsync(const StartUser: string = '';
+    procedure QueryAllUserInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
       const Prefix: string = ''; const Group: string = ''; MaxUser: Integer = 0;
       Flags: TMediaWikiAllUserInfoFlags = []);
     property OnQueryAllUserInfoDone: TMediaWikiAllUserCallback read FOnQueryAllUserInfoDone write FOnQueryAllUserInfoDone;
-    property OnQueryAllUserInfoContinue: TMediaWikiStringCallback read FOnQueryAllUserInfoContinue write FOnQueryAllUserInfoContinue;
 
   // Queries, list, allimages / ai: Returns a list of all images, ordered by image title. TODO
 
   // Queries, list, all backlinks / bl: Lists pages that link to a given page, similar to Special:Whatlinkshere. Ordered by linking page title.
   private
     FOnQueryBackLinkInfoDone: TMediaWikiBackLinkCallback;
-    FOnQueryBackLinkInfoContinue: TMediaWikiStringCallback;
     FQueryBackLinkInfos: TMediaWikiBackLinkInfos;
+    FQueryBackLinkContinueInfo: TMediaWikiContinueInfo;
     procedure QueryBackLinkInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryBackLinkInfo(const BackLinkTitle: string; out Infos: TMediaWikiBackLinkInfos;
-      Namespace: Integer = -1; MaxLink: Integer = 0; const StartBackLink: string = '';
+      var ContinueInfo: TMediaWikiContinueInfo; Namespace: Integer = -1; MaxLink: Integer = 0;
       Flags: TMediaWikiBackLinkInfoFlags = []); overload;
     function QueryBackLinkInfo(const BackLinkTitle: string; OutputFormat: TMediaWikiOutputFormat;
-      Namespace: Integer = -1; MaxLink: Integer = 0; const StartBackLink: string = '';
+      const ContinueInfo: TMediaWikiContinueInfo; Namespace: Integer = -1; MaxLink: Integer = 0;
       Flags: TMediaWikiBackLinkInfoFlags = []): AnsiString; overload;
     procedure QueryBackLinkInfoAsync(const BackLinkTitle: string;
-      Namespace: Integer = -1; MaxLink: Integer = 0; const StartBackLink: string = '';
+      const ContinueInfo: TMediaWikiContinueInfo; Namespace: Integer = -1; MaxLink: Integer = 0;
       Flags: TMediaWikiBackLinkInfoFlags = []);
     property OnQueryBackLinkInfoDone: TMediaWikiBackLinkCallback read FOnQueryBackLinkInfoDone write FOnQueryBackLinkInfoDone;
-    property OnQueryBackLinkInfoContinue: TMediaWikiStringCallback read FOnQueryBackLinkInfoContinue write FOnQueryBackLinkInfoContinue;
 
   // Queries, list, all blocks / bk: List all blocks, à la Special:Ipblocklist. This module cannot be used as a generator.
   private
     FOnQueryBlockInfoDone: TMediaWikiBlockCallback;
-    FOnQueryBlockInfoContinue: TMediaWikiStringCallback;
     FQueryBlockInfos: TMediaWikiBlockInfos;
+    FQueryBlockContinueInfo: TMediaWikiContinueInfo;
     procedure QueryBlockInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
-    procedure QueryBlockInfo(out Infos: TMediaWikiBlockInfos; const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
-      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0; const StartBlock: string = '';
+    procedure QueryBlockInfo(out Infos: TMediaWikiBlockInfos; var ContinueInfo: TMediaWikiContinueInfo;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0;
       Flags: TMediaWikiBlockInfoFlags = []); overload;
-    function QueryBlockInfo(OutputFormat: TMediaWikiOutputFormat; const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
-      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0; const StartBlock: string = '';
+    function QueryBlockInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0;
       Flags: TMediaWikiBlockInfoFlags = []): AnsiString; overload;
-    procedure QueryBlockInfoAsync(const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
-      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0; const StartBlock: string = '';
+    procedure QueryBlockInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      const BlockIDs: string = ''; const Users: string = ''; const IP: string = ''; MaxBlock: Integer = 0;
       Flags: TMediaWikiBlockInfoFlags = []);
     property OnQueryBlockInfoDone: TMediaWikiBlockCallback read FOnQueryBlockInfoDone write FOnQueryBlockInfoDone;
-    property OnQueryBlockInfoContinue: TMediaWikiStringCallback read FOnQueryBlockInfoContinue write FOnQueryBlockInfoContinue;
 
   // Queries, list, categorymembers / cm: List of pages that belong to a given category, ordered by page sort title.
   private
     FOnQueryCategoryMemberInfoDone: TMediaWikiCategoryMemberCallback;
-    FOnQueryCategoryMemberInfoContinue: TMediaWikiStringCallback;
     FQueryCategoryMemberInfos: TMediaWikiCategoryMemberInfos;
+    FQueryCategoryMemberContinueInfo: TMediaWikiContinueInfo;
     procedure QueryCategoryMemberInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure QueryCategoryMemberInfo(const CategoryTitle: string; out Infos: TMediaWikiCategoryMemberInfos;
-      PageNamespace: Integer = -1; const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      var ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer = -1;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
       const StartSortKey: string = ''; const StopSortKey: string = ''; MaxCategoryMember: Integer = 0;
-      const StartCategoryMember: string = ''; Flags: TMediaWikiCategoryMemberInfoFlags = []); overload;
+      Flags: TMediaWikiCategoryMemberInfoFlags = []); overload;
     function QueryCategoryMemberInfo(const CategoryTitle: string; OutputFormat: TMediaWikiOutputFormat;
-      PageNamespace: Integer = -1; const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      const ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer = -1;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
       const StartSortKey: string = ''; const StopSortKey: string = ''; MaxCategoryMember: Integer = 0;
-      const StartCategoryMember: string = ''; Flags: TMediaWikiCategoryMemberInfoFlags = []): AnsiString; overload;
+      Flags: TMediaWikiCategoryMemberInfoFlags = []): AnsiString; overload;
     procedure QueryCategoryMemberInfoAsync(const CategoryTitle: string;
-      PageNamespace: Integer = -1; const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
+      const ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer = -1;
+      const StartDateTime: TDateTime = 0.0; const StopDateTime: TDateTime = 0.0;
       const StartSortKey: string = ''; const StopSortKey: string = ''; MaxCategoryMember: Integer = 0;
-      const StartCategoryMember: string = ''; Flags: TMediaWikiCategoryMemberInfoFlags = []);
+      Flags: TMediaWikiCategoryMemberInfoFlags = []);
     property OnQueryCategoryMemberInfoDone: TMediaWikiCategoryMemberCallback read FOnQueryCategoryMemberInfoDone write FOnQueryCategoryMemberInfoDone;
-    property OnQueryCategoryMemberInfoContinue: TMediaWikiStringCallback read FOnQueryCategoryMemberInfoContinue write FOnQueryCategoryMemberInfoContinue;
 
   // Queries, list, embeddedin / ei: List pages that include a certain page TODO
 
@@ -2079,6 +2076,7 @@ end;
 
 procedure TMediaWikiApi.QueryPageRevisionInfo(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageRevisionInfoFlags; out Infos: TMediaWikiPageRevisionInfos;
+  var ContinueInfo: TMediaWikiContinueInfo;
   MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
   const StartDateTime, EndDateTime: TDateTime; const IncludeUser, ExcludeUser: string);
 var
@@ -2089,12 +2087,13 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryPageRevisionInfo);
-    MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
+    MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxRevisions, Section, StartRevisionID,
       EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, mwoXML);
     QueryExecuteXML(XML);
     QueryPageRevisionInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryPageRevisionInfos;
+    ContinueInfo := FQueryPageRevisionContinueInfo;
     FQueryPageRevisionInfos := nil;
     XML.Free;
   end;
@@ -2102,46 +2101,42 @@ end;
 
 function TMediaWikiApi.QueryPageRevisionInfo(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageRevisionInfoFlags; OutputFormat: TMediaWikiOutputFormat;
+  const ContinueInfo: TMediaWikiContinueInfo;
   MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
   const StartDateTime, EndDateTime: TDateTime; const IncludeUser, ExcludeUser: string): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryPageRevisionInfo);
-  MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
+  MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxRevisions, Section, StartRevisionID,
     EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryPageRevisionInfoAsync(const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageRevisionInfoFlags; MaxRevisions, Section: Integer;
+  Flags: TMediaWikiPageRevisionInfoFlags; const ContinueInfo: TMediaWikiContinueInfo;
+  MaxRevisions, Section: Integer;
   StartRevisionID, EndRevisionID: TMediaWikiID; const StartDateTime, EndDateTime: TDateTime;
   const IncludeUser, ExcludeUser: string);
 begin
   CheckRequest(mwrQueryPageRevisionInfo);
-  MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxRevisions, Section, StartRevisionID,
+  MediaWikiQueryPageRevisionInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxRevisions, Section, StartRevisionID,
     EndRevisionID, StartDateTime, EndDateTime, IncludeUser, ExcludeUser, mwoXML);
   FRequestCallbacks[mwrQueryPageRevisionInfo] := QueryPageRevisionInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryPageRevisionInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartID, EndID: TMediaWikiID;
 begin
-  MediaWikiQueryPageRevisionInfoParseXmlResult(XML, FQueryPageRevisionInfos);
+  MediaWikiQueryPageRevisionInfoParseXmlResult(XML, FQueryPageRevisionInfos, FQueryPageRevisionContinueInfo);
 
   if Assigned(FOnQueryPageRevisionInfoDone) then
-    FOnQueryPageRevisionInfoDone(Self, FQueryPageRevisionInfos);
-
-  MediaWikiQueryPageRevisionInfoParseXmlResult(XML, StartID, EndID);
-
-  if Assigned(FOnQueryPageRevisionInfoContinue) then
-    FOnQueryPageRevisionInfoContinue(Self, StartID, EndID);
+    FOnQueryPageRevisionInfoDone(Self, FQueryPageRevisionInfos, FQueryPageRevisionContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryPageCategoryInfo(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageCategoryInfoFlags; out Infos: TMediaWikiPageCategoryInfos;
-  MaxCategories: Integer; const CategoryTitles, CategoryStart: string);
+  var ContinueInfo: TMediaWikiContinueInfo;
+  MaxCategories: Integer; const CategoryTitles: string);
 var
   XML: TJclSimpleXML;
 begin
@@ -2150,11 +2145,12 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryPageCategoryInfo);
-    MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, mwoXML);
+    MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxCategories, CategoryTitles, mwoXML);
     QueryExecuteXML(XML);
     QueryPageCategoryInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryPageCategoryInfos;
+    ContinueInfo := FQueryPageCategoryContinueInfo;
     FQueryPageCategoryInfos := nil;
     XML.Free;
   end;
@@ -2162,41 +2158,36 @@ end;
 
 function TMediaWikiApi.QueryPageCategoryInfo(const Titles: string; PageID: Boolean;
   Flags: TMediaWikiPageCategoryInfoFlags; OutputFormat: TMediaWikiOutputFormat;
-  MaxCategories: Integer; const CategoryTitles, CategoryStart: string): AnsiString;
+  const ContinueInfo: TMediaWikiContinueInfo;
+  MaxCategories: Integer; const CategoryTitles: string): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryPageCategoryInfo);
-  MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, OutputFormat);
+  MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxCategories, CategoryTitles, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryPageCategoryInfoAsync(const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageCategoryInfoFlags; MaxCategories: Integer;
-  const CategoryTitles, CategoryStart: string);
+  Flags: TMediaWikiPageCategoryInfoFlags; const ContinueInfo: TMediaWikiContinueInfo;
+  MaxCategories: Integer; const CategoryTitles: string);
 begin
   CheckRequest(mwrQueryPageCategoryInfo);
-  MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, MaxCategories, CategoryTitles, CategoryStart, mwoXML);
+  MediaWikiQueryPageCategoryInfoAdd(FQueryStrings, Titles, PageID, Flags, ContinueInfo, MaxCategories, CategoryTitles, mwoXML);
   FRequestCallbacks[mwrQueryPageCategoryInfo] := QueryPageCategoryInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryPageCategoryInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartCategory: string;
 begin
-  MediaWikiQueryPageCategoryInfoParseXmlResult(XML, FQueryPageCategoryInfos);
+  MediaWikiQueryPageCategoryInfoParseXmlResult(XML, FQueryPageCategoryInfos, FQueryPageCategoryContinueInfo);
 
   if Assigned(FOnQueryPageCategoryInfoDone) then
-    FOnQueryPageCategoryInfoDone(Self, FQueryPageCategoryInfos);
-
-  MediaWikiQueryPageCategoryInfoParseXmlResult(XML, StartCategory);
-
-  if (StartCategory <> '') and Assigned(FOnQueryPageCategoryInfoContinue) then
-    FOnQueryPageCategoryInfoContinue(Self, StartCategory);
+    FOnQueryPageCategoryInfoDone(Self, FQueryPageCategoryInfos, FQueryPageCategoryContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryPageLinkInfo(const Titles: string; PageID: Boolean;
-  out Infos: TMediaWikiPageLinkInfos; MaxLinks, Namespace: Integer; const LinkStart: string);
+  out Infos: TMediaWikiPageLinkInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  MaxLinks, Namespace: Integer);
 var
   XML: TJclSimpleXML;
 begin
@@ -2205,51 +2196,47 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryPageLinkInfo);
-    MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, Namespace, LinkStart, mwoXML);
+    MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, Namespace, mwoXML);
     QueryExecuteXML(XML);
     QueryPageLinkInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryPageLinkInfos;
+    ContinueInfo := FQueryPageLinkContinueInfo;
     FQueryPageLinkInfos := nil;
     XML.Free;
   end;
 end;
 
 function TMediaWikiApi.QueryPageLinkInfo(const Titles: string; PageID: Boolean;
-  OutputFormat: TMediaWikiOutputFormat; MaxLinks, Namespace: Integer; const LinkStart: string): AnsiString;
+  OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+  MaxLinks, Namespace: Integer): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryPageLinkInfo);
-  MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, NameSpace, LinkStart, OutputFormat);
+  MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, NameSpace, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryPageLinkInfoAsync(const Titles: string; PageID: Boolean;
-  MaxLinks, Namespace: Integer; const LinkStart: string);
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks, Namespace: Integer);
 begin
   CheckRequest(mwrQueryPageLinkInfo);
-  MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, Namespace, LinkStart, mwoXML);
+  MediaWikiQueryPageLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, Namespace, mwoXML);
   FRequestCallbacks[mwrQueryPageLinkInfo] := QueryPageLinkInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryPageLinkInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartLink: string;
 begin
-  MediaWikiQueryPageLinkInfoParseXmlResult(XML, FQueryPageLinkInfos);
+  MediaWikiQueryPageLinkInfoParseXmlResult(XML, FQueryPageLinkInfos, FQueryPageLinkContinueInfo);
 
   if Assigned(FOnQueryPageLinkInfoDone) then
-    FOnQueryPageLinkInfoDone(Self, FQueryPageLinkInfos);
-
-  MediaWikiQueryPageLinkInfoParseXmlResult(XML, StartLink);
-
-  if (StartLink <> '') and Assigned(FOnQueryPageLinkInfoContinue) then
-    FOnQueryPageLinkInfoContinue(Self, StartLink);
+    FOnQueryPageLinkInfoDone(Self, FQueryPageLinkInfos, FQueryPageLinkContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryPageTemplateInfo(const Titles: string; PageID: Boolean;
-  out Infos: TMediaWikiPageTemplateInfos; MaxTemplates, Namespace: Integer; TemplateStart: string);
+  out Infos: TMediaWikiPageTemplateInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  MaxTemplates, Namespace: Integer);
 var
   XML: TJclSimpleXML;
 begin
@@ -2258,50 +2245,47 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryPageTemplateInfo);
-    MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, mwoXML);
+    MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxTemplates, Namespace, mwoXML);
     QueryExecuteXML(XML);
     QueryPageTemplateInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryPageTemplateInfos;
+    ContinueInfo := FQueryPageTemplateContinueInfo;
     FQueryPageTemplateInfos := nil;
     XML.Free;
   end;
 end;
 
 function TMediaWikiApi.QueryPageTemplateInfo(const Titles: string; PageID: Boolean;
-  OutputFormat: TMediaWikiOutputFormat; MaxTemplates, Namespace: Integer; TemplateStart: string): AnsiString;
+  OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+  MaxTemplates, Namespace: Integer): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryPageTemplateInfo);
-  MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, OutputFormat);
+  MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxTemplates, Namespace, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryPageTemplateInfoAsync;
+procedure TMediaWikiApi.QueryPageTemplateInfoAsync(const Titles: string; PageID: Boolean;
+  const ContinueInfo: TMediaWikiContinueInfo; MaxTemplates, Namespace: Integer);
 begin
   CheckRequest(mwrQueryPageTemplateInfo);
-  MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, MaxTemplates, Namespace, TemplateStart, mwoXML);
+  MediaWikiQueryPageTemplateInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxTemplates, Namespace, mwoXML);
   FRequestCallbacks[mwrQueryPageTemplateInfo] := QueryPageTemplateInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryPageTemplateInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartTemplate: string;
 begin
-  MediaWikiQueryPageTemplateInfoParseXmlResult(XML, FQueryPageTemplateInfos);
+  MediaWikiQueryPageTemplateInfoParseXmlResult(XML, FQueryPageTemplateInfos, FQueryPageTemplateContinueInfo);
 
   if Assigned(FOnQueryPageTemplateInfoDone) then
-    FOnQueryPageTemplateInfoDone(Self, FQueryPageTemplateInfos);
-
-  MediaWikiQueryPageTemplateInfoParseXmlResult(XML, StartTemplate);
-
-  if (StartTemplate <> '') and Assigned(FOnQueryPageTemplateInfoContinue) then
-    FOnQueryPageTemplateInfoContinue(Self, StartTemplate);
+    FOnQueryPageTemplateInfoDone(Self, FQueryPageTemplateInfos, FQueryPageTemplateContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryPageExtLinkInfo(const Titles: string; PageID: Boolean;
-  out Infos: TMediaWikiPageExtLinkInfos; MaxLinks: Integer; const StartLink: string);
+  out Infos: TMediaWikiPageExtLinkInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  MaxLinks: Integer);
 var
   XML: TJclSimpleXML;
 begin
@@ -2310,50 +2294,45 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryPageExtLinkInfo);
-    MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, mwoXML);
+    MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, mwoXML);
     QueryExecuteXML(XML);
     QueryPageExtLinkInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryPageExtLinkInfos;
+    ContinueInfo := FQueryPageExtLinkContinueInfo;
     FQueryPageExtLinkInfos := nil;
     XML.Free;
   end;
 end;
 
 function TMediaWikiApi.QueryPageExtLinkInfo(const Titles: string; PageID: Boolean;
-  OutputFormat: TMediaWikiOutputFormat; MaxLinks: Integer; const StartLink: string): AnsiString;
+  OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+  MaxLinks: Integer): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryPageExtLinkInfo);
-  MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, OutputFormat);
+  MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryPageExtLinkInfoAsync(const Titles: string; PageID: Boolean;
-  MaxLinks: Integer; const StartLink: string);
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer);
 begin
   CheckRequest(mwrQueryPageExtLinkInfo);
-  MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, MaxLinks, StartLink, mwoXML);
+  MediaWikiQueryPageExtLinkInfoAdd(FQueryStrings, Titles, PageID, ContinueInfo, MaxLinks, mwoXML);
   FRequestCallbacks[mwrQueryPageExtLinkInfo] := QueryPageExtLinkInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryPageExtLinkInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartExtLink: string;
 begin
-  MediaWikiQueryPageExtLinkInfoParseXmlResult(XML, FQueryPageExtLinkInfos);
+  MediaWikiQueryPageExtLinkInfoParseXmlResult(XML, FQueryPageExtLinkInfos, FQueryPageExtLinkContinueInfo);
 
   if Assigned(FOnQueryPageExtLinkInfoDone) then
-    FOnQueryPageExtLinkInfoDone(Self, FQueryPageExtLinkInfos);
-
-  MediaWikiQueryPageExtLinkInfoParseXmlResult(XML, StartExtLink);
-
-  if (StartExtLink <> '') and Assigned(FOnQueryPageExtLinkInfoContinue) then
-    FOnQueryPageExtLinkInfoContinue(Self, StartExtLink);
+    FOnQueryPageExtLinkInfoDone(Self, FQueryPageExtLinkInfos, FQueryPageExtLinkContinueInfo);
 end;
 
-procedure TMediaWikiApi.QueryAllPageInfo(out Infos: TMediaWikiAllPageInfos; const StartPage: string;
+procedure TMediaWikiApi.QueryAllPageInfo(out Infos: TMediaWikiAllPageInfos; var ContinueInfo: TMediaWikiContinueInfo;
   const Prefix: string; MaxPage, Namespace: Integer; RedirFilter: TMediaWikiAllPageFilterRedir;
   LangFilter: TMediaWikiAllPageFilterLang; MinSize, MaxSize: Integer;
   ProtectionFilter: TMediaWikiAllPageFilterProtection; LevelFilter: TMediaWikiAllPageFilterLevel;
@@ -2366,18 +2345,19 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryAllPageInfo);
-    MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
+    MediaWikiQueryAllPageAdd(FQueryStrings, ContinueInfo, Prefix, MaxPage, Namespace, RedirFilter,
       LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, mwoXML);
     QueryExecuteXML(XML);
     QueryAllPageInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryAllPageInfos;
+    ContinueInfo := FQueryAllPageContinueInfo;
     FQueryAllPageInfos := nil;
     XML.Free;
   end;
 end;
 
-function TMediaWikiApi.QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; const StartPage: string;
+function TMediaWikiApi.QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
   const Prefix: string; MaxPage, Namespace: Integer; RedirFilter: TMediaWikiAllPageFilterRedir;
   LangFilter: TMediaWikiAllPageFilterLang; MinSize, MaxSize: Integer;
   ProtectionFilter: TMediaWikiAllPageFilterProtection; LevelFilter: TMediaWikiAllPageFilterLevel;
@@ -2385,41 +2365,34 @@ function TMediaWikiApi.QueryAllPageInfo(OutputFormat: TMediaWikiOutputFormat; co
 begin
   QueryInit;
   CheckRequest(mwrQueryAllPageInfo);
-  MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
+  MediaWikiQueryAllPageAdd(FQueryStrings, ContinueInfo, Prefix, MaxPage, Namespace, RedirFilter,
     LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryAllPageInfoAsync(const StartPage, Prefix: string;
+procedure TMediaWikiApi.QueryAllPageInfoAsync(const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string;
   MaxPage, Namespace: Integer; RedirFilter: TMediaWikiAllPageFilterRedir;
   LangFilter: TMediaWikiAllPageFilterLang; MinSize, MaxSize: Integer;
   ProtectionFilter: TMediaWikiAllPageFilterProtection; LevelFilter: TMediaWikiAllPageFilterLevel;
   Direction: TMediaWikiAllPageDirection);
 begin
   CheckRequest(mwrQueryAllPageInfo);
-  MediaWikiQueryAllPageAdd(FQueryStrings, StartPage, Prefix, MaxPage, Namespace, RedirFilter,
+  MediaWikiQueryAllPageAdd(FQueryStrings, ContinueInfo, Prefix, MaxPage, Namespace, RedirFilter,
     LangFilter, MinSize, MaxSize, ProtectionFilter, LevelFilter, Direction, mwoXML);
   FRequestCallbacks[mwrQueryAllPageInfo] := QueryAllPageInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryAllPageInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartPage: string;
 begin
-  MediaWikiQueryAllPageParseXmlResult(XML, FQueryAllPageInfos);
+  MediaWikiQueryAllPageParseXmlResult(XML, FQueryAllPageInfos, FQueryAllPageContinueInfo);
 
   if Assigned(FOnQueryAllPageInfoDone) then
-    FOnQueryAllPageInfoDone(Self, FQueryAllPageInfos);
-
-  MediaWikiQueryAllPageParseXmlResult(XML, StartPage);
-
-  if (StartPage <> '') and Assigned(FOnQueryAllPageInfoContinue) then
-    FOnQueryAllPageInfoContinue(Self, StartPage);
+    FOnQueryAllPageInfoDone(Self, FQueryAllPageInfos, FQueryAllPageContinueInfo);
 end;
 
-procedure TMediaWikiApi.QueryAllLinkInfo(out Infos: TMediaWikiAllLinkInfos;
-  const StartLink, Prefix: string; MaxLink: Integer; const ContinueLink: string; Namespace: Integer;
+procedure TMediaWikiApi.QueryAllLinkInfo(out Infos: TMediaWikiAllLinkInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxLink: Integer; Namespace: Integer;
   Flags: TMediaWikiAllLinkInfoFlags);
 var
   XML: TJclSimpleXML;
@@ -2429,54 +2402,47 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryAllLinkInfo);
-    MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
+    MediaWikiQueryAllLinkAdd(FQueryStrings, ContinueInfo, Prefix, MaxLink, Namespace,
       Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryAllLinkInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryAllLinkInfos;
+    ContinueInfo := FQueryAllLinkContinueInfo;
     FQueryAllLinkInfos := nil;
     XML.Free;
   end;
 end;
 
-function TMediaWikiApi.QueryAllLinkInfo(OutputFormat: TMediaWikiOutputFormat;
-  const StartLink, Prefix: string; MaxLink: Integer; const ContinueLink: string;
-  Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags): AnsiString;
+function TMediaWikiApi.QueryAllLinkInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxLink: Integer; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryAllLinkInfo);
-  MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
+  MediaWikiQueryAllLinkAdd(FQueryStrings, ContinueInfo, Prefix, MaxLink, Namespace,
     Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryAllLinkInfoAsync(const StartLink, Prefix: string;
-  MaxLink: Integer; const ContinueLink: string; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags);
+procedure TMediaWikiApi.QueryAllLinkInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxLink: Integer; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags);
 begin
   CheckRequest(mwrQueryAllLinkInfo);
-  MediaWikiQueryAllLinkAdd(FQueryStrings, StartLink, Prefix, MaxLink, ContinueLink, Namespace,
+  MediaWikiQueryAllLinkAdd(FQueryStrings, ContinueInfo, Prefix, MaxLink, Namespace,
     Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllLinkInfo] := QueryAllLinkInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryAllLinkInfoParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartLink: string;
 begin
-  MediaWikiQueryAllLinkParseXmlResult(XML, FQueryAllLinkInfos);
+  MediaWikiQueryAllLinkParseXmlResult(XML, FQueryAllLinkInfos, FQueryAllLinkContinueInfo);
 
   if Assigned(FOnQueryAllLinkInfoDone) then
-    FOnQueryAllLinkInfoDone(Self, FQueryAllLinkInfos);
-
-  MediaWikiQueryAllLinkParseXmlResult(XML, StartLink);
-
-  if (StartLink <> '') and Assigned(FOnQueryAllLinkInfoContinue) then
-    FOnQueryAllLinkInfoContinue(Self, StartLink);
+    FOnQueryAllLinkInfoDone(Self, FQueryAllLinkInfos, FQueryAllLinkContinueInfo);
 end;
 
-procedure TMediaWikiApi.QueryAllCategoryInfo(Infos: TStrings;
-  const StartCategory, Prefix: string; MaxCategory: Integer;
+procedure TMediaWikiApi.QueryAllCategoryInfo(Infos: TStrings; var ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxCategory: Integer;
   Flags: TMediaWikiAllCategoryInfoFlags);
 var
   XML: TJclSimpleXML;
@@ -2487,32 +2453,33 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryAllCategoryInfo);
-    MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
+    MediaWikiQueryAllCategoryAdd(FQueryStrings, ContinueInfo, Prefix, MaxCategory,
       Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryAllCategoryInfoParseXmlResult(Self, XML);
   finally
+    ContinueInfo := FQueryAllCategoryContinueInfo;
     XML.Free;
   end;
 end;
 
-function TMediaWikiApi.QueryAllCategoryInfo(
-  OutputFormat: TMediaWikiOutputFormat; const StartCategory, Prefix: string;
+function TMediaWikiApi.QueryAllCategoryInfo(OutputFormat: TMediaWikiOutputFormat;
+  const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string;
   MaxCategory: Integer; Flags: TMediaWikiAllCategoryInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryAllCategoryInfo);
-  MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
+  MediaWikiQueryAllCategoryAdd(FQueryStrings, ContinueInfo, Prefix, MaxCategory,
     Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryAllCategoryInfoAsync(const StartCategory,
-  Prefix: string; MaxCategory: Integer;
+procedure TMediaWikiApi.QueryAllCategoryInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxCategory: Integer;
   Flags: TMediaWikiAllCategoryInfoFlags);
 begin
   CheckRequest(mwrQueryAllCategoryInfo);
-  MediaWikiQueryAllCategoryAdd(FQueryStrings, StartCategory, Prefix, MaxCategory,
+  MediaWikiQueryAllCategoryAdd(FQueryStrings, ContinueInfo, Prefix, MaxCategory,
     Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllCategoryInfo] := QueryAllCategoryInfoParseXmlResult;
 end;
@@ -2520,32 +2487,26 @@ end;
 procedure TMediaWikiApi.QueryAllCategoryInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
 var
-  StartCategory: string;
   OwnsStrings: Boolean;
 begin
   OwnsStrings := not Assigned(FQueryAllCategoryInfos);
   if OwnsStrings then
     FQueryAllCategoryInfos := TStringList.Create;
   try
-    MediaWikiQueryAllCategoryParseXmlResult(XML, FQueryAllCategoryInfos);
+    MediaWikiQueryAllCategoryParseXmlResult(XML, FQueryAllCategoryInfos, FQueryAllCategoryContinueInfo);
 
     if Assigned(FOnQueryAllCategoryInfoDone) then
-      FOnQueryAllCategoryInfoDone(Self, FQueryAllCategoryInfos);
+      FOnQueryAllCategoryInfoDone(Self, FQueryAllCategoryInfos, FQueryAllCategoryContinueInfo);
   finally
     if OwnsStrings then
       FreeAndNil(FQueryAllCategoryInfos)
     else
       FQueryAllCategoryInfos := nil;
   end;
-
-  MediaWikiQueryAllCategoryParseXmlResult(XML, StartCategory);
-
-  if (StartCategory <> '') and Assigned(FOnQueryAllCategoryInfoContinue) then
-    FOnQueryAllCategoryInfoContinue(Self, StartCategory);
 end;
 
-procedure TMediaWikiApi.QueryAllUserInfo(out Infos: TMediaWikiAllUserInfos; const StartUser, Prefix, Group: string;
-  MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags);
+procedure TMediaWikiApi.QueryAllUserInfo(out Infos: TMediaWikiAllUserInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix, Group: string; MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags);
 var
   XML: TJclSimpleXML;
 begin
@@ -2554,52 +2515,46 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryAllUserInfo);
-    MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, mwoXML);
+    MediaWikiQueryAllUserAdd(FQueryStrings, ContinueInfo, Prefix, Group, MaxUser, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryAllUserInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryAllUserInfos;
+    ContinueInfo := FQueryAllUserContinueInfo;
     FQueryAllUserInfos := nil;
     XML.Free;
   end;
 end;
 
-function TMediaWikiApi.QueryAllUserInfo(
-  OutputFormat: TMediaWikiOutputFormat; const StartUser, Prefix, Group: string;
+function TMediaWikiApi.QueryAllUserInfo(OutputFormat: TMediaWikiOutputFormat;
+  const ContinueInfo: TMediaWikiContinueInfo; const Prefix, Group: string;
   MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryAllUserInfo);
-  MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, OutputFormat);
+  MediaWikiQueryAllUserAdd(FQueryStrings, ContinueInfo, Prefix, Group, MaxUser, Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryAllUserInfoAsync(const StartUser, Prefix,
-  Group: string; MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags);
+procedure TMediaWikiApi.QueryAllUserInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix, Group: string; MaxUser: Integer; Flags: TMediaWikiAllUserInfoFlags);
 begin
   CheckRequest(mwrQueryAllUserInfo);
-  MediaWikiQueryAllUserAdd(FQueryStrings, StartUser, Prefix, Group, MaxUser, Flags, mwoXML);
+  MediaWikiQueryAllUserAdd(FQueryStrings, ContinueInfo, Prefix, Group, MaxUser, Flags, mwoXML);
   FRequestCallbacks[mwrQueryAllUserInfo] := QueryAllUserInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryAllUserInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartUser: string;
 begin
-  MediaWikiQueryAllUserParseXmlResult(XML, FQueryAllUserInfos);
+  MediaWikiQueryAllUserParseXmlResult(XML, FQueryAllUserInfos, FQueryAllUserContinueInfo);
 
   if Assigned(FOnQueryAllUserInfoDone) then
-    FOnQueryAllUserInfoDone(Self, FQueryAllUserInfos);
-
-  MediaWikiQueryAllUserParseXmlResult(XML, StartUser);
-
-  if (StartUser <> '') and Assigned(FOnQueryAllUserInfoContinue) then
-    FOnQueryAllUserInfoContinue(Self, StartUser);
+    FOnQueryAllUserInfoDone(Self, FQueryAllUserInfos, FQueryAllUserContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryBackLinkInfo(const BackLinkTitle: string; out Infos: TMediaWikiBackLinkInfos;
-  Namespace, MaxLink: Integer; const StartBackLink: string; Flags: TMediaWikiBackLinkInfoFlags);
+  var ContinueInfo: TMediaWikiContinueInfo; Namespace, MaxLink: Integer; Flags: TMediaWikiBackLinkInfoFlags);
 var
   XML: TJclSimpleXML;
 begin
@@ -2608,51 +2563,46 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryBackLinkInfo);
-    MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, mwoXML);
+    MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, ContinueInfo, Namespace, MaxLink, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryBackLinkInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryBackLinkInfos;
+    ContinueInfo := FQueryBackLinkContinueInfo;
     FQueryBackLinkInfos := nil;
     XML.Free;
   end;
 end;
 
 function TMediaWikiApi.QueryBackLinkInfo(const BackLinkTitle: string; OutputFormat: TMediaWikiOutputFormat;
-  Namespace, MaxLink: Integer; const StartBackLink: string; Flags: TMediaWikiBackLinkInfoFlags): AnsiString;
+  const ContinueInfo: TMediaWikiContinueInfo; Namespace, MaxLink: Integer; Flags: TMediaWikiBackLinkInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryBackLinkInfo);
-  MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, OutputFormat);
+  MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, ContinueInfo, Namespace, MaxLink, Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryBackLinkInfoAsync(const BackLinkTitle: string;
-  Namespace, MaxLink: Integer; const StartBackLink: string; Flags: TMediaWikiBackLinkInfoFlags);
+  const ContinueInfo: TMediaWikiContinueInfo; Namespace, MaxLink: Integer; Flags: TMediaWikiBackLinkInfoFlags);
 begin
   CheckRequest(mwrQueryBackLinkInfo);
-  MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, Namespace, MaxLink, StartBackLink, Flags, mwoXML);
+  MediaWikiQueryBackLinkAdd(FQueryStrings, BackLinkTitle, ContinueInfo, Namespace, MaxLink, Flags, mwoXML);
   FRequestCallbacks[mwrQueryBackLinkInfo] := QueryBackLinkInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryBackLinkInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartUser: string;
 begin
-  MediaWikiQueryBackLinkParseXmlResult(XML, FQueryBackLinkInfos);
+  MediaWikiQueryBackLinkParseXmlResult(XML, FQueryBackLinkInfos, FQueryBackLinkContinueInfo);
 
   if Assigned(FOnQueryBackLinkInfoDone) then
-    FOnQueryBackLinkInfoDone(Self, FQueryBackLinkInfos);
-
-  MediaWikiQueryBackLinkParseXmlResult(XML, StartUser);
-
-  if (StartUser <> '') and Assigned(FOnQueryBackLinkInfoContinue) then
-    FOnQueryBackLinkInfoContinue(Self, StartUser);
+    FOnQueryBackLinkInfoDone(Self, FQueryBackLinkInfos, FQueryBackLinkContinueInfo);
 end;
 
-procedure TMediaWikiApi.QueryBlockInfo(out Infos: TMediaWikiBlockInfos; const StartDateTime, StopDateTime: TDateTime;
-  const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string; Flags: TMediaWikiBlockInfoFlags);
+procedure TMediaWikiApi.QueryBlockInfo(out Infos: TMediaWikiBlockInfos; var ContinueInfo: TMediaWikiContinueInfo;
+  const StartDateTime, StopDateTime: TDateTime;
+  const BlockIDs, Users, IP: string; MaxBlock: Integer; Flags: TMediaWikiBlockInfoFlags);
 var
   XML: TJclSimpleXML;
 begin
@@ -2661,52 +2611,48 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryBlockInfo);
-    MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, mwoXML);
+    MediaWikiQueryBlockAdd(FQueryStrings, ContinueInfo, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryBlockInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryBlockInfos;
+    ContinueInfo := FQueryBlockContinueInfo;
     FQueryBlockInfos := nil;
     XML.Free;
   end;
 end;
 
-function TMediaWikiApi.QueryBlockInfo(OutputFormat: TMediaWikiOutputFormat; const StartDateTime, StopDateTime: TDateTime;
-  const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string; Flags: TMediaWikiBlockInfoFlags): AnsiString;
+function TMediaWikiApi.QueryBlockInfo(OutputFormat: TMediaWikiOutputFormat; const ContinueInfo: TMediaWikiContinueInfo;
+  const StartDateTime, StopDateTime: TDateTime;
+  const BlockIDs, Users, IP: string; MaxBlock: Integer; Flags: TMediaWikiBlockInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryBlockInfo);
-  MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, OutputFormat);
+  MediaWikiQueryBlockAdd(FQueryStrings, ContinueInfo, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
-procedure TMediaWikiApi.QueryBlockInfoAsync(const StartDateTime, StopDateTime: TDateTime;
-  const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string; Flags: TMediaWikiBlockInfoFlags);
+procedure TMediaWikiApi.QueryBlockInfoAsync(const ContinueInfo: TMediaWikiContinueInfo;
+  const StartDateTime, StopDateTime: TDateTime;
+  const BlockIDs, Users, IP: string; MaxBlock: Integer; Flags: TMediaWikiBlockInfoFlags);
 begin
   CheckRequest(mwrQueryBlockInfo);
-  MediaWikiQueryBlockAdd(FQueryStrings, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, StartBlock, Flags, mwoXML);
+  MediaWikiQueryBlockAdd(FQueryStrings, ContinueInfo, StartDateTime, StopDateTime, BlockIDs, Users, IP, MaxBlock, Flags, mwoXML);
   FRequestCallbacks[mwrQueryBlockInfo] := QueryBlockInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryBlockInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartUser: string;
 begin
-  MediaWikiQueryBlockParseXmlResult(XML, FQueryBlockInfos);
+  MediaWikiQueryBlockParseXmlResult(XML, FQueryBlockInfos, FQueryBlockContinueInfo);
 
   if Assigned(FOnQueryBlockInfoDone) then
-    FOnQueryBlockInfoDone(Self, FQueryBlockInfos);
-
-  MediaWikiQueryBlockParseXmlResult(XML, StartUser);
-
-  if (StartUser <> '') and Assigned(FOnQueryBlockInfoContinue) then
-    FOnQueryBlockInfoContinue(Self, StartUser);
+    FOnQueryBlockInfoDone(Self, FQueryBlockInfos, FQueryBlockContinueInfo);
 end;
 
 procedure TMediaWikiApi.QueryCategoryMemberInfo(const CategoryTitle: string; out Infos: TMediaWikiCategoryMemberInfos;
-  PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
-  MaxCategoryMember: Integer; const StartCategoryMember: string; Flags: TMediaWikiCategoryMemberInfoFlags);
+  var ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
+  MaxCategoryMember: Integer; Flags: TMediaWikiCategoryMemberInfoFlags);
 var
   XML: TJclSimpleXML;
 begin
@@ -2715,49 +2661,43 @@ begin
   try
     QueryInit;
     CheckRequest(mwrQueryCategoryMemberInfo);
-    MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, mwoXML);
+    MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, ContinueInfo, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, Flags, mwoXML);
     QueryExecuteXML(XML);
     QueryCategoryMemberInfoParseXmlResult(Self, XML);
   finally
     Infos := FQueryCategoryMemberInfos;
+    ContinueInfo := FQueryCategoryMemberContinueInfo;
     FQueryCategoryMemberInfos := nil;
     XML.Free;
   end;
 end;
 
 function TMediaWikiApi.QueryCategoryMemberInfo(const CategoryTitle: string; OutputFormat: TMediaWikiOutputFormat;
-  PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
-  MaxCategoryMember: Integer; const StartCategoryMember: string; Flags: TMediaWikiCategoryMemberInfoFlags): AnsiString;
+  const ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
+  MaxCategoryMember: Integer; Flags: TMediaWikiCategoryMemberInfoFlags): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrQueryCategoryMemberInfo);
-  MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, OutputFormat);
+  MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, ContinueInfo, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, Flags, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.QueryCategoryMemberInfoAsync(const CategoryTitle: string;
-  PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
-  MaxCategoryMember: Integer; const StartCategoryMember: string; Flags: TMediaWikiCategoryMemberInfoFlags);
+  const ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer; const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
+  MaxCategoryMember: Integer; Flags: TMediaWikiCategoryMemberInfoFlags);
 begin
   CheckRequest(mwrQueryCategoryMemberInfo);
-  MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, StartCategoryMember, Flags, mwoXML);
+  MediaWikiQueryCategoryMemberAdd(FQueryStrings, CategoryTitle, ContinueInfo, PageNamespace, StartDateTime, StopDateTime, StartSortKey, StopSortKey, MaxCategoryMember, Flags, mwoXML);
   FRequestCallbacks[mwrQueryCategoryMemberInfo] := QueryCategoryMemberInfoParseXmlResult;
 end;
 
 procedure TMediaWikiApi.QueryCategoryMemberInfoParseXmlResult(
   Sender: TMediaWikiApi; XML: TJclSimpleXML);
-var
-  StartUser: string;
 begin
-  MediaWikiQueryCategoryMemberParseXmlResult(XML, FQueryCategoryMemberInfos);
+  MediaWikiQueryCategoryMemberParseXmlResult(XML, FQueryCategoryMemberInfos, FQueryCategoryMemberContinueInfo);
 
   if Assigned(FOnQueryCategoryMemberInfoDone) then
-    FOnQueryCategoryMemberInfoDone(Self, FQueryCategoryMemberInfos);
-
-  MediaWikiQueryCategoryMemberParseXmlResult(XML, StartUser);
-
-  if (StartUser <> '') and Assigned(FOnQueryCategoryMemberInfoContinue) then
-    FOnQueryCategoryMemberInfoContinue(Self, StartUser);
+    FOnQueryCategoryMemberInfoDone(Self, FQueryCategoryMemberInfos, FQueryCategoryMemberContinueInfo);
 end;
 
 procedure TMediaWikiApi.Edit(const PageTitle, Section, Text, PrependText, AppendText, EditToken, Summary: string;

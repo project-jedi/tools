@@ -32,7 +32,8 @@ type
   private
     FMediaWikiApi: TMediaWikiApi;
     procedure MediaWikiQueryPageInfoDone(Sender: TMediaWikiApi; const PageInfos: TMediaWikiPageInfos);
-    procedure MediaWikiQueryPageRevisionInfoDone(Sender: TMediaWikiApi; const PageRevisionInfos: TMediaWikiPageRevisionInfos);
+    procedure MediaWikiQueryPageRevisionInfoDone(Sender: TMediaWikiApi; const PageRevisionInfos: TMediaWikiPageRevisionInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
     procedure MediaWikiEditDone(Sender: TMediaWikiApi; const EditInfo: TMediaWikiEditInfo);
   public
   end;
@@ -77,6 +78,7 @@ var
   PageInfos: TMediaWikiPageInfos;
   PageRevisionInfos: TMediaWikiPageRevisionInfos;
   RevisionID: TMediaWikiID;
+  Unused: TMediaWikiContinueInfo;
 begin
   MemoResult.Lines.Clear;
 
@@ -90,7 +92,7 @@ begin
   EditRevID.Text := IntToStr(RevisionID);
 
   FMediaWikiApi.OnQueryPageRevisionInfoDone := nil;
-  FMediaWikiApi.QueryPageRevisionInfo(EditPage.Text, False, [mwfIncludeRevisionContent], PageRevisionInfos, 1, -1, RevisionID, RevisionID);
+  FMediaWikiApi.QueryPageRevisionInfo(EditPage.Text, False, [mwfIncludeRevisionContent], PageRevisionInfos, Unused, 1, -1, RevisionID, RevisionID);
   if Length(PageRevisionInfos) <> 1 then
     raise Exception.Create('length error');
   MemoResult.Lines.Text := PageRevisionInfos[0].PageRevisionInfoContent;
@@ -130,6 +132,7 @@ procedure TMainForm.MediaWikiQueryPageInfoDone(Sender: TMediaWikiApi;
   const PageInfos: TMediaWikiPageInfos);
 var
   RevisionID: TMediaWikiID;
+  Unused: TMediaWikiContinueInfo;
 begin
   if Length(PageInfos) <> 1 then
     raise Exception.Create('length error');
@@ -141,12 +144,12 @@ begin
 
   FMediaWikiApi.OnQueryPageRevisionInfoDone := MediaWikiQueryPageRevisionInfoDone;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryPageRevisionInfoAsync(EditPage.Text, False, [mwfIncludeRevisionContent], 1, -1, RevisionID - 1, RevisionID);
+  FMediaWikiApi.QueryPageRevisionInfoAsync(EditPage.Text, False, [mwfIncludeRevisionContent], Unused, 1, -1, RevisionID - 1, RevisionID);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
 procedure TMainForm.MediaWikiQueryPageRevisionInfoDone(Sender: TMediaWikiApi;
-  const PageRevisionInfos: TMediaWikiPageRevisionInfos);
+  const PageRevisionInfos: TMediaWikiPageRevisionInfos; const ContinueInfo: TMediaWikiContinueInfo);
 begin
   if Length(PageRevisionInfos) <> 1 then
     raise Exception.Create('length error');

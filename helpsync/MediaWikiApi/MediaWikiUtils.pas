@@ -120,9 +120,16 @@ function FindMediaWikiLoginResult(const AString: string): TMediaWikiLoginResult;
 function StrISO8601ToDateTime(const When: string): TDateTime;
 function DateTimeToStrISO8601(When: TDateTime): string;
 
+type
+  TMediaWikiContinueInfo = record
+    ParameterName: string;
+    ParameterValue: string;
+  end;
+
 // post stuff
 procedure MediaWikiQueryAdd(Queries: TStrings; const AName: string; const AValue: string = '';
-  RawValue: Boolean = False; Content: TStream = nil);
+  RawValue: Boolean = False; Content: TStream = nil); overload;
+procedure MediaWikiQueryAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo); overload;
 procedure MediaWikiQueryPost(Queries: TStrings; ASendStream: TStream; out ContentType: string);
 
 // login stuff
@@ -303,10 +310,9 @@ type
   TMediaWikiPageRevisionInfoFlags = set of TMediaWikiPageRevisionInfoFlag;
 
 procedure MediaWikiQueryPageRevisionInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageRevisionInfoFlags; MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
+  Flags: TMediaWikiPageRevisionInfoFlags; const ContinueInfo: TMediaWikiContinueInfo; MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
   const StartDateTime, EndDateTime: TDateTime; const IncludeUser, ExcludeUser: string; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageRevisionInfos); overload;
-procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out StartID, EndID: TMediaWikiID); overload;
+procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageRevisionInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, page info, category info
 type
@@ -324,10 +330,9 @@ type
   TMediaWikiPageCategoryInfoFlags = set of TMediaWikiPageCategoryInfoFlag;
 
 procedure MediaWikiQueryPageCategoryInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageCategoryInfoFlags; MaxCategories: Integer;
-  const CategoryTitles, CategoryStart: string; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageCategoryInfos); overload;
-procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out StartCategory: string); overload;
+  Flags: TMediaWikiPageCategoryInfoFlags; const ContinueInfo: TMediaWikiContinueInfo; MaxCategories: Integer;
+  const CategoryTitles: string; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageCategoryInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, page info, link info
 type
@@ -339,9 +344,8 @@ type
   TMediaWikiPageLinkInfos = array of TMediaWikiPageLinkInfo;
 
 procedure MediaWikiQueryPageLinkInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxLinks, Namespace: Integer; const LinkStart: string; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageLinkInfos); overload;
-procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out StartCategory: string); overload;
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks, Namespace: Integer; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, page info, template info
 type
@@ -353,9 +357,8 @@ type
   TMediaWikiPageTemplateInfos = array of TMediaWikiPageTemplateInfo;
 
 procedure MediaWikiQueryPageTemplateInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxTemplates, Namespace: Integer; TemplateStart: string; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageTemplateInfos); overload;
-procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out StartTemplate: string); overload;
+  const ContinueInfo: TMediaWikiContinueInfo; MaxTemplates, Namespace: Integer; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageTemplateInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, page info, ext links
 type
@@ -366,9 +369,8 @@ type
   TMediaWikiPageExtLinkInfos = array of TMediaWikiPageExtLinkInfo;
 
 procedure MediaWikiQueryPageExtLinkInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxLinks: Integer; const StartLink: string; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageExtLinkInfos); overload;
-procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out StartExtLink: string); overload;
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageExtLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, list, all pages
 type
@@ -380,12 +382,11 @@ type
   TMediaWikiAllPageFilterLevel = (mwfAllPageLevelNone, mwfAllPageLevelAutoConfirmed, mwfAllPageLevelSysops);
   TMediaWikiAllPageDirection = (mwfAllPageAscending, mwfAllPageDescending);
 
-procedure MediaWikiQueryAllPageAdd(Queries: TStrings; const StartPage, Prefix: string; MaxPage: Integer;
+procedure MediaWikiQueryAllPageAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string; MaxPage: Integer;
   Namespace: Integer; RedirFilter: TMediaWikiAllPageFilterRedir;
   LangFilter: TMediaWikiAllPageFilterLang; MinSize, MaxSize: Integer; ProtectionFilter: TMediaWikiAllPageFilterProtection;
   LevelFilter: TMediaWikiAllPageFilterLevel; Direction: TMediaWikiAllPageDirection; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllPageInfos); overload;
-procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out StartPage: string); overload;
+procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllPageInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 // query, list, alllinks: Returns a list of (unique) links to pages in a given namespace starting ordered by link title.
 type
@@ -399,20 +400,18 @@ type
   TMediaWikiAllLinkInfoFlag = (mwfLinkUnique, mwfLinkIncludePageID);
   TMediaWikiAllLinkInfoFlags = set of TMediaWikiAllLinkInfoFlag;
 
-procedure MediaWikiQueryAllLinkAdd(Queries: TStrings; const StartLink, Prefix: string; MaxLink: Integer;
-  const ContinueLink: string; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags;
+procedure MediaWikiQueryAllLinkAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string; MaxLink: Integer;
+  Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags;
   OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllLinkInfos); overload;
-procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out StartPage: string); overload;
+procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiAllCategoryInfoFlag = (mwfCategoryDescending);
   TMediaWikiAllCategoryInfoFlags = set of TMediaWikiAllCategoryInfoFlag;
 
-procedure MediaWikiQueryAllCategoryAdd(Queries: TStrings; const StartCategory, Prefix: string; MaxCategory: Integer;
+procedure MediaWikiQueryAllCategoryAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo; const Prefix: string; MaxCategory: Integer;
   Flags: TMediaWikiAllCategoryInfoFlags; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; Infos: TStrings); overload;
-procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; out StartCategory: string); overload;
+procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; Infos: TStrings; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiAllUserInfo = record
@@ -426,10 +425,9 @@ type
   TMediaWikiAllUserInfoFlag = (mwfIncludeUserEditCount, mwfIncludeUserGroups, mwfIncludeUserRegistration);
   TMediaWikiAllUserInfoFlags = set of TMediaWikiAllUserInfoFlag;
 
-procedure MediaWikiQueryAllUserAdd(Queries: TStrings; const StartUser, Prefix, Group: string; MaxUser: Integer;
+procedure MediaWikiQueryAllUserAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo; const Prefix, Group: string; MaxUser: Integer;
   Flags: TMediaWikiAllUserInfoFlags; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllUserInfos); overload;
-procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out StartUser: string); overload;
+procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllUserInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiBackLinkFlag = (mwfBackLinkIsRedirect,  // BackLinkPageID is redirected to BackLinkTitle
@@ -446,10 +444,9 @@ type
   TMediaWikiBackLinkInfoFlag = (mwfExcludeBackLinkRedirect, mwfExcludeBackLinkNonRedirect, mwfIncludeBackLinksFromRedirect);
   TMediaWikiBackLinkInfoFlags = set of TMediaWikiBackLinkInfoFlag;
 
-procedure MediaWikiQueryBackLinkAdd(Queries: TStrings; const BackLinkTitle: string; Namespace, MaxLink: Integer; const StartBackLink: string;
+procedure MediaWikiQueryBackLinkAdd(Queries: TStrings; const BackLinkTitle: string; const ContinueInfo: TMediaWikiContinueInfo; Namespace, MaxLink: Integer;
   Flags: TMediaWikiBackLinkInfoFlags; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBackLinkInfos); overload;
-procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out StartBackLink: string); overload;
+procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBackLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiBlockFlag = (mwfBlockAutomatic, mwfBlockAnonymousEdits, mwfBlockNoAccountCreate, mwfBlockAutomaticBlocking, mwfBlockNoEmail, mwfBlockHidden);
@@ -473,11 +470,11 @@ type
   TMediaWikiBlockInfoFlag = (mwfBlockID, mwfBlockUser, mwfBlockByUser, mwfBlockDateTime, mwfBlockExpiry, mwfBlockReason, mwfBlockIPRange, mwfBlockFlags, mwfBlockDescending);
   TMediaWikiBlockInfoFlags = set of TMediaWikiBlockInfoFlag;
 
-procedure MediaWikiQueryBlockAdd(Queries: TStrings; const StartDateTime, StopDateTime: TDateTime;
-  const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string;
+procedure MediaWikiQueryBlockAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const StartDateTime, StopDateTime: TDateTime;
+  const BlockIDs, Users, IP: string; MaxBlock: Integer;
   Flags: TMediaWikiBlockInfoFlags; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBlockInfos); overload;
-procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out StartBlock: string); overload;
+procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBlockInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiCategoryMemberInfo = record
@@ -491,12 +488,11 @@ type
     mwfCategoryMemberPageDateTime, mwfCategoryMemberPageSortKey, mwfCategoryMemberDescending);
   TMediaWikiCategoryMemberInfoFlags = set of TMediaWikiCategoryMemberInfoFlag;
 
-procedure MediaWikiQueryCategoryMemberAdd(Queries: TStrings; const CategoryTitle: string; PageNamespace: Integer;
+procedure MediaWikiQueryCategoryMemberAdd(Queries: TStrings; const CategoryTitle: string;
+  const ContinueInfo: TMediaWikiContinueInfo; PageNamespace: Integer;
   const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
-  MaxCategoryMember: Integer; const StartCategoryMember: string;
-  Flags: TMediaWikiCategoryMemberInfoFlags; OutputFormat: TMediaWikiOutputFormat);
-procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiCategoryMemberInfos); overload;
-procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out StartCategoryMember: string); overload;
+  MaxCategoryMember: Integer; Flags: TMediaWikiCategoryMemberInfoFlags; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiCategoryMemberInfos; out ContinueInfo: TMediaWikiContinueInfo);
 
 type
   TMediaWikiEditFlag = (mwfEditMinor, mwfEditNotMinor, mwfEditBot, mwfEditAlwaysRecreate, mwfEditMustCreate, mwfEditMustExist,
@@ -767,6 +763,12 @@ begin
       Queries.Objects[NamePos] := Queries;
     end;
   end;
+end;
+
+procedure MediaWikiQueryAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo);
+begin
+  if ContinueInfo.ParameterName <> '' then
+    MediaWikiQueryAdd(Queries, ContinueInfo.ParameterName, ContinueInfo.ParameterValue, True, nil); 
 end;
 
 procedure MediaWikiQueryPostAdd(ASendStream: TStream; const Data: AnsiString);
@@ -1647,7 +1649,7 @@ end;
 
 // query, page info, revision info
 procedure MediaWikiQueryPageRevisionInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageRevisionInfoFlags; MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
+  Flags: TMediaWikiPageRevisionInfoFlags; const ContinueInfo: TMediaWikiContinueInfo; MaxRevisions, Section: Integer; StartRevisionID, EndRevisionID: TMediaWikiID;
   const StartDateTime, EndDateTime: TDateTime; const IncludeUser, ExcludeUser: string; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
@@ -1714,12 +1716,14 @@ begin
   if ExcludeUser <> '' then
     MediaWikiQueryAdd(Queries, 'rvexcludeuser', ExcludeUser);
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageRevisionInfos);
+procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageRevisionInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Pages, Page, Revisions, Revision: TJclSimpleXMLElem;
+  Query, Pages, Page, Revisions, Revision, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageID, NameSpace, Title, RevID, Minor, Author, TimeStamp, Size, Comment, RollbackToken: TJclSimpleXMLProp;
 begin
@@ -1766,16 +1770,9 @@ begin
       Infos[K].PageRevisionInfoRollbackToken := RollbackToken.Value;
     end;
   end;
-end;
 
-
-procedure MediaWikiQueryPageRevisionInfoParseXmlResult(XML: TJclSimpleXML; out StartID, EndID: TMediaWikiID);
-var
-  QueryContinue, Revisions: TJclSimpleXMLElem;
-  RevStartID, RevEndID: TJclSimpleXMLProp;
-begin
-  StartID := -1;
-  EndID := -1;
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -1784,20 +1781,16 @@ begin
   Revisions := QueryContinue.Items.ItemNamed['revisions'];
   if not Assigned(Revisions) then
     Exit;
-  RevStartID := Revisions.Properties.ItemNamed['rvstartid'];
-  RevEndID := Revisions.Properties.ItemNamed['rvendid'];
-  XML.Options := XML.Options + [sxoAutoCreate];
-
-  if Assigned(RevStartID) then
-    StartID := RevStartID.IntValue;
-  if Assigned(RevEndID) then
-    EndID := RevEndID.IntValue;
+  if Revisions.Properties.Count <> 1 then
+    Exit;
+  ContinueInfo.ParameterName := Revisions.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := Revisions.Properties.Item[0].Value;
 end;
 
 // query, page info, category info
 procedure MediaWikiQueryPageCategoryInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  Flags: TMediaWikiPageCategoryInfoFlags; MaxCategories: Integer;
-  const CategoryTitles, CategoryStart: string; OutputFormat: TMediaWikiOutputFormat);
+  Flags: TMediaWikiPageCategoryInfoFlags; const ContinueInfo: TMediaWikiContinueInfo; MaxCategories: Integer;
+  const CategoryTitles: string; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'prop', 'categories');
@@ -1821,15 +1814,14 @@ begin
   if CategoryTitles <> '' then
     MediaWikiQueryAdd(Queries, 'clcategories', CategoryTitles);
 
-  if CategoryStart <> '' then
-    MediaWikiQueryAdd(Queries, 'clcontinue', CategoryStart);
+  MediaWikiQueryAdd(Queries, ContinueInfo);
 
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageCategoryInfos);
+procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageCategoryInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Pages, Page, Categories, Category: TJclSimpleXMLElem;
+  Query, Pages, Page, Categories, Category, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageID, PageNamespace, PageTitle, Namespace, Title, SortKey, TimeStamp: TJclSimpleXMLProp;
 begin
@@ -1866,14 +1858,9 @@ begin
       Infos[K].CategorySortKey := SortKey.Value;
     end;
   end;
-end;
 
-procedure MediaWikiQueryPageCategoryInfoParseXmlResult(XML: TJclSimpleXML; out StartCategory: string);
-var
-  QueryContinue, Categories: TJclSimpleXMLElem;
-  clContinue: TJclSimpleXMLProp;
-begin
-  StartCategory := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -1882,15 +1869,15 @@ begin
   Categories := QueryContinue.Items.ItemNamed['categories'];
   if not Assigned(Categories) then
     Exit;
-  clContinue := Categories.Properties.ItemNamed['clcontinue'];
-
-  if Assigned(clContinue) then
-    StartCategory := clContinue.Value;
+  if Categories.Properties.Count <> 1 then
+    Exit;
+  ContinueInfo.ParameterName := Categories.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := Categories.Properties.Item[0].Value;
 end;
 
 // query, page info, link info
 procedure MediaWikiQueryPageLinkInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxLinks, Namespace: Integer; const LinkStart: string; OutputFormat: TMediaWikiOutputFormat);
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks, Namespace: Integer; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'prop', 'links');
@@ -1906,15 +1893,14 @@ begin
   if Namespace >= 0 then
     MediaWikiQueryAdd(Queries, 'plnamespace', IntToStr(Namespace));
 
-  if LinkStart <> '' then
-    MediaWikiQueryAdd(Queries, 'plcontinue', LinkStart);
+  MediaWikiQueryAdd(Queries, ContinueInfo);
 
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageLinkInfos);
+procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Pages, Page, Links, Link: TJclSimpleXMLElem;
+  Query, Pages, Page, Links, Link, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageID, PageTitle, PageNamespace, TargetNamespace, TargetTitle: TJclSimpleXMLProp;
 begin
@@ -1948,14 +1934,9 @@ begin
       Infos[K].LinkTargetNameSpace := TargetNamespace.IntValue;
     end;
   end;
-end;
 
-procedure MediaWikiQueryPageLinkInfoParseXmlResult(XML: TJclSimpleXML; out StartCategory: string);
-var
-  QueryContinue, Links: TJclSimpleXMLElem;
-  plContinue: TJclSimpleXMLProp;
-begin
-  StartCategory := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -1964,16 +1945,16 @@ begin
   Links := QueryContinue.Items.ItemNamed['links'];
   if not Assigned(Links) then
     Exit;
-  plContinue := Links.Properties.ItemNamed['plcontinue'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if Links.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(plContinue) then
-    StartCategory := plContinue.Value;
+  ContinueInfo.ParameterName := Links.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := Links.Properties.Item[0].Value;
 end;
 
 // query, page info, template info
 procedure MediaWikiQueryPageTemplateInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxTemplates, Namespace: Integer; TemplateStart: string; OutputFormat: TMediaWikiOutputFormat);
+  const ContinueInfo: TMediaWikiContinueInfo; MaxTemplates, Namespace: Integer; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'prop', 'templates');
@@ -1989,15 +1970,14 @@ begin
   if Namespace >= 0 then
     MediaWikiQueryAdd(Queries, 'tlnamespace', IntToStr(Namespace));
 
-  if TemplateStart <> '' then
-    MediaWikiQueryAdd(Queries, 'tlcontinue', TemplateStart);
+  MediaWikiQueryAdd(Queries, ContinueInfo);
 
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageTemplateInfos);
+procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageTemplateInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Pages, Page, Templates, Template: TJclSimpleXMLElem;
+  Query, Pages, Page, Templates, Template, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageTitle, PageID, PageNamespace, TemplateNamespace, TemplateTitle: TJclSimpleXMLProp;
 begin
@@ -2030,14 +2010,9 @@ begin
       Infos[K].TemplateNameSpace := TemplateNamespace.IntValue;
     end;
   end;
-end;
 
-procedure MediaWikiQueryPageTemplateInfoParseXmlResult(XML: TJclSimpleXML; out StartTemplate: string);
-var
-  QueryContinue, Templates: TJclSimpleXMLElem;
-  tlContinue: TJclSimpleXMLProp;
-begin
-  StartTemplate := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2046,16 +2021,16 @@ begin
   Templates := QueryContinue.Items.ItemNamed['templates'];
   if not Assigned(Templates) then
     Exit;
-  tlContinue := Templates.Properties.ItemNamed['tlcontinue'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if Templates.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(tlContinue) then
-    StartTemplate :=tlContinue.Value;
+  ContinueInfo.ParameterName := Templates.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := Templates.Properties.Item[0].Value;
 end;
 
 // query, page info, ext links
 procedure MediaWikiQueryPageExtLinkInfoAdd(Queries: TStrings; const Titles: string; PageID: Boolean;
-  MaxLinks: Integer; const StartLink: string; OutputFormat: TMediaWikiOutputFormat);
+  const ContinueInfo: TMediaWikiContinueInfo; MaxLinks: Integer; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'prop', 'extlinks');
@@ -2068,15 +2043,14 @@ begin
   if MaxLinks > 0 then
     MediaWikiQueryAdd(Queries, 'ellimit', IntToStr(MaxLinks));
 
-  if StartLink <> '' then
-    MediaWikiQueryAdd(Queries, 'eloffset', StartLink, True);
+  MediaWikiQueryAdd(Queries, ContinueInfo);
 
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageExtLinkInfos);
+procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiPageExtLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Pages, Page, ExtLinks, ExtLink: TJclSimpleXMLElem;
+  Query, Pages, Page, ExtLinks, ExtLink, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageTitle, PageID, PageNamespace: TJclSimpleXMLProp;
 begin
@@ -2105,14 +2079,9 @@ begin
       Infos[K].ExtLinkTarget := ExtLink.Value;
     end;
   end;
-end;
 
-procedure MediaWikiQueryPageExtLinkInfoParseXmlResult(XML: TJclSimpleXML; out StartExtLink: string);
-var
-  QueryContinue, ExtLinks: TJclSimpleXMLElem;
-  elOffset: TJclSimpleXMLProp;
-begin
-  StartExtLink := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2121,24 +2090,22 @@ begin
   ExtLinks := QueryContinue.Items.ItemNamed['extlinks'];
   if not Assigned(ExtLinks) then
     Exit;
-  elOffset := ExtLinks.Properties.ItemNamed['eloffset'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if ExtLinks.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(elOffset) then
-    StartExtLink := elOffset.Value;
+  ContinueInfo.ParameterName := ExtLinks.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := ExtLinks.Properties.Item[0].Value;
 end;
 
 // query, list, all pages
-procedure MediaWikiQueryAllPageAdd(Queries: TStrings; const StartPage, Prefix: string; MaxPage: Integer;
+procedure MediaWikiQueryAllPageAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxPage: Integer;
   Namespace: Integer; RedirFilter: TMediaWikiAllPageFilterRedir; LangFilter: TMediaWikiAllPageFilterLang;
   MinSize, MaxSize: Integer; ProtectionFilter: TMediaWikiAllPageFilterProtection;
   LevelFilter: TMediaWikiAllPageFilterLevel; Direction: TMediaWikiAllPageDirection; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'allpages');
-
-  if StartPage <> '' then
-    MediaWikiQueryAdd(Queries, 'apfrom', StartPage, True);
 
   if Prefix <> '' then
     MediaWikiQueryAdd(Queries, 'apprefix', Prefix);
@@ -2184,12 +2151,14 @@ begin
   else
     MediaWikiQueryAdd(Queries, 'apdir', 'descending');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllPageInfos);
+procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllPageInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, AllPages, Page: TJclSimpleXMLElem;
+  Query, AllPages, Page, QueryContinue: TJclSimpleXMLElem;
   Index: Integer;
   PageTitle, PageID, PageNamespace: TJclSimpleXMLProp;
 begin
@@ -2209,14 +2178,9 @@ begin
     Infos[Index].PageID := PageID.IntValue;
     Infos[Index].PageNamespace := PageNamespace.IntValue;
   end;
-end;
 
-procedure MediaWikiQueryAllPageParseXmlResult(XML: TJclSimpleXML; out StartPage: string);
-var
-  QueryContinue, AllPages: TJclSimpleXMLElem;
-  apFrom: TJclSimpleXMLProp;
-begin
-  StartPage := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2225,25 +2189,19 @@ begin
   AllPages := QueryContinue.Items.ItemNamed['allpages'];
   if not Assigned(AllPages) then
     Exit;
-  apFrom := AllPages.Properties.ItemNamed['apfrom'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if AllPages.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(apFrom) then
-    StartPage := apFrom.Value;
+  ContinueInfo.ParameterName := AllPages.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := AllPages.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryAllLinkAdd(Queries: TStrings; const StartLink, Prefix: string; MaxLink: Integer;
-  const ContinueLink: string; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags;
+procedure MediaWikiQueryAllLinkAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxLink: Integer; Namespace: Integer; Flags: TMediaWikiAllLinkInfoFlags;
   OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'alllinks');
-
-  if StartLink <> '' then
-    MediaWikiQueryAdd(Queries, 'alfrom', StartLink);
-
-  if ContinueLink <> '' then
-    MediaWikiQueryAdd(Queries, 'alcontinue', ContinueLink, True);
 
   if Prefix <> '' then
     MediaWikiQueryAdd(Queries, 'alprefix', Prefix);
@@ -2260,12 +2218,14 @@ begin
   if mwfLinkIncludePageID in Flags then
     MediaWikiQueryAdd(Queries, 'alprop', 'ids');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllLinkInfos);
+procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, AllLinks, Link: TJclSimpleXMLElem;
+  Query, AllLinks, Link, QueryContinue: TJclSimpleXMLElem;
   Index: Integer;
   LinkTitle, PageID, LinkNamespace: TJclSimpleXMLProp;
 begin
@@ -2285,14 +2245,9 @@ begin
     Infos[Index].PageID := PageID.IntValue;
     Infos[Index].LinkNamespace := LinkNamespace.IntValue;
   end;
-end;
 
-procedure MediaWikiQueryAllLinkParseXmlResult(XML: TJclSimpleXML; out StartPage: string);
-var
-  QueryContinue, AllLinks: TJclSimpleXMLElem;
-  alFrom: TJclSimpleXMLProp;
-begin
-  StartPage := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2301,21 +2256,19 @@ begin
   AllLinks := QueryContinue.Items.ItemNamed['alllinks'];
   if not Assigned(AllLinks) then
     Exit;
-  alFrom := AllLinks.Properties.ItemNamed['alcontinue'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if AllLinks.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(alFrom) then
-    StartPage := alFrom.Value;
+  ContinueInfo.ParameterName := AllLinks.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := AllLinks.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryAllCategoryAdd(Queries: TStrings; const StartCategory, Prefix: string; MaxCategory: Integer;
+procedure MediaWikiQueryAllCategoryAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix: string; MaxCategory: Integer;
   Flags: TMediaWikiAllCategoryInfoFlags; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'allcategories');
-
-  if StartCategory <> '' then
-    MediaWikiQueryAdd(Queries, 'acfrom', StartCategory, True);
 
   if Prefix <> '' then
     MediaWikiQueryAdd(Queries, 'acprefix', Prefix);
@@ -2326,12 +2279,14 @@ begin
   if mwfCategoryDescending in Flags then
     MediaWikiQueryAdd(Queries, 'acdir', 'descending');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; Infos: TStrings);
+procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; Infos: TStrings; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, AllCategories, Category: TJclSimpleXMLElem;
+  Query, AllCategories, Category, QueryContinue: TJclSimpleXMLElem;
   Index: Integer;
 begin
   Infos.Clear;
@@ -2348,14 +2303,9 @@ begin
   finally
     Infos.EndUpdate
   end;
-end;
 
-procedure MediaWikiQueryAllCategoryParseXmlResult(XML: TJclSimpleXML; out StartCategory: string);
-var
-  QueryContinue, AllCategories: TJclSimpleXMLElem;
-  acFrom: TJclSimpleXMLProp;
-begin
-  StartCategory := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2364,21 +2314,19 @@ begin
   AllCategories := QueryContinue.Items.ItemNamed['allcategories'];
   if not Assigned(AllCategories) then
     Exit;
-  acFrom := AllCategories.Properties.ItemNamed['acfrom'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if AllCategories.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(acFrom) then
-    StartCategory := acFrom.Value;
+  ContinueInfo.ParameterName := AllCategories.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := AllCategories.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryAllUserAdd(Queries: TStrings; const StartUser, Prefix, Group: string; MaxUser: Integer;
+procedure MediaWikiQueryAllUserAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const Prefix, Group: string; MaxUser: Integer;
   Flags: TMediaWikiAllUserInfoFlags; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'allusers');
-
-  if StartUser <> '' then
-    MediaWikiQueryAdd(Queries, 'aufrom', StartUser);
 
   if Prefix <> '' then
     MediaWikiQueryAdd(Queries, 'auprefix', Prefix);
@@ -2396,12 +2344,14 @@ begin
   if mwfIncludeUserRegistration in Flags then
     MediaWikiQueryAdd(Queries, 'auprop', 'registration');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllUserInfos);
+procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiAllUserInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, AllUsers, User, Groups, Group: TJclSimpleXMLElem;
+  Query, AllUsers, User, Groups, Group, QueryContinue: TJclSimpleXMLElem;
   I, J: Integer;
   Name, EditCount, Registration: TJclSimpleXMLProp;
 begin
@@ -2429,14 +2379,9 @@ begin
       Infos[I].UserGroups[J] := Group.Value;
     end;
   end;
-end;
 
-procedure MediaWikiQueryAllUserParseXmlResult(XML: TJclSimpleXML; out StartUser: string);
-var
-  QueryContinue, AllUsers: TJclSimpleXMLElem;
-  auFrom: TJclSimpleXMLProp;
-begin
-  StartUser := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2445,15 +2390,15 @@ begin
   AllUsers := QueryContinue.Items.ItemNamed['allusers'];
   if not Assigned(AllUsers) then
     Exit;
-  auFrom := AllUsers.Properties.ItemNamed['aufrom'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if AllUsers.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(auFrom) then
-    StartUser := auFrom.Value;
+  ContinueInfo.ParameterName := AllUsers.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := AllUsers.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryBackLinkAdd(Queries: TStrings; const BackLinkTitle: string; Namespace, MaxLink: Integer; const StartBackLink: string;
-  Flags: TMediaWikiBackLinkInfoFlags; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiQueryBackLinkAdd(Queries: TStrings; const BackLinkTitle: string; const ContinueInfo: TMediaWikiContinueInfo;
+  Namespace, MaxLink: Integer; Flags: TMediaWikiBackLinkInfoFlags; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'backlinks');
@@ -2467,9 +2412,6 @@ begin
   if MaxLink > 0 then
     MediaWikiQueryAdd(Queries, 'bllimit', IntToStr(MaxLink));
 
-  if StartBackLink <> '' then
-    MediaWikiQueryAdd(Queries, 'blcontinue', StartBackLink, True);
-
   if mwfIncludeBackLinksFromRedirect in Flags then
     MediaWikiQueryAdd(Queries, 'blredirect');
 
@@ -2481,12 +2423,14 @@ begin
   else
     MediaWikiQueryAdd(Queries, 'blfilterredir', 'all');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBackLinkInfos);
+procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBackLinkInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, BackLinks, BackLink, RedirLinks, RedirLink: TJclSimpleXMLElem;
+  Query, BackLinks, BackLink, RedirLinks, RedirLink, QueryContinue: TJclSimpleXMLElem;
   I, J, K: Integer;
   PageID, PageNamespace, PageTitle, Redirect, RedirPageID, RedirPageNamespace, RedirPageTitle: TJclSimpleXMLProp;
 begin
@@ -2538,14 +2482,9 @@ begin
       Infos[K].BackLinkRedirFromPageBasics.PageTitle := RedirPageTitle.Value;
     end;
   end;
-end;
 
-procedure MediaWikiQueryBackLinkParseXmlResult(XML: TJclSimpleXML; out StartBackLink: string);
-var
-  QueryContinue, BackLinks: TJclSimpleXMLElem;
-  blContinue: TJclSimpleXMLProp;
-begin
-  StartBackLink := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2554,15 +2493,16 @@ begin
   BackLinks := QueryContinue.Items.ItemNamed['backlinks'];
   if not Assigned(BackLinks) then
     Exit;
-  blContinue := BackLinks.Properties.ItemNamed['blcontinue'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if BackLinks.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(blContinue) then
-    StartBackLink := blContinue.Value;
+  ContinueInfo.ParameterName := BackLinks.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := BackLinks.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryBlockAdd(Queries: TStrings; const StartDateTime, StopDateTime: TDateTime;
-  const BlockIDs, Users, IP: string; MaxBlock: Integer; const StartBlock: string;
+procedure MediaWikiQueryBlockAdd(Queries: TStrings; const ContinueInfo: TMediaWikiContinueInfo;
+  const StartDateTime, StopDateTime: TDateTime;
+  const BlockIDs, Users, IP: string; MaxBlock: Integer;
   Flags: TMediaWikiBlockInfoFlags; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
@@ -2586,9 +2526,6 @@ begin
   if MaxBlock > 0 then
     MediaWikiQueryAdd(Queries, 'bklimit', IntToStr(MaxBlock));
 
-  if StartBlock <> '' then
-    MediaWikiQueryAdd(Queries, 'bkstart', StartBlock, True);
-
   if mwfBlockID in Flags then
     MediaWikiQueryAdd(Queries, 'bkprop', 'id');
   if mwfBlockUser in Flags then
@@ -2610,12 +2547,14 @@ begin
   else
     MediaWikiQueryAdd(Queries, 'bkdir', 'newer');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+  
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBlockInfos);
+procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiBlockInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, Blocks, Block: TJclSimpleXMLElem;
+  Query, Blocks, Block, QueryContinue: TJclSimpleXMLElem;
   Index: Integer;
   ID, User, UserID, By, ByUserID, TimeStamp, Expiry, Reason, RangeStart, RangeEnd,
   Automatic, AnonOnly, NoCreate, AutoBlock, NoEmail, Hidden: TJclSimpleXMLProp;
@@ -2672,14 +2611,9 @@ begin
     if Assigned(Hidden) then
       Include(Infos[Index].BlockFlags, mwfBlockHidden);
   end;
-end;
 
-procedure MediaWikiQueryBlockParseXmlResult(XML: TJclSimpleXML; out StartBlock: string);
-var
-  QueryContinue, Blocks: TJclSimpleXMLElem;
-  bkStart: TJclSimpleXMLProp;
-begin
-  StartBlock := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2688,17 +2622,17 @@ begin
   Blocks := QueryContinue.Items.ItemNamed['blocks'];
   if not Assigned(Blocks) then
     Exit;
-  bkStart := Blocks.Properties.ItemNamed['bkstart'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if Blocks.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(bkStart) then
-    StartBlock := bkStart.Value;
+  ContinueInfo.ParameterName := Blocks.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := Blocks.Properties.Item[0].Value;
 end;
 
-procedure MediaWikiQueryCategoryMemberAdd(Queries: TStrings; const CategoryTitle: string; PageNameSpace: Integer;
+procedure MediaWikiQueryCategoryMemberAdd(Queries: TStrings; const CategoryTitle: string;
+  const ContinueInfo: TMediaWikiContinueInfo; PageNameSpace: Integer;
   const StartDateTime, StopDateTime: TDateTime; const StartSortKey, StopSortKey: string;
-  MaxCategoryMember: Integer; const StartCategoryMember: string;
-  Flags: TMediaWikiCategoryMemberInfoFlags; OutputFormat: TMediaWikiOutputFormat);
+  MaxCategoryMember: Integer; Flags: TMediaWikiCategoryMemberInfoFlags; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'query');
   MediaWikiQueryAdd(Queries, 'list', 'categorymembers');
@@ -2708,7 +2642,7 @@ begin
 
   if PageNamespace >= 0 then
     MediaWikiQueryAdd(Queries, 'cmnamespace', IntToStr(PageNamespace));
-  
+
   if StartDateTime <> 0.0 then
   begin
     MediaWikiQueryAdd(Queries, 'cmsort', 'timestamp');
@@ -2730,9 +2664,6 @@ begin
   if MaxCategoryMember > 0 then
     MediaWikiQueryAdd(Queries, 'cmlimit', IntToStr(MaxCategoryMember));
 
-  if StartCategoryMember <> '' then
-    MediaWikiQueryAdd(Queries, 'cmcontinue', StartCategoryMember, True);
-
   if mwfCategoryMemberPageID in Flags then
     MediaWikiQueryAdd(Queries, 'cmprop', 'ids');
   if mwfCategoryMemberPageTitle in Flags then
@@ -2746,12 +2677,14 @@ begin
   else
     MediaWikiQueryAdd(Queries, 'cmdir', 'desc');
 
+  MediaWikiQueryAdd(Queries, ContinueInfo);
+
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
-procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiCategoryMemberInfos);
+procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out Infos: TMediaWikiCategoryMemberInfos; out ContinueInfo: TMediaWikiContinueInfo);
 var
-  Query, CategoryMembers, CategoryMember: TJclSimpleXMLElem;
+  Query, CategoryMembers, CategoryMember, QueryContinue: TJclSimpleXMLElem;
   Index: Integer;
   PageID, NS, Title, SortKey, TimeStamp: TJclSimpleXMLProp;
 begin
@@ -2775,14 +2708,9 @@ begin
     Infos[Index].CategoryMemberDateTime := StrISO8601ToDateTime(TimeStamp.Value);
     Infos[Index].CategoryMemberSortKey := SortKey.Value;
   end;
-end;
 
-procedure MediaWikiQueryCategoryMemberParseXmlResult(XML: TJclSimpleXML; out StartCategoryMember: string);
-var
-  QueryContinue, CategoryMembers: TJclSimpleXMLElem;
-  cmStart, cmContinue: TJclSimpleXMLProp;
-begin
-  StartCategoryMember := '';
+  ContinueInfo.ParameterName := '';
+  ContinueInfo.ParameterValue := '';
   // process continuation
   XML.Options := XML.Options - [sxoAutoCreate];
   QueryContinue := XML.Root.Items.ItemNamed['query-continue'];
@@ -2791,15 +2719,11 @@ begin
   CategoryMembers := QueryContinue.Items.ItemNamed['categorymembers'];
   if not Assigned(CategoryMembers) then
     Exit;
-  cmStart := CategoryMembers.Properties.ItemNamed['cmstart'];
-  cmContinue := CategoryMembers.Properties.ItemNamed['cmcontinue'];
-  XML.Options := XML.Options + [sxoAutoCreate];
+  if CategoryMembers.Properties.Count <> 1 then
+    Exit;
 
-  if Assigned(cmStart) then
-    StartCategoryMember := cmStart.Value
-  else
-  if Assigned(cmContinue) then
-    StartCategoryMember := cmContinue.Value;
+  ContinueInfo.ParameterName := CategoryMembers.Properties.Item[0].Name;
+  ContinueInfo.ParameterValue := CategoryMembers.Properties.Item[0].Value;
 end;
 
 procedure MediaWikiEditAdd(Queries: TStrings; const PageTitle, Section, Text, PrependText, AppendText, EditToken, Summary, MD5, CaptchaID, CaptchaWord: string;

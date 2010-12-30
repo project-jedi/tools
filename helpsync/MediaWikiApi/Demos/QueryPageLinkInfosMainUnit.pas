@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllPageLinkDone(Sender: TMediaWikiApi; const PageLinkInfos: TMediaWikiPageLinkInfos);
-    procedure MediaWikiAllPageLinkContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllPageLinkDone(Sender: TMediaWikiApi; const PageLinkInfos: TMediaWikiPageLinkInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageLinkInfoDone := MediaWikiAllPageLinkDone;
-  FMediaWikiApi.OnQueryPageLinkInfoContinue := MediaWikiAllPageLinkContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryPageLinkInfoAsync(EditPage.Text, False, StrToInt(EditMaxLinks.Text), -1, EditStartLink.Text);
+  FMediaWikiApi.QueryPageLinkInfoAsync(EditPage.Text, False, FContinueInfo, StrToInt(EditMaxLinks.Text), -1);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,8 +54,7 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageLinkInfoDone := nil;
-  FMediaWikiApi.OnQueryPageLinkInfoContinue := nil;
-  FMediaWikiApi.QueryPageLinkInfo(EditPage.Text, False, LinkInfos, StrToInt(EditMaxLinks.Text), -1, EditStartLink.Text);
+  FMediaWikiApi.QueryPageLinkInfo(EditPage.Text, False, LinkInfos, FContinueInfo, StrToInt(EditMaxLinks.Text), -1);
   for Index := Low(LinkInfos) to High(LinkInfos) do
   begin
     MemoResult.Lines.Add('source page title = ' + LinkInfos[Index].LinkSourceBasics.PageTitle);
@@ -65,6 +64,7 @@ begin
     MemoResult.Lines.Add('target page namespace = ' + IntToStr(LinkInfos[Index].LinkTargetNameSpace));
     MemoResult.Lines.Add('');
   end;
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -85,14 +85,8 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllPageLinkContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartLink.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllPageLinkDone(Sender: TMediaWikiApi;
-  const PageLinkInfos: TMediaWikiPageLinkInfos);
+  const PageLinkInfos: TMediaWikiPageLinkInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
@@ -105,6 +99,8 @@ begin
     MemoResult.Lines.Add('target page namespace = ' + IntToStr(PageLinkInfos[Index].LinkTargetNameSpace));
     MemoResult.Lines.Add('');
   end;
+  FContinueInfo := ContinueInfo;
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

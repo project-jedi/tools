@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllPageTemplateDone(Sender: TMediaWikiApi; const PageTemplateInfos: TMediaWikiPageTemplateInfos);
-    procedure MediaWikiAllPageTemplateContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllPageTemplateDone(Sender: TMediaWikiApi; const PageTemplateInfos: TMediaWikiPageTemplateInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageTemplateInfoDone := MediaWikiAllPageTemplateDone;
-  FMediaWikiApi.OnQueryPageTemplateInfoContinue := MediaWikiAllPageTemplateContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryPageTemplateInfoAsync(EditPage.Text, False, StrToInt(EditMaxTemplates.Text), -1, EditStartTemplate.Text);
+  FMediaWikiApi.QueryPageTemplateInfoAsync(EditPage.Text, False, FContinueInfo, StrToInt(EditMaxTemplates.Text), -1);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,8 +54,7 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageTemplateInfoDone := nil;
-  FMediaWikiApi.OnQueryPageTemplateInfoContinue := nil;
-  FMediaWikiApi.QueryPageTemplateInfo(EditPage.Text, False, TemplateInfos, StrToInt(EditMaxTemplates.Text), -1, EditStartTemplate.Text);
+  FMediaWikiApi.QueryPageTemplateInfo(EditPage.Text, False, TemplateInfos, FContinueInfo, StrToInt(EditMaxTemplates.Text), -1);
   for Index := Low(TemplateInfos) to High(TemplateInfos) do
   begin
     MemoResult.Lines.Add('template page title = ' + TemplateInfos[Index].TemplatePageBasics.PageTitle);
@@ -65,6 +64,7 @@ begin
     MemoResult.Lines.Add('page namespace = ' + IntToStr(TemplateInfos[Index].TemplateNameSpace));
     MemoResult.Lines.Add('');
   end;
+  EditStartTemplate.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -85,14 +85,8 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllPageTemplateContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartTemplate.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllPageTemplateDone(Sender: TMediaWikiApi;
-  const PageTemplateInfos: TMediaWikiPageTemplateInfos);
+  const PageTemplateInfos: TMediaWikiPageTemplateInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
@@ -105,6 +99,8 @@ begin
     MemoResult.Lines.Add('page namespace = ' + IntToStr(PageTemplateInfos[Index].TemplateNameSpace));
     MemoResult.Lines.Add('');
   end;
+  FContinueInfo := ContinueInfo;
+  EditStartTemplate.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

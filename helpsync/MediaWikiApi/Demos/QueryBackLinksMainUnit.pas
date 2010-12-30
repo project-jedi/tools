@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiBackLinkDone(Sender: TMediaWikiApi; const BackLinkInfos: TMediaWikiBackLinkInfos);
-    procedure MediaWikiBackLinkContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiBackLinkDone(Sender: TMediaWikiApi; const BackLinkInfos: TMediaWikiBackLinkInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryBackLinkInfoDone := MediaWikiBackLinkDone;
-  FMediaWikiApi.OnQueryBackLinkInfoContinue := MediaWikiBackLinkContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryBackLinkInfoAsync(EditPageTitle.Text, -1, StrToInt(EditMaxLinks.Text), EditStartLink.Text, []);
+  FMediaWikiApi.QueryBackLinkInfoAsync(EditPageTitle.Text, FContinueInfo, -1, StrToInt(EditMaxLinks.Text), []);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,10 +54,10 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryBackLinkInfoDone := nil;
-  FMediaWikiApi.OnQueryBackLinkInfoContinue := nil;
-  FMediaWikiApi.QueryBackLinkInfo(EditPageTitle.Text, BackLinkInfos, -1, StrToInt(EditMaxLinks.Text), EditStartLink.Text, []);
+  FMediaWikiApi.QueryBackLinkInfo(EditPageTitle.Text, BackLinkInfos, FContinueInfo, -1, StrToInt(EditMaxLinks.Text), []);
   for Index := Low(BackLinkInfos) to High(BackLinkInfos) do
     MemoResult.Lines.Add(BackLinkInfos[Index].BackLinkPageBasics.PageTitle);
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -78,19 +78,15 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiBackLinkContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartLink.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiBackLinkDone(Sender: TMediaWikiApi;
-  const BackLinkInfos: TMediaWikiBackLinkInfos);
+  const BackLinkInfos: TMediaWikiBackLinkInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
   for Index := Low(BackLinkInfos) to High(BackLinkInfos) do
     MemoResult.Lines.Add(BackLinkInfos[Index].BackLinkPageBasics.PageTitle);
+  FContinueInfo := ContinueInfo;
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

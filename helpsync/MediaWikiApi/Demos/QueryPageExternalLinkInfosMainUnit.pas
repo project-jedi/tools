@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllPageExternalLinkDone(Sender: TMediaWikiApi; const PageExternalLinkInfos: TMediaWikiPageExtLinkInfos);
-    procedure MediaWikiAllPageExternalLinkContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllPageExternalLinkDone(Sender: TMediaWikiApi; const PageExternalLinkInfos: TMediaWikiPageExtLinkInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageExtLinkInfoDone := MediaWikiAllPageExternalLinkDone;
-  FMediaWikiApi.OnQueryPageExtLinkInfoContinue := MediaWikiAllPageExternalLinkContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryPageExtLinkInfoAsync(EditPage.Text, False, StrToInt(EditMaxLinks.Text), EditStartLink.Text);
+  FMediaWikiApi.QueryPageExtLinkInfoAsync(EditPage.Text, False, FContinueInfo, StrToInt(EditMaxLinks.Text));
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,8 +54,7 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageLinkInfoDone := nil;
-  FMediaWikiApi.OnQueryPageLinkInfoContinue := nil;
-  FMediaWikiApi.QueryPageExtLinkInfo(EditPage.Text, False, ExternalLinkInfos, StrToInt(EditMaxLinks.Text), EditStartLink.Text);
+  FMediaWikiApi.QueryPageExtLinkInfo(EditPage.Text, False, ExternalLinkInfos, FContinueInfo, StrToInt(EditMaxLinks.Text));
   for Index := Low(ExternalLinkInfos) to High(ExternalLinkInfos) do
   begin
     MemoResult.Lines.Add('source page title = ' + ExternalLinkInfos[Index].ExtLinkPageBasics.PageTitle);
@@ -64,6 +63,7 @@ begin
     MemoResult.Lines.Add('target = ' + ExternalLinkInfos[Index].ExtLinkTarget);
     MemoResult.Lines.Add('');
   end;
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -84,14 +84,8 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllPageExternalLinkContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartLink.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllPageExternalLinkDone(Sender: TMediaWikiApi;
-  const PageExternalLinkInfos: TMediaWikiPageExtLinkInfos);
+  const PageExternalLinkInfos: TMediaWikiPageExtLinkInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
@@ -103,6 +97,8 @@ begin
     MemoResult.Lines.Add('target = ' + PageExternalLinkInfos[Index].ExtLinkTarget);
     MemoResult.Lines.Add('');
   end;
+  FContinueInfo := ContinueInfo;
+  EditStartLink.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

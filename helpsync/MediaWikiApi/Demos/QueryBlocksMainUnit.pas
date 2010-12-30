@@ -23,8 +23,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiBlockDone(Sender: TMediaWikiApi; const BlockInfos: TMediaWikiBlockInfos);
-    procedure MediaWikiBlockContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiBlockDone(Sender: TMediaWikiApi; const BlockInfos: TMediaWikiBlockInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -39,9 +40,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryBlockInfoDone := MediaWikiBlockDone;
-  FMediaWikiApi.OnQueryBlockInfoContinue := MediaWikiBlockContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryBlockInfoAsync(0.0, 0.0, '', '', '', StrToInt(EditMaxBlocks.Text), EditStartBlock.Text, []);
+  FMediaWikiApi.QueryBlockInfoAsync(FContinueInfo, 0.0, 0.0, '', '', '', StrToInt(EditMaxBlocks.Text), []);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -52,10 +52,10 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryBlockInfoDone := nil;
-  FMediaWikiApi.OnQueryBlockInfoContinue := nil;
-  FMediaWikiApi.QueryBlockInfo(BlockInfos, 0.0, 0.0, '', '', '', StrToInt(EditMaxBlocks.Text), EditStartBlock.Text, []);
+  FMediaWikiApi.QueryBlockInfo(BlockInfos, FContinueInfo, 0.0, 0.0, '', '', '', StrToInt(EditMaxBlocks.Text), []);
   for Index := Low(BlockInfos) to High(BlockInfos) do
     MemoResult.Lines.Add(BlockInfos[Index].BlockUser);
+  EditStartBlock.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -76,19 +76,15 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiBlockContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartBlock.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiBlockDone(Sender: TMediaWikiApi;
-  const BlockInfos: TMediaWikiBlockInfos);
+  const BlockInfos: TMediaWikiBlockInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
   for Index := Low(BlockInfos) to High(BlockInfos) do
     MemoResult.Lines.Add(BlockInfos[Index].BlockUser);
+  FContinueInfo := ContinueInfo;
+  EditStartBlock.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

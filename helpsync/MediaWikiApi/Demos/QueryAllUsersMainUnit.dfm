@@ -69,6 +69,13 @@ object MainForm: TMainForm
     Top = 97
     Width = 57
     Height = 21
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBtnFace
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ReadOnly = True
     TabOrder = 4
   end
 end

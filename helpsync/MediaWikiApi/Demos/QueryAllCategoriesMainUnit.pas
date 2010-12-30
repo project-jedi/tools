@@ -23,8 +23,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllCategorieDone(Sender: TMediaWikiApi; CategorieInfos: TStrings);
-    procedure MediaWikiAllCategorieContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllCategorieDone(Sender: TMediaWikiApi; CategorieInfos: TStrings;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -39,9 +40,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryAllCategoryInfoDone := MediaWikiAllCategorieDone;
-  FMediaWikiApi.OnQueryAllCategoryInfoContinue := MediaWikiAllCategorieContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryAllCategoryInfoAsync(EditStartCategory.Text, '', StrToInt(EditMaxCategories.Text), []);
+  FMediaWikiApi.QueryAllCategoryInfoAsync(FContinueInfo, '', StrToInt(EditMaxCategories.Text), []);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -49,8 +49,8 @@ procedure TMainForm.ButtonQuerySyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryAllCategoryInfoDone := nil;
-  FMediaWikiApi.OnQueryAllCategoryInfoContinue := nil;
-  FMediaWikiApi.QueryAllCategoryInfo(MemoResult.Lines, EditStartCategory.Text, '', StrToInt(EditMaxCategories.Text), []);
+  FMediaWikiApi.QueryAllCategoryInfo(MemoResult.Lines, FContinueInfo, '', StrToInt(EditMaxCategories.Text), []);
+  EditStartCategory.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -71,16 +71,12 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllCategorieContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartCategory.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllCategorieDone(Sender: TMediaWikiApi;
-  CategorieInfos: TStrings);
+  CategorieInfos: TStrings; const ContinueInfo: TMediaWikiContinueInfo);
 begin
   MemoResult.Lines.Assign(CategorieInfos);
+  FContinueInfo := ContinueInfo;
+  EditStartCategory.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

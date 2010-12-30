@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiCategoryMemberDone(Sender: TMediaWikiApi; const CategoryMemberInfos: TMediaWikiCategoryMemberInfos);
-    procedure MediaWikiCategoryMemberContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiCategoryMemberDone(Sender: TMediaWikiApi; const CategoryMemberInfos: TMediaWikiCategoryMemberInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryCategoryMemberInfoDone := MediaWikiCategoryMemberDone;
-  FMediaWikiApi.OnQueryCategoryMemberInfoContinue := MediaWikiCategoryMemberContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryCategoryMemberInfoAsync(EditCategory.Text, -1, 0.0, 0.0, '', '', StrToInt(EditMaxCategoryMembers.Text), EditStartCategoryMember.Text, []);
+  FMediaWikiApi.QueryCategoryMemberInfoAsync(EditCategory.Text, FContinueInfo, -1, 0.0, 0.0, '', '', StrToInt(EditMaxCategoryMembers.Text), []);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,10 +54,10 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryCategoryMemberInfoDone := nil;
-  FMediaWikiApi.OnQueryCategoryMemberInfoContinue := nil;
-  FMediaWikiApi.QueryCategoryMemberInfo(EditCategory.Text, CategoryMemberInfos, -1, 0.0, 0.0, '', '', StrToInt(EditMaxCategoryMembers.Text), EditStartCategoryMember.Text, []);
+  FMediaWikiApi.QueryCategoryMemberInfo(EditCategory.Text, CategoryMemberInfos, FContinueInfo, -1, 0.0, 0.0, '', '', StrToInt(EditMaxCategoryMembers.Text), []);
   for Index := Low(CategoryMemberInfos) to High(CategoryMemberInfos) do
     MemoResult.Lines.Add(CategoryMemberInfos[Index].CategoryMemberPageBasics.PageTitle);
+  EditStartCategoryMember.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -78,19 +78,15 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiCategoryMemberContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartCategoryMember.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiCategoryMemberDone(Sender: TMediaWikiApi;
-  const CategoryMemberInfos: TMediaWikiCategoryMemberInfos);
+  const CategoryMemberInfos: TMediaWikiCategoryMemberInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
   for Index := Low(CategoryMemberInfos) to High(CategoryMemberInfos) do
     MemoResult.Lines.Add(CategoryMemberInfos[Index].CategoryMemberPageBasics.PageTitle);
+  FContinueInfo := ContinueInfo;
+  EditStartCategoryMember.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

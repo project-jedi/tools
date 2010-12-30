@@ -23,8 +23,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllUserDone(Sender: TMediaWikiApi; const UserInfos: TMediaWikiAllUserInfos);
-    procedure MediaWikiAllUserContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllUserDone(Sender: TMediaWikiApi; const UserInfos: TMediaWikiAllUserInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -39,9 +40,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryAllUserInfoDone := MediaWikiAllUserDone;
-  FMediaWikiApi.OnQueryAllUserInfoContinue := MediaWikiAllUserContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryAllUserInfoAsync(EditStartUser.Text, '', '', StrToInt(EditMaxUsers.Text), []);
+  FMediaWikiApi.QueryAllUserInfoAsync(FContinueInfo, '', '', StrToInt(EditMaxUsers.Text), []);
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -52,10 +52,10 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryAllUserInfoDone := nil;
-  FMediaWikiApi.OnQueryAllUserInfoContinue := nil;
-  FMediaWikiApi.QueryAllUserInfo(UserInfos, EditStartUser.Text, '', '', StrToInt(EditMaxUsers.Text), []);
+  FMediaWikiApi.QueryAllUserInfo(UserInfos, FContinueInfo, '', '', StrToInt(EditMaxUsers.Text), []);
   for Index := Low(UserInfos) to High(UserInfos) do
     MemoResult.Lines.Add(UserInfos[Index].UserName);
+  EditStartUser.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -76,19 +76,15 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllUserContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartUser.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllUserDone(Sender: TMediaWikiApi;
-  const UserInfos: TMediaWikiAllUserInfos);
+  const UserInfos: TMediaWikiAllUserInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
   for Index := Low(UserInfos) to High(UserInfos) do
     MemoResult.Lines.Add(UserInfos[Index].UserName);
+  FContinueInfo := ContinueInfo;
+  EditStartUser.Text := FContinueInfo.ParameterValue;
 end;
 
 end.

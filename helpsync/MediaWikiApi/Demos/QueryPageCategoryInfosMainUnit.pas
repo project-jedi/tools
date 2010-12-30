@@ -25,8 +25,9 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FMediaWikiApi: TMediaWikiApi;
-    procedure MediaWikiAllPageCategoryDone(Sender: TMediaWikiApi; const PageCategoryInfos: TMediaWikiPageCategoryInfos);
-    procedure MediaWikiAllPageCategoryContinue(Sender: TMediaWikiApi; const Start: string);
+    FContinueInfo: TMediaWikiContinueInfo;
+    procedure MediaWikiAllPageCategoryDone(Sender: TMediaWikiApi; const PageCategoryInfos: TMediaWikiPageCategoryInfos;
+      const ContinueInfo: TMediaWikiContinueInfo);
   public
   end;
 
@@ -41,9 +42,8 @@ procedure TMainForm.ButtonQueryAsyncClick(Sender: TObject);
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageCategoryInfoDone := MediaWikiAllPageCategoryDone;
-  FMediaWikiApi.OnQueryPageCategoryInfoContinue := MediaWikiAllPageCategoryContinue;
   FMediaWikiApi.QueryInit;
-  FMediaWikiApi.QueryPageCategoryInfoAsync(EditPage.Text, False, [], StrToInt(EditMaxCategories.Text), '', EditStartCategory.Text);
+  FMediaWikiApi.QueryPageCategoryInfoAsync(EditPage.Text, False, [], FContinueInfo, StrToInt(EditMaxCategories.Text), '');
   FMediaWikiApi.QueryExecuteAsync;
 end;
 
@@ -54,8 +54,7 @@ var
 begin
   MemoResult.Lines.Clear;
   FMediaWikiApi.OnQueryPageCategoryInfoDone := nil;
-  FMediaWikiApi.OnQueryPageCategoryInfoContinue := nil;
-  FMediaWikiApi.QueryPageCategoryInfo(EditPage.Text, False, [], PageInfos, StrToInt(EditMaxCategories.Text), '', EditStartCategory.Text);
+  FMediaWikiApi.QueryPageCategoryInfo(EditPage.Text, False, [], PageInfos, FContinueInfo, StrToInt(EditMaxCategories.Text), '');
   for Index := Low(PageInfos) to High(PageInfos) do
   begin
     MemoResult.Lines.Add('page title = ' + PageInfos[Index].CategoryPageBasics.PageTitle);
@@ -66,6 +65,7 @@ begin
     MemoResult.Lines.Add('category datetime = ' + DateTimeToStr(PageInfos[Index].CategoryTimeStamp));
     MemoResult.Lines.Add('');
   end;
+  EditStartCategory.Text := FContinueInfo.ParameterValue;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -86,14 +86,8 @@ begin
   //FMediaWikiApi.Login()
 end;
 
-procedure TMainForm.MediaWikiAllPageCategoryContinue(Sender: TMediaWikiApi;
-  const Start: string);
-begin
-  EditStartCategory.Text := Start;
-end;
-
 procedure TMainForm.MediaWikiAllPageCategoryDone(Sender: TMediaWikiApi;
-  const PageCategoryInfos: TMediaWikiPageCategoryInfos);
+  const PageCategoryInfos: TMediaWikiPageCategoryInfos; const ContinueInfo: TMediaWikiContinueInfo);
 var
   Index: Integer;
 begin
@@ -107,6 +101,8 @@ begin
     MemoResult.Lines.Add('category datetime = ' + DateTimeToStr(PageCategoryInfos[Index].CategoryTimeStamp));
     MemoResult.Lines.Add('');
   end;
+  FContinueInfo := ContinueInfo;
+  EditStartCategory.Text := FContinueInfo.ParameterValue;
 end;
 
 end.
