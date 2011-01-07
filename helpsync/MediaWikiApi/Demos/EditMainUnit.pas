@@ -111,7 +111,7 @@ var
   LoginName, LoginPassword: string;
 begin
   FMediaWikiApi := TMediaWikiApi.Create;
-  FMediaWikiApi.URL := 'http://wiki.delphi-jedi.org/api.php';
+  FMediaWikiApi.URL := 'http://wiki.delphi-jedi.org/w/api.php';
   FMediaWikiApi.UserAgent := 'MediaWiki JEDI bot';
   FMediaWikiApi.FollowRelocation := False;
   // login is mandatory
