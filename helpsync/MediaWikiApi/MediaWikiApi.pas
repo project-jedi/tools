@@ -99,14 +99,8 @@ type
     FRequestCallbacks: TMediaWikiXMLRequestCallbacks;
     FQueryStrings: TStrings;
     FPendingRequests: TMediaWikiRequests;
-    function GetFollowRelocation: Boolean;
     function GetReady: Boolean;
-    function GetURL: string;
-    function GetUserAgent: string;
     procedure RequestDone(Sender: TObject; RqType: THttpRequest; ErrCode: Word);
-    procedure SetFollowRelocation(const Value: Boolean);
-    procedure SetURL(const Value: string);
-    procedure SetUserAgent(const Value: string);
   public
     constructor Create;
     destructor Destroy; override;
@@ -123,9 +117,6 @@ type
     property Ready: Boolean read GetReady;
   published
     property HttpCli: THttpCli read FHttpCli;
-    property URL: string read GetURL write SetURL;
-    property UserAgent: string read GetUserAgent write SetUserAgent;
-    property FollowRelocation: Boolean read GetFollowRelocation write SetFollowRelocation;
   // error handling
   private
     FIgnoreWarnings: Boolean;
@@ -795,24 +786,9 @@ begin
   Include(FPendingRequests, Request);  
 end;
 
-function TMediaWikiApi.GetFollowRelocation: Boolean;
-begin
-  Result := FHttpCli.FollowRelocation;
-end;
-
 function TMediaWikiApi.GetReady: Boolean;
 begin
   Result := FHttpCli.State = httpReady;
-end;
-
-function TMediaWikiApi.GetURL: string;
-begin
-  Result := FHttpCli.URL;
-end;
-
-function TMediaWikiApi.GetUserAgent: string;
-begin
-  Result := FHttpCli.Agent;
 end;
 
 procedure TMediaWikiApi.ProcessXMLError(const AInfo, ACode: string);
@@ -2970,21 +2946,6 @@ begin
   finally
     XML.Free;
   end;
-end;
-
-procedure TMediaWikiApi.SetFollowRelocation(const Value: Boolean);
-begin
-  FHttpCli.FollowRelocation := Value;
-end;
-
-procedure TMediaWikiApi.SetURL(const Value: string);
-begin
-  FHttpCli.URL := Value;
-end;
-
-procedure TMediaWikiApi.SetUserAgent(const Value: string);
-begin
-  FHttpCli.Agent := Value;
 end;
 
 end.
