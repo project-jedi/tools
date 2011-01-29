@@ -55,6 +55,8 @@ const
   MediaWikiExclusiveRequests: TMediaWikiRequests =
     [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete, mwrUpload];
 
+{$TYPEINFO ON}
+
 type
   TMediaWikiApi = class;
 
@@ -118,8 +120,9 @@ type
     procedure QueryExecuteAsync;
 
     property PendingRequests: TMediaWikiRequests read FPendingRequests;
-    property HttpCli: THttpCli read FHttpCli;
     property Ready: Boolean read GetReady;
+  published
+    property HttpCli: THttpCli read FHttpCli;
     property URL: string read GetURL write SetURL;
     property UserAgent: string read GetUserAgent write SetUserAgent;
     property FollowRelocation: Boolean read GetFollowRelocation write SetFollowRelocation;
@@ -151,20 +154,24 @@ type
     procedure LoginParseAndConfirmXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     // synchronous login
+    function Login(AutoConfirmToken: Boolean): TMediaWikiLoginResult; overload;
     function Login(const lgName, lgPassword: string; AutoConfirmToken: Boolean): TMediaWikiLoginResult; overload;
     function Login(const lgName, lgPassword, lgToken: string): TMediaWikiLoginResult; overload;
     function Login(const lgName, lgPassword, lgToken: string; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
     // asynchronous login
+    procedure LoginAsync(AutoConfirmToken: Boolean); overload;
     procedure LoginAsync(const lgName, lgPassword: string; AutoConfirmToken: Boolean); overload;
     procedure LoginAsync(const lgName, lgPassword, lgToken: string); overload;
     property OnLoginDone: TMediaWikiCallback read FOnLoginDone write FOnLoginDone;
     // login states
     property LoginResult: TMediaWikiLoginResult read FLoginResult write FLoginResult;
     property LoginUserID: TMediaWikiID read FLoginUserID write FLoginUserID;
-    property LoginUserName: string read FLoginUserName write FLoginUserName;
     property LoginToken: string read FLoginToken write FLoginToken;
     property CookiePrefix: string read FCookiePrefix write FCookiePrefix;
     property SessionID: string read FSessionID write FSessionID;
+  published
+    property LoginUserName: string read FLoginUserName write FLoginUserName;
+    property LoginPassword: string read FLoginPassword write FLoginPassword;  
   // logout stuff
   private
     FOnLogoutDone: TMediaWikiCallback;
@@ -745,6 +752,8 @@ type
     property OnUploadDone: TMediaWikiUploadCallback read FOnUploadDone write FOnUploadDone;
   end;
 
+{$TYPEINFO OFF}
+
 implementation
 
 uses
@@ -889,6 +898,31 @@ begin
   Result := QueryExecute;
 end;
 
+function TMediaWikiApi.Login(AutoConfirmToken: Boolean): TMediaWikiLoginResult;
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    CheckRequest(mwrLogin);
+    MediaWikiQueryLoginAdd(FQueryStrings, FLoginUserName, FLoginPassword, '', mwoXML);
+    QueryExecuteXML(XML);
+    LoginParseXmlResult(Self, XML);
+    if AutoConfirmToken and (LoginResult = mwlNeedToken) then
+    begin
+      QueryInit;
+      CheckRequest(mwrLogin);
+      MediaWikiQueryLoginAdd(FQueryStrings, FLoginUserName, FLoginPassword, LoginToken, mwoXML);
+      QueryExecuteXML(XML);
+      LoginParseXmlResult(Self, XML);
+    end;
+    Result := LoginResult;
+  finally
+    XML.Free;
+  end;
+end;
+
 function TMediaWikiApi.Login(const lgName, lgPassword,
   lgToken: string): TMediaWikiLoginResult;
 var
@@ -919,7 +953,7 @@ begin
     MediaWikiQueryLoginAdd(FQueryStrings, lgName, lgPassword, '', mwoXML);
     QueryExecuteXML(XML);
     LoginParseXmlResult(Self, XML);
-    if LoginResult = mwlNeedToken then
+    if AutoConfirmToken and (LoginResult = mwlNeedToken) then
     begin
       QueryInit;
       CheckRequest(mwrLogin);
@@ -931,6 +965,16 @@ begin
   finally
     XML.Free;
   end;
+end;
+
+procedure TMediaWikiApi.LoginAsync(AutoConfirmToken: Boolean);
+begin
+  if AutoConfirmToken then
+    FRequestCallbacks[mwrLogin] := LoginParseAndConfirmXmlResult
+  else
+    FRequestCallbacks[mwrLogin] := LoginParseXmlResult;
+  CheckRequest(mwrLogin);
+  MediaWikiQueryLoginAdd(FQueryStrings, FLoginUserName, FLoginPassword, '', mwoXML);
 end;
 
 procedure TMediaWikiApi.LoginAsync(const lgName, lgPassword, lgToken: string);
