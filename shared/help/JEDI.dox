@@ -51290,55 +51290,7 @@ UseInheritedTopics=1
 UseInheritedUseUsing=0
 
 [External Topic Properties]
-Count=6
-ID0=CompilerCapabilities
-ID1=CompilerSettings
-ID2=CompilerVersions
-ID3=HardwareArchitecture
-ID4=RTLFeatures
-ID5=TargetOS
-
-[External Topic Properties\CompilerCapabilities]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=1
-
-[External Topic Properties\CompilerSettings]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=2
-
-[External Topic Properties\CompilerVersions]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=0
-
-[External Topic Properties\HardwareArchitecture]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=4
-
-[External Topic Properties\RTLFeatures]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=3
-
-[External Topic Properties\TargetOS]
-Count=2
-ETPCommand0=2
-ETPCommand1=3
-ETPGroup1=jedi.inc
-ETPTopicOrder0=5
+Count=0
 
 [File Extensions]
 ID1=.cs
