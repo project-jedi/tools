@@ -769,6 +769,8 @@ end;
 
 destructor TMediaWikiApi.Destroy;
 begin
+  if SessionID <> '' then
+    Logout;
   FQueryStrings.Free;
   FSendStream.Free;
   FReceiveStream.Free;
@@ -1031,6 +1033,8 @@ procedure TMediaWikiApi.LogoutParseXmlResult(Sender: TMediaWikiApi;
   XML: TJclSimpleXML);
 begin
   MediaWikiQueryLogoutParseXmlResult(XML);
+
+  SessionID := '';
 
   if Assigned(FOnLogoutDone) then
     FOnLogoutDone(Self);
