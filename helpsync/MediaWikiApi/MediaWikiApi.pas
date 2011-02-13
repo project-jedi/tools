@@ -47,13 +47,13 @@ type
                        mwrQueryPageLinkInfo, mwrQueryPageTemplateInfo, mwrQueryPageExtLinkInfo,
                        mwrQueryAllPageInfo, mwrQueryAllLinkInfo, mwrQueryAllCategoryInfo,
                        mwrQueryAllUserInfo, mwrQueryBackLinkInfo, mwrQueryBlockInfo, mwrQueryCategoryMemberInfo,
-                       mwrEdit, mwrMove, mwrDelete, mwrUpload);
+                       mwrEdit, mwrMove, mwrDelete, mwrDeleteRevision, mwrUpload);
 
   TMediaWikiRequests = set of TMediaWikiRequest;
 
 const
   MediaWikiExclusiveRequests: TMediaWikiRequests =
-    [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete, mwrUpload];
+    [mwrLogin, mwrLogout, mwrEdit, mwrMove, mwrDelete, mwrDeleteRevision, mwrUpload];
 
 {$TYPEINFO ON}
 
@@ -85,7 +85,8 @@ type
   TMediaWikiCategoryMemberCallback = procedure (Sender: TMediaWikiApi; const CategoryMembers: TMediaWikiCategoryMemberInfos; const ContinueInfo: TMediaWikiContinueInfo) of object;
   TMediaWikiEditCallback = procedure (Sender: TMediaWikiApi; const EditInfo: TMediaWikiEditInfo) of object;
   TMediaWikiMoveCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiMoveInfo) of object;
-  TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const MoveInfo: TMediaWikiDeleteInfo) of object;
+  TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const DeleteInfo: TMediaWikiDeleteInfo) of object;
+  TMediaWikiDeleteRevisionCallback = procedure (Sender: TMediaWikiApi; const DeleteRevisionInfo: TMediaWikiDeleteRevisionInfo) of object;
   TMediaWikiUploadCallback = procedure (Sender: TMediaWikiApi; const UploadInfo: TMediaWikiUploadInfo) of object;
 
   TMediaWikiXMLRequestCallbacks = array [TMediaWikiRequest] of TMediaWikiXMLCallback;
@@ -709,6 +710,20 @@ type
     procedure DeleteAsync(const PageTitle, DeleteToken, Reason: string;
       FromPageID: TMediaWikiID);
     property OnDeleteDone: TMediaWikiDeleteCallback read FOnDeleteDone write FOnDeleteDone;
+
+  // Delete Revision
+  private
+    FOnDeleteRevisionDone: TMediaWikiDeleteRevisionCallback;
+    FDeleteRevisionInfo: TMediaWikiDeleteRevisionInfo;
+    procedure DeleteRevisionParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
+  public
+    procedure DeleteRevision(const PageTitle, DeleteToken, Reason: string;
+      FromPageID, RevisionID: TMediaWikiID; out DeleteRevisionInfo: TMediaWikiDeleteRevisionInfo); overload;
+    function DeleteRevision(const PageTitle, DeleteToken, Reason: string;
+      FromPageID, RevisionID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+    procedure DeleteRevisionAsync(const PageTitle, DeleteToken, Reason: string;
+      FromPageID, RevisionID: TMediaWikiID);
+    property OnDeleteRevisionDone: TMediaWikiDeleteRevisionCallback read FOnDeleteRevisionDone write FOnDeleteRevisionDone;
 
   // restore deleted revisions TODO
 
@@ -2857,6 +2872,50 @@ begin
 
   if Assigned(FOnDeleteDone) then
     FOnDeleteDone(Self, FDeleteInfo);
+end;
+
+procedure TMediaWikiApi.DeleteRevision(const PageTitle, DeleteToken, Reason: string;
+  FromPageID, RevisionID: TMediaWikiID; out DeleteRevisionInfo: TMediaWikiDeleteRevisionInfo);
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    CheckRequest(mwrDeleteRevision);
+    MediaWikiDeleteRevisionAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, RevisionID, mwoXML);
+    QueryExecuteXML(XML);
+    DeleteRevisionParseXmlResult(Self, XML);
+  finally
+    DeleteRevisionInfo := FDeleteRevisionInfo;
+    XML.Free;
+  end;
+end;
+
+function TMediaWikiApi.DeleteRevision(const PageTitle, DeleteToken, Reason: string;
+  FromPageID, RevisionID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString;
+begin
+  QueryInit;
+  CheckRequest(mwrDeleteRevision);
+  MediaWikiDeleteRevisionAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, RevisionID, OutputFormat);
+  Result := QueryExecute;
+end;
+
+procedure TMediaWikiApi.DeleteRevisionAsync(const PageTitle, DeleteToken, Reason: string;
+  FromPageID, RevisionID: TMediaWikiID);
+begin
+  CheckRequest(mwrDeleteRevision);
+  MediaWikiDeleteRevisionAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, RevisionID, mwoXML);
+  FRequestCallbacks[mwrDeleteRevision] := DeleteRevisionParseXmlResult;
+end;
+
+procedure TMediaWikiApi.DeleteRevisionParseXmlResult(
+  Sender: TMediaWikiApi; XML: TJclSimpleXML);
+begin
+  MediaWikiDeleteRevisionParseXmlResult(XML, FDeleteRevisionInfo);
+
+  if Assigned(FOnDeleteRevisionDone) then
+    FOnDeleteRevisionDone(Self, FDeleteRevisionInfo);
 end;
 
 procedure TMediaWikiApi.Upload(const FileName, Comment, Text, EditToken: string;

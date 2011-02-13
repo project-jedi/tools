@@ -534,6 +534,7 @@ procedure MediaWikiMoveAdd(Queries: TStrings; const FromPageTitle, ToPageTitle, 
   FromPageID: TMediaWikiID; Flags: TMediaWikiMoveFlags; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiMoveParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiMoveInfo);
 
+// DeleteRevision requires some modifications in the MediaWiki API running in the server
 type
   TMediaWikiDeleteInfo = record
     DeleteSuccess: Boolean;
@@ -544,6 +545,18 @@ type
 procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
   PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiDeleteParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteInfo);
+
+type
+  TMediaWikiDeleteRevisionInfo = record
+    DeleteRevisionSuccess: Boolean;
+    DeleteRevisionPage: string;
+    DeleteRevisionID: TMediaWikiID;
+    DeleteRevisionReason: string;
+  end;
+
+procedure MediaWikiDeleteRevisionAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
+  PageID, RevisionID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiDeleteRevisionParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteRevisionInfo);
 
 type
   TMediaWikiUploadFlag = (mwfUploadWatch, mwfUploadIgnoreWarnings);
@@ -2924,6 +2937,47 @@ begin
   Info.DeleteSuccess := TitleProp.Value <> '';
   Info.DeletePage := TitleProp.Value;
   Info.DeleteReason := ReasonProp.Value;
+end;
+
+procedure MediaWikiDeleteRevisionAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
+  PageID, RevisionID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+begin
+  MediaWikiQueryAdd(Queries, 'action', 'deleterevision');
+
+  if PageTitle <> '' then
+    MediaWikiQueryAdd(Queries, 'title', PageTitle);
+
+  if DeleteToken <> '' then
+    MediaWikiQueryAdd(Queries, 'token', DeleteToken);
+
+  if Reason <> '' then
+    MediaWikiQueryAdd(Queries, 'reason', Reason);
+
+  if (PageID >= 0) and (PageTitle = '') then
+    MediaWikiQueryAdd(Queries, 'pageid', IntToStr(PageID));
+
+  if (RevisionID >= 0) then
+    MediaWikiQueryAdd(Queries, 'revid', IntToStr(RevisionID));
+
+  MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
+end;
+
+procedure MediaWikiDeleteRevisionParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteRevisionInfo);
+var
+  DeleteRevisionNode: TJclSimpleXMLElem;
+  TitleProp, RevIDProp, ReasonProp: TJclSimpleXMLProp;
+begin
+  XML.Options := XML.Options + [sxoAutoCreate];
+  DeleteRevisionNode := XML.Root.Items.ItemNamed['deleterevision'];
+
+  TitleProp := DeleteRevisionNode.Properties.ItemNamed['title'];
+  RevIDProp := DeleteRevisionNode.Properties.ItemNamed['revid'];
+  ReasonProp := DeleteRevisionNode.Properties.ItemNamed['reason'];
+
+  Info.DeleteRevisionSuccess := TitleProp.Value <> '';
+  Info.DeleteRevisionPage := TitleProp.Value;
+  Info.DeleteRevisionID := RevIDProp.IntValue;
+  Info.DeleteRevisionReason := ReasonProp.Value;
 end;
 
 procedure MediaWikiUploadAdd(Queries: TStrings; const FileName, Comment, Text, EditToken: string;
