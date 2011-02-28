@@ -168,11 +168,11 @@ begin
 
   // setup link format
   LinkFormat := Arguments.LinkFormat;
-  StrReplace(LinkFormat, '%title', '%0s');
-  StrReplace(LinkFormat, '%id', '%1s');
-  StrReplace(LinkFormat, '%file', '%2s');
-  StrReplace(LinkFormat, '%doxfile', '%3s');
-  StrReplace(LinkFormat, '%xml', '%4s');
+  StrReplace(LinkFormat, '%title', '%0:s');
+  StrReplace(LinkFormat, '%id', '%1:s');
+  StrReplace(LinkFormat, '%file', '%2:s');
+  StrReplace(LinkFormat, '%doxfile', '%3:s');
+  StrReplace(LinkFormat, '%xml', '%4:s');
 
   // setup link params
   SetLength(LinkParams, 5);
