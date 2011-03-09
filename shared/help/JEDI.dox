@@ -401,7 +401,7 @@ CValue_9=7872391
 
 [Configurations]
 Count=6
-Current=4
+Current=0
 Name0=HTML
 Name1=CHM
 Name2=H2
@@ -9915,12 +9915,12 @@ IndexDynamicSearch=0
 ContentTableColCount=3
 
 [Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Footer]
-FeedbackCode=%FBDESCRIPTION%\n<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">\n%FBLINKTEXT%\n</a>
+FeedbackCode=The most up-to-date documentation is available and can be edited at <a href="http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%">http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%</a>
 FeedbackShow=1
-InfoCode=%PROJECTTITLE%
+InfoCode=%PROJECTTITLE% generated on %DATE%
 InfoHTML=
 InfoImage=dmlogo.png
-Kind=1
+Kind=0
 LayoutOption=1
 LinkConfigOptions=0
 LinkOrderGlobal0=0
@@ -9949,7 +9949,7 @@ Visible_2=1
 Visible_3=1
 
 [Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Header]
-FeedbackCode=<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">%FBTITLELINKTEXT%</a>
+FeedbackCode=
 FeedbackShow=0
 InfoCode=%PROJECTTITLE%
 InfoHTML=
@@ -9968,7 +9968,7 @@ LinkOrderNeighbor1=4
 LinkOrderNeighbor2=6
 LinkSeparatorCode=' | '
 LinkSeparatorMode=0
-PrintFeedbackLinkInTitleLinks=1
+PrintFeedbackLinkInTitleLinks=0
 ProjectInfo=2
 ShowOnContentsPage=1
 ShowOnIndexPage=1
@@ -21870,12 +21870,12 @@ IndexDynamicSearch=0
 ContentTableColCount=3
 
 [Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Footer]
-FeedbackCode=%FBDESCRIPTION%\n<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">\n%FBLINKTEXT%\n</a>
+FeedbackCode=The most up-to-date documentation is available and can be edited at <a href="http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%">http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%</a>
 FeedbackShow=1
-InfoCode=%PROJECTTITLE%
+InfoCode=%PROJECTTITLE% generated on %DATE%
 InfoHTML=
 InfoImage=dmlogo.png
-Kind=1
+Kind=0
 LayoutOption=1
 LinkConfigOptions=0
 LinkOrderGlobal0=0
@@ -21904,7 +21904,7 @@ Visible_2=1
 Visible_3=1
 
 [Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Header]
-FeedbackCode=<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">%FBTITLELINKTEXT%</a>
+FeedbackCode=
 FeedbackShow=0
 InfoCode=%PROJECTTITLE%
 InfoHTML=
@@ -21923,7 +21923,7 @@ LinkOrderNeighbor1=4
 LinkOrderNeighbor2=6
 LinkSeparatorCode=' | '
 LinkSeparatorMode=0
-PrintFeedbackLinkInTitleLinks=1
+PrintFeedbackLinkInTitleLinks=0
 ProjectInfo=2
 ShowOnContentsPage=1
 ShowOnIndexPage=1
@@ -37584,12 +37584,12 @@ IndexDynamicSearch=0
 ContentTableColCount=3
 
 [Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Footer]
-FeedbackCode=%FBDESCRIPTION%\n<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">\n%FBLINKTEXT%\n</a>
+FeedbackCode=The most up-to-date documentation is available and can be edited at <a href="http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%">http://wiki.delphi-jedi.org/JEDI_Help/%TOPICID%</a>\n
 FeedbackShow=1
-InfoCode=%PROJECTTITLE%
+InfoCode=%PROJECTTITLE% generated on %DATE%
 InfoHTML=
 InfoImage=dmlogo.png
-Kind=1
+Kind=0
 LayoutOption=1
 LinkConfigOptions=0
 LinkOrderGlobal0=0
@@ -37618,7 +37618,7 @@ Visible_2=1
 Visible_3=1
 
 [Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Layout\Header]
-FeedbackCode=<a href="#" onclick="sendFeedback('%AUTHOREMAIL%', '%FBSUBJECT%', 'Project: %PROJECTTITLE%%0ATopic ID: %TOPICID%%0ATitle: %TOPICTITLE%');">%FBTITLELINKTEXT%</a>
+FeedbackCode=
 FeedbackShow=0
 InfoCode=%PROJECTTITLE%
 InfoHTML=
@@ -37637,7 +37637,7 @@ LinkOrderNeighbor1=4
 LinkOrderNeighbor2=6
 LinkSeparatorCode=' | '
 LinkSeparatorMode=0
-PrintFeedbackLinkInTitleLinks=1
+PrintFeedbackLinkInTitleLinks=0
 ProjectInfo=2
 ShowOnContentsPage=1
 ShowOnIndexPage=1
@@ -40046,7 +40046,7 @@ FooterString4=
 FooterString5=
 FooterString6=
 FooterStringColumnCount=3
-FooterStringRowCount=2
+FooterStringRowCount=1
 FooterStringVisible=1
 HeaderString1=%CL1%%.CL2% %TL2%
 HeaderString2=%T%
@@ -40055,7 +40055,7 @@ HeaderString4=
 HeaderString5=
 HeaderString6=
 HeaderStringColumnCount=3
-HeaderStringRowCount=2
+HeaderStringRowCount=1
 HeaderStringVisible=1
 ImagesDPI=144
 ImagesInterpolate=0
@@ -51290,7 +51290,27 @@ UseInheritedTopics=1
 UseInheritedUseUsing=0
 
 [External Topic Properties]
-Count=0
+Count=3
+ID0=!!SYMREF
+ID1=jedi.inc
+ID2=JEDI_Include_Files
+
+[External Topic Properties\!!SYMREF]
+Count=1
+ETPCommand0=2
+ETPTopicOrder0=0
+
+[External Topic Properties\jedi.inc]
+Count=1
+ETPCommand0=3
+ETPGroup0=JEDI_Include_Files
+
+[External Topic Properties\JEDI_Include_Files]
+Count=2
+ETPCommand0=2
+ETPCommand1=3
+ETPGroup1=' !'
+ETPTopicOrder0=1
 
 [File Extensions]
 ID1=.cs
