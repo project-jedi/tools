@@ -82,8 +82,9 @@ procedure FillDoxDB(const DoxDBFileName, LinkFormat: string; LinkParams: array o
 var
   XML: TJclSimpleXML;
   LinkDatabase, Link, Target: TJclSimpleXMLElem;
-  TopicIDProp, DisplayStringProp, IDProp: TJclSimpleXMLProp;
-  I, J: Integer;
+  VersionProp, IDProp: TJclSimpleXMLProp;
+  TopicIDData, DisplayStringData: TJclSimpleData;
+  Version, I, J: Integer;
   Found: Boolean;
 begin
   XML := TJclSimpleXML.Create;
@@ -91,6 +92,12 @@ begin
     XML.LoadFromFile(DoxDBFileName);
     XML.Options := XML.Options - [sxoAutoCreate];
 
+    VersionProp := XML.Root.Properties.ItemNamed['version'];
+    if Assigned(VersionProp) then
+      Version := VersionProp.IntValue
+    else
+      Version := 1;
+    
     LinkDatabase := XML.Root.Items.ItemNamed['linkdatabase'];
     if not Assigned(LinkDatabase) then
       LinkDatabase := XML.Root.Items.Add('linkdatabase');
@@ -99,25 +106,36 @@ begin
     for I := 0 to LinkDatabase.ItemCount - 1 do
     begin
       Link := LinkDatabase.Items.Item[I];
-      TopicIDProp := Link.Properties.ItemNamed['topicid'];
-      DisplayStringProp := Link.Properties.ItemNamed['displaystring'];
-      if Assigned(TopicIDProp) and Assigned(DisplayStringProp) then
+      if Version >= 7 then
       begin
-        if Topics.Values[TopicIDProp.Value] <> '' then
+        TopicIDData := Link.Items.ItemNamed['topicid'];
+        DisplayStringData := Link.Items.ItemNamed['displaystring'];
+      end
+      else
+      begin
+        TopicIDData := Link.Properties.ItemNamed['topicid'];
+        DisplayStringData := Link.Properties.ItemNamed['displaystring'];
+      end;
+      if Assigned(TopicIDData) and Assigned(DisplayStringData) then
+      begin
+        if Topics.Values[TopicIDData.Value] <> '' then
         begin
           Found := False;
-          LinkParams[0].VPChar := PChar(DisplayStringProp.Value);
-          LinkParams[1].VPChar := PChar(TopicIDProp.Value);
+          LinkParams[0].VPChar := PChar(DisplayStringData.Value);
+          LinkParams[1].VPChar := PChar(TopicIDData.Value);
           for J := 0 to Link.ItemCount - 1 do
           begin
             Target := Link.Items.Item[J];
-            IDProp := Target.Properties.ItemNamed['id'];
-            if not Assigned(IDProp) then
-              raise Exception.Create('invalid target');
-            if IDProp.Value = 'xml' then
+            if Target.Name = 'target' then
             begin
-              Found := True;
-              Target.Value := Format(LinkFormat, LinkParams);
+              IDProp := Target.Properties.ItemNamed['id'];
+              if not Assigned(IDProp) then
+                raise Exception.Create('invalid target');
+              if IDProp.Value = 'xml' then
+              begin
+                Found := True;
+                Target.Value := Format(LinkFormat, LinkParams);
+              end;
             end;
           end;
           if not Found then
@@ -126,7 +144,7 @@ begin
             Target.Properties.Add('id', 'xml');
             Target.Value := Format(LinkFormat, LinkParams);
           end;
-          Topics.Values[TopicIDProp.Value] := '';
+          Topics.Values[TopicIDData.Value] := '';
         end;
       end
       else
@@ -136,12 +154,20 @@ begin
     for I := 0 to Topics.Count - 1 do
     begin
       Link := LinkDatabase.Items.Add('link');
-      TopicIDProp := Link.Properties.Add('topicid', Topics.Names[I]);
-      DisplayStringProp := Link.Properties.Add('displaystring', Topics.ValueFromIndex[I]);
+      if Version >= 7 then
+      begin
+        TopicIDData := Link.Items.Add('topicid', Topics.Names[I]);
+        DisplayStringData := Link.Items.Add('displaystring', Topics.ValueFromIndex[I]);
+      end
+      else
+      begin
+        TopicIDData := Link.Properties.Add('topicid', Topics.Names[I]);
+        DisplayStringData := Link.Properties.Add('displaystring', Topics.ValueFromIndex[I]);
+      end;
       Target := Link.Items.Add('target');
       Target.Properties.Add('id', 'xml');
-      LinkParams[0].VPChar := PChar(DisplayStringProp.Value);
-      LinkParams[1].VPChar := PChar(TopicIDProp.Value);
+      LinkParams[0].VPChar := PChar(DisplayStringData.Value);
+      LinkParams[1].VPChar := PChar(TopicIDData.Value);
       Target.Value := Format(LinkFormat, LinkParams);
     end;
     XML.SaveToFile(DoxDBFileName);
