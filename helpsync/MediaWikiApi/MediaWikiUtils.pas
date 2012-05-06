@@ -583,6 +583,17 @@ procedure MediaWikiUploadAdd(Queries: TStrings; const FileName, Comment, Text, E
   Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiUploadParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiUploadInfo);
 
+type
+  TMediaWikiUserMergeInfo = record
+    UserMergeSuccess: Boolean;
+    UserMergeOldUser: string;
+    UserMergeNewUser: string;
+  end;
+
+procedure MediaWikiUserMergeAdd(Queries: TStrings; const OldUser, NewUser: string;
+  DeleteUser: Boolean; OutputFormat: TMediaWikiOutputFormat);
+procedure MediaWikiUserMergeParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiUserMergeInfo);
+
 implementation
 
 uses
@@ -2437,7 +2448,7 @@ begin
     MediaWikiQueryAdd(Queries, 'blfilterredir', 'all');
 
   MediaWikiQueryAdd(Queries, ContinueInfo);
-  
+
   MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
 end;
 
@@ -3049,6 +3060,42 @@ begin
   Info.UploadImageMetaData := MetaDataProp.Value;
   Info.UploadImageMime := MimeProp.Value;
   Info.UploadImageBitDepth := BitDepthProp.IntValue;
+end;
+
+procedure MediaWikiUserMergeAdd(Queries: TStrings; const OldUser, NewUser: string;
+  DeleteUser: Boolean; OutputFormat: TMediaWikiOutputFormat);
+begin
+  MediaWikiQueryAdd(Queries, 'action', 'usermerge');
+
+  if OldUser <> '' then
+    MediaWikiQueryAdd(Queries, 'olduser', OldUser);
+
+  if NewUser <> '' then
+    MediaWikiQueryAdd(Queries, 'newuser', NewUser);
+
+  if (DeleteUser) then
+    MediaWikiQueryAdd(Queries, 'deleteuser', 'true')
+  else
+    MediaWikiQueryAdd(Queries, 'deleteuser', 'false');
+
+  MediaWikiQueryAdd(Queries, 'format', MediaWikiOutputFormats[OutputFormat]);
+end;
+
+procedure MediaWikiUserMergeParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiUserMergeInfo);
+var
+  UserMergeNode: TJclSimpleXMLElem;
+  ResultProp, OldUserProp, NewUserProp: TJclSimpleXMLProp;
+begin
+  XML.Options := XML.Options + [sxoAutoCreate];
+  UserMergeNode := XML.Root.Items.ItemNamed['usermerge'];
+
+  ResultProp := UserMergeNode.Properties.ItemNamed['result'];
+  OldUserProp := UserMergeNode.Properties.ItemNamed['olduser'];
+  NewUserProp := UserMergeNode.Properties.ItemNamed['newuser'];
+
+  Info.UserMergeSuccess := ResultProp.Value = 'Success';
+  Info.UserMergeOldUser := OldUserProp.Value;
+  Info.UserMergeNewUser := NewUserProp.Value;
 end;
 
 end.

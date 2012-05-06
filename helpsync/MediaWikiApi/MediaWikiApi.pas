@@ -47,7 +47,7 @@ type
                        mwrQueryPageLinkInfo, mwrQueryPageTemplateInfo, mwrQueryPageExtLinkInfo,
                        mwrQueryAllPageInfo, mwrQueryAllLinkInfo, mwrQueryAllCategoryInfo,
                        mwrQueryAllUserInfo, mwrQueryBackLinkInfo, mwrQueryBlockInfo, mwrQueryCategoryMemberInfo,
-                       mwrEdit, mwrMove, mwrDelete, mwrDeleteRevision, mwrUpload);
+                       mwrEdit, mwrMove, mwrDelete, mwrDeleteRevision, mwrUpload, mwrUserMerge);
 
   TMediaWikiRequests = set of TMediaWikiRequest;
 
@@ -88,6 +88,7 @@ type
   TMediaWikiDeleteCallback = procedure (Sender: TMediaWikiApi; const DeleteInfo: TMediaWikiDeleteInfo) of object;
   TMediaWikiDeleteRevisionCallback = procedure (Sender: TMediaWikiApi; const DeleteRevisionInfo: TMediaWikiDeleteRevisionInfo) of object;
   TMediaWikiUploadCallback = procedure (Sender: TMediaWikiApi; const UploadInfo: TMediaWikiUploadInfo) of object;
+  TMediaWikiUserMergeCallback = procedure (Sender: TMediaWikiApi; const UserMergeInfo: TMediaWikiUserMergeInfo) of object;
 
   TMediaWikiXMLRequestCallbacks = array [TMediaWikiRequest] of TMediaWikiXMLCallback;
 
@@ -756,6 +757,20 @@ type
     procedure UploadAsync(const FileName, Comment, Text, EditToken: string;
       Flags: TMediaWikiUploadFlags; Content: TStream; const URL: string);
     property OnUploadDone: TMediaWikiUploadCallback read FOnUploadDone write FOnUploadDone;
+
+  // User Merge
+  private
+    FOnUserMergeDone: TMediaWikiUserMergeCallback;
+    FUserMergeInfo: TMediaWikiUserMergeInfo;
+    procedure UserMergeParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
+  public
+    procedure UserMerge(const OldUser, NewUser: string;
+      DeleteUser: Boolean; out UserMergeInfo: TMediaWikiUserMergeInfo); overload;
+    function UserMerge(const OldUser, NewUser: string;
+      DeleteUser: Boolean; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+    procedure UserMergeAsync(const OldUser, NewUser: string;
+      DeleteUser: Boolean);
+    property OnUserMergeDone: TMediaWikiUserMergeCallback read FOnUserMergeDone write FOnUserMergeDone;
   end;
 
 {$TYPEINFO OFF}
@@ -877,7 +892,13 @@ begin
   FPendingRequests := [];
 
   FReceiveStream.Position := 0;
-  XML.LoadFromStream(FReceiveStream, seUTF8);
+  try
+    XML.LoadFromStream(FReceiveStream, seUTF8);
+  except
+    FReceiveStream.Position := 0;
+    FReceiveStream.SaveToFile('c:\dev\receive.xml');
+    raise;
+  end;
 
   MediaWikiCheckXML(XML, ProcessXMLWarning, ProcessXMLError);
 end;
@@ -2962,6 +2983,49 @@ begin
 
   if Assigned(FOnUploadDone) then
     FOnUploadDone(Self, FUploadInfo);
+end;
+
+procedure TMediaWikiApi.UserMerge(const OldUser, NewUser: string;
+  DeleteUser: Boolean; out UserMergeInfo: TMediaWikiUserMergeInfo);
+var
+  XML: TJclSimpleXML;
+begin
+  XML := TJclSimpleXML.Create;
+  try
+    QueryInit;
+    CheckRequest(mwrUserMerge);
+    MediaWikiUserMergeAdd(FQueryStrings, OldUser, NewUser, DeleteUser, mwoXML);
+    QueryExecuteXML(XML);
+    UserMergeParseXmlResult(Self, XML);
+  finally
+    UserMergeInfo := FUserMergeInfo;
+    XML.Free;
+  end;
+end;
+
+function TMediaWikiApi.UserMerge(const OldUser, NewUser: string;
+  DeleteUser: Boolean; OutputFormat: TMediaWikiOutputFormat): AnsiString;
+begin
+  QueryInit;
+  CheckRequest(mwrUserMerge);
+  MediaWikiUserMergeAdd(FQueryStrings, OldUser, NewUser, DeleteUser, OutputFormat);
+  Result := QueryExecute;
+end;
+
+procedure TMediaWikiApi.UserMergeAsync(const OldUser, NewUser: string; DeleteUser: Boolean);
+begin
+  CheckRequest(mwrUserMerge);
+  MediaWikiUserMergeAdd(FQueryStrings, OldUser, NewUser, DeleteUser, mwoXML);
+  FRequestCallbacks[mwrUserMerge] := UserMergeParseXmlResult;
+end;
+
+procedure TMediaWikiApi.UserMergeParseXmlResult(Sender: TMediaWikiApi;
+  XML: TJclSimpleXML);
+begin
+  MediaWikiUserMergeParseXmlResult(XML, FUserMergeInfo);
+
+  if Assigned(FOnUserMergeDone) then
+    FOnUserMergeDone(Self, FUserMergeInfo);
 end;
 
 procedure TMediaWikiApi.RequestDone(Sender: TObject; RqType: THttpRequest;
