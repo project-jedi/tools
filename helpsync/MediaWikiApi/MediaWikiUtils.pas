@@ -543,7 +543,7 @@ type
   end;
 
 procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
-  PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+  PageID: TMediaWikiID; Suppress: Boolean; OutputFormat: TMediaWikiOutputFormat);
 procedure MediaWikiDeleteParseXmlResult(XML: TJclSimpleXML; out Info: TMediaWikiDeleteInfo);
 
 type
@@ -2915,7 +2915,7 @@ begin
 end;
 
 procedure MediaWikiDeleteAdd(Queries: TStrings; const PageTitle, DeleteToken, Reason: string;
-  PageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat);
+  PageID: TMediaWikiID; Suppress: Boolean; OutputFormat: TMediaWikiOutputFormat);
 begin
   MediaWikiQueryAdd(Queries, 'action', 'delete');
 
@@ -2927,6 +2927,9 @@ begin
 
   if Reason <> '' then
     MediaWikiQueryAdd(Queries, 'reason', Reason);
+
+  if Suppress then
+    MediaWikiQueryAdd(Queries, 'suppress', 'true');
 
   if (PageID >= 0) and (PageTitle = '') then
     MediaWikiQueryAdd(Queries, 'pageid', IntToStr(PageID));

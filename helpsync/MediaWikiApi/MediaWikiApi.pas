@@ -705,11 +705,13 @@ type
     procedure DeleteParseXmlResult(Sender: TMediaWikiApi; XML: TJclSimpleXML);
   public
     procedure Delete(const PageTitle, DeleteToken, Reason: string;
-      FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo); overload;
+      FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo;
+      Suppress: Boolean = False); overload;
     function Delete(const PageTitle, DeleteToken, Reason: string;
-      FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString; overload;
+      FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat;
+      Suppress: Boolean = False): AnsiString; overload;
     procedure DeleteAsync(const PageTitle, DeleteToken, Reason: string;
-      FromPageID: TMediaWikiID);
+      FromPageID: TMediaWikiID; Suppress: Boolean = False);
     property OnDeleteDone: TMediaWikiDeleteCallback read FOnDeleteDone write FOnDeleteDone;
 
   // Delete Revision
@@ -2852,7 +2854,7 @@ begin
 end;
 
 procedure TMediaWikiApi.Delete(const PageTitle, DeleteToken, Reason: string;
-  FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo);
+  FromPageID: TMediaWikiID; out DeleteInfo: TMediaWikiDeleteInfo; Suppress: Boolean);
 var
   XML: TJclSimpleXML;
 begin
@@ -2860,7 +2862,7 @@ begin
   try
     QueryInit;
     CheckRequest(mwrDelete);
-    MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
+    MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, Suppress, mwoXML);
     QueryExecuteXML(XML);
     DeleteParseXmlResult(Self, XML);
   finally
@@ -2870,19 +2872,19 @@ begin
 end;
 
 function TMediaWikiApi.Delete(const PageTitle, DeleteToken, Reason: string;
-  FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat): AnsiString;
+  FromPageID: TMediaWikiID; OutputFormat: TMediaWikiOutputFormat; Suppress: Boolean): AnsiString;
 begin
   QueryInit;
   CheckRequest(mwrDelete);
-  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, OutputFormat);
+  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, Suppress, OutputFormat);
   Result := QueryExecute;
 end;
 
 procedure TMediaWikiApi.DeleteAsync(const PageTitle, DeleteToken, Reason: string;
-  FromPageID: TMediaWikiID);
+  FromPageID: TMediaWikiID; Suppress: Boolean);
 begin
   CheckRequest(mwrDelete);
-  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, mwoXML);
+  MediaWikiDeleteAdd(FQueryStrings, PageTitle, DeleteToken, Reason, FromPageID, Suppress, mwoXML);
   FRequestCallbacks[mwrDelete] := DeleteParseXmlResult;
 end;
 
