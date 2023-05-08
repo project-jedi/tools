@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  badges:
+  jvcl_badges:
     uses: ./.github/workflows/build_results_base.yml
     with:
       base_name: jvcl

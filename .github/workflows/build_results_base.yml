@@ -1,4 +1,4 @@
-name: Build badges
+run-name: Build ${{ inputs.base_name }} badges
 
 on:
   workflow_call:
