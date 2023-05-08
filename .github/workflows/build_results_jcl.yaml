@@ -10,6 +10,9 @@ on:
 jobs:
   badges:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./build_results
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
@@ -25,8 +28,6 @@ jobs:
           node-version: '16.x'
           cache: 'npm'
           cache-dependency-path: build_results/package-lock.json
-      - name: Change to build_results folder
-        run: cd build_results
       #- name: Cache dependencies and build outputs to improve workflow execution time.
       #  uses: actions/cache@v3
       #  with:
@@ -40,4 +41,4 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Automated badges generation
-          file_pattern: '*.md badges/*.svg'
+          file_pattern: 'build_results/*.md build_results/badges/*.svg'
