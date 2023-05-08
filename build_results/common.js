@@ -102,6 +102,7 @@ function Process(xmlFileName, xmlRootName, badgePrefix, libraryName)
         }
 
         installation.LogFile = installation.LogFile?.trim();
+        installation.Target = installation.Target.toLowerCase();
 
         saveOneBadge(badgePrefix + "_" + installation.Target.toLowerCase(), installation.TargetName, status, color);
     }
