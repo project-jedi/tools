@@ -5,6 +5,7 @@ on:
     branches: master
     paths:
       - 'build_results/jcl.xml'
+  workflow_dispatch:
 
 jobs:
   badges:
