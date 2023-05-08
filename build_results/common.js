@@ -1,5 +1,6 @@
 const { badgen } = require("badgen");
 const { XMLParser } = require("fast-xml-parser");
+const mustache = require('mustache');
 const fs = require('fs');
 
 const BADGES_FOLDER = "./badges";
@@ -26,6 +27,7 @@ function Process(xmlFileName, xmlRootName, badgePrefix, libraryName)
     const parser = new XMLParser(options);
     const data = parser.parse(fs.readFileSync("./" + xmlFileName + ".xml"), options);
 
+    // Sort installations by target code
     const installations = data[xmlRootName].Installation;
     installations.sort((a, b) =>
         {
@@ -55,6 +57,7 @@ function Process(xmlFileName, xmlRootName, badgePrefix, libraryName)
         }
     )
 
+    // Generated individual badges, storing global status along the way
     let allEnabled = true;
     let allAttempted = true; 
     let allSucceeded = true;
@@ -98,6 +101,8 @@ function Process(xmlFileName, xmlRootName, badgePrefix, libraryName)
             color = "red";
         }
 
+        installation.LogFile = installation.LogFile?.trim();
+
         saveOneBadge(badgePrefix + "_" + installation.Target.toLowerCase(), installation.TargetName, status, color);
     }
 
@@ -135,6 +140,16 @@ function Process(xmlFileName, xmlRootName, badgePrefix, libraryName)
         color = "yellow";
     }
     saveOneBadge(badgePrefix, libraryName, status, color);
+
+    // Generated markdown page from mustache template
+    const template = fs.readFileSync("./" + badgePrefix + ".mustache", "utf-8");
+    const templateData = 
+    {
+        generated: new Date().toISOString(),
+        installations
+    };
+    const markdown = mustache.render(template, templateData);
+    fs.writeFileSync("./" + badgePrefix + ".md", markdown);
 
     console.log(libraryName + ": done");
 }

@@ -1,0 +1,17 @@
+# JVCL build results
+
+Generated {{generated}}
+
+{{#installations}}
+{{#LogFile}}
+<details>
+<summary><img alt="{{TargetName}}" src="./badges/jvcl_{{Target}}.svg"></summary>
+```
+{{{LogFile}}}
+```
+</details>
+{{/LogFile}}
+{{^LogFile}}
+<img alt="{{TargetName}}" src="./badges/jvcl_{{Target}}.svg">\
+{{/LogFile}}
+{{/installations}}
