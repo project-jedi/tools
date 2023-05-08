@@ -11,4 +11,4 @@ jobs:
   jcl_badges:
     uses: ./.github/workflows/build_results_base.yml
     with:
-      base_name: jvcl
+      base_name: jcl
