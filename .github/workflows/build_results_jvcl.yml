@@ -1,0 +1,15 @@
+name: Update JVCL badges
+
+on:
+  push:
+    branches: master
+    paths:
+      - 'build_results/jvcl.xml'
+  workflow_dispatch:
+
+jobs:
+  badges:
+    uses: ./.github/workflows/build_results_base.yml
+    with:
+      base_name: jvcl
+       
