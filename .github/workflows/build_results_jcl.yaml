@@ -25,6 +25,8 @@ jobs:
           node-version: '16.x'
           cache: 'npm'
           cache-dependency-path: build_results/package-lock.json
+      - name: Change to build_results folder
+        run: cd build_results
       #- name: Cache dependencies and build outputs to improve workflow execution time.
       #  uses: actions/cache@v3
       #  with:
