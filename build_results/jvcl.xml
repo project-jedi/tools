@@ -1,17 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <JvclInstall>
-  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D10" TargetName="Borland Developer Studio 2006" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d10.log">
+  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d6.log">
     <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
 ]]>
     </LogFile>
   </Installation>
-  <Installation Target="D11" TargetName="CodeGear RAD Studio 2007" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d11.log">
+  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_c6.log">
     <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+]]>
+    </LogFile>
+  </Installation>
+  <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d7.log">
+    <LogFile>
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+]]>
+    </LogFile>
+  </Installation>
+  <Installation Target="D10" TargetName="Borland Developer Studio 2006" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d10.log">
+    <LogFile>
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+]]>
+    </LogFile>
+  </Installation>
+  <Installation Target="D11" TargetName="CodeGear RAD Studio 2007" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d11.log">
+    <LogFile>
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
 ]]>
     </LogFile>
   </Installation>
@@ -42,18 +62,6 @@
   <Installation Target="D26" TargetName="Embarcadero RAD Studio 10.3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D27_x64" TargetName="Embarcadero RAD Studio 10.4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D27" TargetName="Embarcadero RAD Studio 10.4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d28_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1175) - Warning: W1054 Check if Vcl.Mask.TCustomMaskEdit still has the exact same fields and adjust the IFDEF
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (681) - Hint: H2269 Overriding virtual method 'TJvCustomRichEdit.SetSelText' has lower visibility (protected) than base class 'TJvExCustomMemo' (public)
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d28.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1175) - Warning: W1054 Check if Vcl.Mask.TCustomMaskEdit still has the exact same fields and adjust the IFDEF
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (681) - Hint: H2269 Overriding virtual method 'TJvCustomRichEdit.SetSelText' has lower visibility (protected) than base class 'TJvExCustomMemo' (public)
-]]>
-    </LogFile>
-  </Installation>
+  <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
 </JvclInstall>
