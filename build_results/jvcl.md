@@ -1,15 +1,40 @@
 # JVCL build results
 
-Generated 2023-05-08T20:34:09.223Z
+Generated 2023-06-13T00:20:29.451Z
 
-<img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
-<img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
-<img alt="Delphi 7.0" src="./badges/jvcl_d7.svg">
+<details>
+<summary><img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Delphi 6.0" src="./badges/jvcl_d6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Delphi 7.0" src="./badges/jvcl_d7.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+```
+
+</details>
 <details>
 <summary><img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg"></summary>
 
 ```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
 ```
 
 </details>
@@ -17,7 +42,8 @@ C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Sy
 <summary><img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg"></summary>
 
 ```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
 ```
 
 </details>
@@ -48,21 +74,5 @@ C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Sy
 <img alt="Embarcadero RAD Studio 10.3 Win64" src="./badges/jvcl_d26_x64.svg">
 <img alt="Embarcadero RAD Studio 10.4 Win32" src="./badges/jvcl_d27.svg">
 <img alt="Embarcadero RAD Studio 10.4 Win64" src="./badges/jvcl_d27_x64.svg">
-<details>
-<summary><img alt="Embarcadero RAD Studio 11 Win32" src="./badges/jvcl_d28.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1175) - Warning: W1054 Check if Vcl.Mask.TCustomMaskEdit still has the exact same fields and adjust the IFDEF
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (681) - Hint: H2269 Overriding virtual method 'TJvCustomRichEdit.SetSelText' has lower visibility (protected) than base class 'TJvExCustomMemo' (public)
-```
-
-</details>
-<details>
-<summary><img alt="Embarcadero RAD Studio 11 Win64" src="./badges/jvcl_d28_x64.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1175) - Warning: W1054 Check if Vcl.Mask.TCustomMaskEdit still has the exact same fields and adjust the IFDEF
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (681) - Hint: H2269 Overriding virtual method 'TJvCustomRichEdit.SetSelText' has lower visibility (protected) than base class 'TJvExCustomMemo' (public)
-```
-
-</details>
+<img alt="Embarcadero RAD Studio 11 Win32" src="./badges/jvcl_d28.svg">
+<img alt="Embarcadero RAD Studio 11 Win64" src="./badges/jvcl_d28_x64.svg">
