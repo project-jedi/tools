@@ -1,40 +1,15 @@
 # JVCL build results
 
-Generated 2023-06-13T00:20:29.451Z
+Generated 2023-06-14T00:24:05.364Z
 
-<details>
-<summary><img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
-```
-
-</details>
-<details>
-<summary><img alt="Delphi 6.0" src="./badges/jvcl_d6.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
-```
-
-</details>
-<details>
-<summary><img alt="Delphi 7.0" src="./badges/jvcl_d7.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: Field or method identifier expected
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
-```
-
-</details>
+<img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
+<img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
+<img alt="Delphi 7.0" src="./badges/jvcl_d7.svg">
 <details>
 <summary><img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg"></summary>
 
 ```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
 ```
 
 </details>
@@ -42,8 +17,7 @@ C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Co
 <summary><img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg"></summary>
 
 ```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (703) - Error: E2168 Field or method identifier expected
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvRichEdit.pas (1007) - Fatal: F2063 Could not compile used unit '..\..\run\JvFixedEditPopUp.pas'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
 ```
 
 </details>
