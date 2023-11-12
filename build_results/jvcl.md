@@ -1,9 +1,25 @@
 # JVCL build results
 
-Generated 2023-06-14T00:24:05.364Z
+Generated 2023-11-12T01:20:38.151Z
 
-<img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
-<img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
+<details>
+<summary><img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1784) - Error: Incompatible types
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvMaskEdit.pas (44) - Fatal: Could not compile used unit '..\..\run\JvToolEdit.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Delphi 6.0" src="./badges/jvcl_d6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1784) - Error: Incompatible types
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvMaskEdit.pas (44) - Fatal: Could not compile used unit '..\..\run\JvToolEdit.pas'
+```
+
+</details>
 <img alt="Delphi 7.0" src="./badges/jvcl_d7.svg">
 <details>
 <summary><img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg"></summary>
