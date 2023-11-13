@@ -1,42 +1,12 @@
 # JVCL build results
 
-Generated 2023-11-12T01:20:38.151Z
+Generated 2023-11-13T01:22:10.909Z
 
-<details>
-<summary><img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1784) - Error: Incompatible types
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvMaskEdit.pas (44) - Fatal: Could not compile used unit '..\..\run\JvToolEdit.pas'
-```
-
-</details>
-<details>
-<summary><img alt="Delphi 6.0" src="./badges/jvcl_d6.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvToolEdit.pas (1784) - Error: Incompatible types
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvMaskEdit.pas (44) - Fatal: Could not compile used unit '..\..\run\JvToolEdit.pas'
-```
-
-</details>
+<img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
+<img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
 <img alt="Delphi 7.0" src="./badges/jvcl_d7.svg">
-<details>
-<summary><img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
-```
-
-</details>
-<details>
-<summary><img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvDBGrid.pas (3831) - Warning: W1000 Symbol 'ExtractFieldName' is deprecated
-```
-
-</details>
+<img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg">
+<img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg">
 <img alt="CodeGear RAD Studio 2009" src="./badges/jvcl_d12.svg">
 <img alt="Embarcadero RAD Studio 2010" src="./badges/jvcl_d14.svg">
 <img alt="Embarcadero RAD Studio XE" src="./badges/jvcl_d15.svg">
