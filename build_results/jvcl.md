@@ -1,12 +1,52 @@
 # JVCL build results
 
-Generated 2023-11-13T01:22:10.909Z
+Generated 2024-01-03T01:23:53.876Z
 
-<img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
-<img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
-<img alt="Delphi 7.0" src="./badges/jvcl_d7.svg">
-<img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg">
-<img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg">
+<details>
+<summary><img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: Undeclared identifier: 'OleStrings'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: Could not compile used unit '..\..\run\JvInterpreter.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Delphi 6.0" src="./badges/jvcl_d6.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: Undeclared identifier: 'OleStrings'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: Could not compile used unit '..\..\run\JvInterpreter.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Delphi 7.0" src="./badges/jvcl_d7.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: Undeclared identifier: 'OleStrings'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: Could not compile used unit '..\..\run\JvInterpreter.pas'
+```
+
+</details>
+<details>
+<summary><img alt="Borland Developer Studio 2006" src="./badges/jvcl_d10.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: E2003 Undeclared identifier: 'OleStrings'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: F2063 Could not compile used unit '..\..\run\JvInterpreter.pas'
+```
+
+</details>
+<details>
+<summary><img alt="CodeGear RAD Studio 2007" src="./badges/jvcl_d11.svg"></summary>
+
+```
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: E2003 Undeclared identifier: 'OleStrings'
+C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: F2063 Could not compile used unit '..\..\run\JvInterpreter.pas'
+```
+
+</details>
 <img alt="CodeGear RAD Studio 2009" src="./badges/jvcl_d12.svg">
 <img alt="Embarcadero RAD Studio 2010" src="./badges/jvcl_d14.svg">
 <img alt="Embarcadero RAD Studio XE" src="./badges/jvcl_d15.svg">
