@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <JvclInstall>
-  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d6.log">
+  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_c6.log">
     <LogFile>
       <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: Undeclared identifier: 'OleStrings'
 C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: Could not compile used unit '..\..\run\JvInterpreter.pas'
 ]]>
     </LogFile>
   </Installation>
-  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_c6.log">
+  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d6.log">
     <LogFile>
       <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreter.pas (5071) - Error: Undeclared identifier: 'OleStrings'
 C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: Could not compile used unit '..\..\run\JvInterpreter.pas'
@@ -40,12 +40,12 @@ C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: 
   <Installation Target="D15" TargetName="Embarcadero RAD Studio XE" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D16" TargetName="Embarcadero RAD Studio XE2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D16_x64" TargetName="Embarcadero RAD Studio XE2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D17" TargetName="Embarcadero RAD Studio XE3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D17_x64" TargetName="Embarcadero RAD Studio XE3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D17" TargetName="Embarcadero RAD Studio XE3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D18" TargetName="Embarcadero RAD Studio XE4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D18_x64" TargetName="Embarcadero RAD Studio XE4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D19_x64" TargetName="Embarcadero RAD Studio XE5 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D19" TargetName="Embarcadero RAD Studio XE5 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D19_x64" TargetName="Embarcadero RAD Studio XE5 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D20_x64" TargetName="Embarcadero RAD Studio XE6 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D20" TargetName="Embarcadero RAD Studio XE6 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D21_x64" TargetName="Embarcadero RAD Studio XE7 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
@@ -54,14 +54,26 @@ C:\Prog\build_auto\sources\jvcl\jvcl\run\JvInterpreterParser.pas (270) - Fatal: 
   <Installation Target="D22" TargetName="Embarcadero RAD Studio XE8 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D23_x64" TargetName="Embarcadero RAD Studio 10 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D23" TargetName="Embarcadero RAD Studio 10 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D24" TargetName="Embarcadero RAD Studio 10.1 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D24_x64" TargetName="Embarcadero RAD Studio 10.1 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D24" TargetName="Embarcadero RAD Studio 10.1 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D25" TargetName="Embarcadero RAD Studio 10.2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D25_x64" TargetName="Embarcadero RAD Studio 10.2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D26_x64" TargetName="Embarcadero RAD Studio 10.3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D26" TargetName="Embarcadero RAD Studio 10.3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D26_x64" TargetName="Embarcadero RAD Studio 10.3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D27_x64" TargetName="Embarcadero RAD Studio 10.4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D27" TargetName="Embarcadero RAD Studio 10.4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D29_x64" TargetName="Embarcadero RAD Studio 12 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29_x64.log">
+    <LogFile>
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
+]]>
+    </LogFile>
+  </Installation>
+  <Installation Target="D29" TargetName="Embarcadero RAD Studio 12 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29.log">
+    <LogFile>
+      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
+]]>
+    </LogFile>
+  </Installation>
 </JvclInstall>
