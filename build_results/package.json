@@ -4,10 +4,10 @@
     "main": "all.js",
     "author": "Olivier Sannier",
     "license": "MPL",
-    "dependencies": 
+    "dependencies":
     {
         "badgen": "^3.2.2",
-        "fast-xml-parser": "^4.2.4",
+        "fast-xml-parser": "^4.4.1",
         "mustache": "^4.2.0"
     }
 }
