@@ -1,6 +1,6 @@
 # JVCL build results
 
-Generated 2024-01-20T01:23:04.918Z
+Generated 2024-12-17T01:22:24.130Z
 
 <img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
 <img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
@@ -36,19 +36,5 @@ Generated 2024-01-20T01:23:04.918Z
 <img alt="Embarcadero RAD Studio 10.4 Win64" src="./badges/jvcl_d27_x64.svg">
 <img alt="Embarcadero RAD Studio 11 Win32" src="./badges/jvcl_d28.svg">
 <img alt="Embarcadero RAD Studio 11 Win64" src="./badges/jvcl_d28_x64.svg">
-<details>
-<summary><img alt="Embarcadero RAD Studio 12 Win32" src="./badges/jvcl_d29.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
-```
-
-</details>
-<details>
-<summary><img alt="Embarcadero RAD Studio 12 Win64" src="./badges/jvcl_d29_x64.svg"></summary>
-
-```
-C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
-```
-
-</details>
+<img alt="Embarcadero RAD Studio 12 Win32" src="./badges/jvcl_d29.svg">
+<img alt="Embarcadero RAD Studio 12 Win64" src="./badges/jvcl_d29_x64.svg">
