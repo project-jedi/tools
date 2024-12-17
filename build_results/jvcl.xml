@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<JvclInstall>
+<JvclInstall timestamp="2024-12-17 02:22:02">
   <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
@@ -34,16 +34,6 @@
   <Installation Target="D27" TargetName="Embarcadero RAD Studio 10.4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
-  <Installation Target="D29_x64" TargetName="Embarcadero RAD Studio 12 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D29" TargetName="Embarcadero RAD Studio 12 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvPageSetup.pas (315) - Warning: W1000 Symbol 'GetPrinter' is deprecated
-]]>
-    </LogFile>
-  </Installation>
+  <Installation Target="D29_x64" TargetName="Embarcadero RAD Studio 12 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D29" TargetName="Embarcadero RAD Studio 12 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
 </JvclInstall>
