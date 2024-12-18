@@ -1,14 +1,14 @@
 <svg width="268.4" height="20" viewBox="0 0 2684 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Embarcadero RAD Studio XE7 Win64: Success">
   <title>Embarcadero RAD Studio XE7 Win64: Success</title>
-  <linearGradient id="ldEKh" x2="0" y2="100%">
+  <linearGradient id="nDBCM" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="vSZTz"><rect width="2684" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#vSZTz)">
+  <mask id="jgqUw"><rect width="2684" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#jgqUw)">
     <rect width="2145" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="2145"/>
-    <rect width="2684" height="200" fill="url(#ldEKh)"/>
+    <rect width="2684" height="200" fill="url(#nDBCM)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="2045" fill="#000" opacity="0.25">Embarcadero RAD Studio XE7 Win64</text>
