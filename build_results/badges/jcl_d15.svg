@@ -1,14 +1,14 @@
 <svg width="145.2" height="20" viewBox="0 0 1452 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAD Studio XE: Success">
   <title>RAD Studio XE: Success</title>
-  <linearGradient id="jNNFR" x2="0" y2="100%">
+  <linearGradient id="ATved" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="nMQxH"><rect width="1452" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#nMQxH)">
+  <mask id="zuERX"><rect width="1452" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#zuERX)">
     <rect width="913" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="913"/>
-    <rect width="1452" height="200" fill="url(#jNNFR)"/>
+    <rect width="1452" height="200" fill="url(#ATved)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="813" fill="#000" opacity="0.25">RAD Studio XE</text>
