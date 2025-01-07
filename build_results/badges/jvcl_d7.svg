@@ -1,14 +1,14 @@
 <svg width="120.8" height="20" viewBox="0 0 1208 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delphi 7.0: Success">
   <title>Delphi 7.0: Success</title>
-  <linearGradient id="iAiKn" x2="0" y2="100%">
+  <linearGradient id="OprzC" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="lbtwL"><rect width="1208" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#lbtwL)">
+  <mask id="DPxZy"><rect width="1208" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#DPxZy)">
     <rect width="669" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="669"/>
-    <rect width="1208" height="200" fill="url(#iAiKn)"/>
+    <rect width="1208" height="200" fill="url(#OprzC)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="569" fill="#000" opacity="0.25">Delphi 7.0</text>
