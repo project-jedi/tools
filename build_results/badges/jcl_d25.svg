@@ -1,14 +1,14 @@
 <svg width="191.7" height="20" viewBox="0 0 1917 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAD Studio 10.2 32 bit: Success">
   <title>RAD Studio 10.2 32 bit: Success</title>
-  <linearGradient id="KnzPq" x2="0" y2="100%">
+  <linearGradient id="vkbyp" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="XknnU"><rect width="1917" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#XknnU)">
+  <mask id="yCITO"><rect width="1917" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#yCITO)">
     <rect width="1378" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="1378"/>
-    <rect width="1917" height="200" fill="url(#KnzPq)"/>
+    <rect width="1917" height="200" fill="url(#vkbyp)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="1278" fill="#000" opacity="0.25">RAD Studio 10.2 32 bit</text>
