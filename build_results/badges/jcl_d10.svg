@@ -1,14 +1,14 @@
 <svg width="237.5" height="20" viewBox="0 0 2375 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Borland Developer Studio 2006: Success">
   <title>Borland Developer Studio 2006: Success</title>
-  <linearGradient id="nYJHT" x2="0" y2="100%">
+  <linearGradient id="AdSMm" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="SaVHh"><rect width="2375" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#SaVHh)">
+  <mask id="ULeRy"><rect width="2375" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#ULeRy)">
     <rect width="1836" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="1836"/>
-    <rect width="2375" height="200" fill="url(#nYJHT)"/>
+    <rect width="2375" height="200" fill="url(#AdSMm)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="1736" fill="#000" opacity="0.25">Borland Developer Studio 2006</text>
