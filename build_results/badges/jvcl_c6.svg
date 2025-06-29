@@ -1,14 +1,14 @@
 <svg width="150.2" height="20" viewBox="0 0 1502 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C++Builder 6.0: Success">
   <title>C++Builder 6.0: Success</title>
-  <linearGradient id="QQYkR" x2="0" y2="100%">
+  <linearGradient id="flvLW" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="yydkD"><rect width="1502" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#yydkD)">
+  <mask id="QHNFh"><rect width="1502" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#QHNFh)">
     <rect width="963" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="963"/>
-    <rect width="1502" height="200" fill="url(#QQYkR)"/>
+    <rect width="1502" height="200" fill="url(#flvLW)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="863" fill="#000" opacity="0.25">C++Builder 6.0</text>
