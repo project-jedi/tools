@@ -1,20 +1,20 @@
-<svg width="98.3" height="20" viewBox="0 0 983 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delphi 7: Failed">
-  <title>Delphi 7: Failed</title>
-  <linearGradient id="enzQe" x2="0" y2="100%">
+<svg width="109.8" height="20" viewBox="0 0 1098 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delphi 7: Success">
+  <title>Delphi 7: Success</title>
+  <linearGradient id="stiZU" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="gmhgE"><rect width="983" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#gmhgE)">
+  <mask id="XhtaJ"><rect width="1098" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#XhtaJ)">
     <rect width="559" height="200" fill="#555"/>
-    <rect width="424" height="200" fill="#E43" x="559"/>
-    <rect width="983" height="200" fill="url(#enzQe)"/>
+    <rect width="539" height="200" fill="#3C1" x="559"/>
+    <rect width="1098" height="200" fill="url(#stiZU)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="459" fill="#000" opacity="0.25">Delphi 7</text>
     <text x="50" y="138" textLength="459">Delphi 7</text>
-    <text x="614" y="148" textLength="324" fill="#000" opacity="0.25">Failed</text>
-    <text x="604" y="138" textLength="324">Failed</text>
+    <text x="614" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
+    <text x="604" y="138" textLength="439">Success</text>
   </g>
   
 </svg>
