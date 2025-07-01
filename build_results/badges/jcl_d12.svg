@@ -1,20 +1,20 @@
-<svg width="158.7" height="20" viewBox="0 0 1587 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAD Studio 2009: Success">
-  <title>RAD Studio 2009: Success</title>
-  <linearGradient id="nPgQF" x2="0" y2="100%">
+<svg width="147.2" height="20" viewBox="0 0 1472 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RAD Studio 2009: Failed">
+  <title>RAD Studio 2009: Failed</title>
+  <linearGradient id="biRvA" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="FaKlU"><rect width="1587" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#FaKlU)">
+  <mask id="oQgWp"><rect width="1472" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#oQgWp)">
     <rect width="1048" height="200" fill="#555"/>
-    <rect width="539" height="200" fill="#3C1" x="1048"/>
-    <rect width="1587" height="200" fill="url(#nPgQF)"/>
+    <rect width="424" height="200" fill="#E43" x="1048"/>
+    <rect width="1472" height="200" fill="url(#biRvA)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="948" fill="#000" opacity="0.25">RAD Studio 2009</text>
     <text x="50" y="138" textLength="948">RAD Studio 2009</text>
-    <text x="1103" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
-    <text x="1093" y="138" textLength="439">Success</text>
+    <text x="1103" y="148" textLength="324" fill="#000" opacity="0.25">Failed</text>
+    <text x="1093" y="138" textLength="324">Failed</text>
   </g>
   
 </svg>
