@@ -1,20 +1,20 @@
-<svg width="138.7" height="20" viewBox="0 0 1387 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C++Builder 6.0: Failed">
-  <title>C++Builder 6.0: Failed</title>
-  <linearGradient id="SzKcX" x2="0" y2="100%">
+<svg width="150.2" height="20" viewBox="0 0 1502 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="C++Builder 6.0: Success">
+  <title>C++Builder 6.0: Success</title>
+  <linearGradient id="lNiaF" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="CZKkI"><rect width="1387" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#CZKkI)">
+  <mask id="oyKGE"><rect width="1502" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#oyKGE)">
     <rect width="963" height="200" fill="#555"/>
-    <rect width="424" height="200" fill="#E43" x="963"/>
-    <rect width="1387" height="200" fill="url(#SzKcX)"/>
+    <rect width="539" height="200" fill="#3C1" x="963"/>
+    <rect width="1502" height="200" fill="url(#lNiaF)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="863" fill="#000" opacity="0.25">C++Builder 6.0</text>
     <text x="50" y="138" textLength="863">C++Builder 6.0</text>
-    <text x="1018" y="148" textLength="324" fill="#000" opacity="0.25">Failed</text>
-    <text x="1008" y="138" textLength="324">Failed</text>
+    <text x="1018" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
+    <text x="1008" y="138" textLength="439">Success</text>
   </g>
   
 </svg>
