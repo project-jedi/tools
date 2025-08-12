@@ -1,6 +1,6 @@
 # JVCL build results
 
-Generated 2025-07-02T00:23:33.290Z
+Generated 2025-08-12T00:24:20.636Z
 
 <img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
 <img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
