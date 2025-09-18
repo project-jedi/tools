@@ -1,6 +1,6 @@
 # JVCL build results
 
-Generated 2025-09-16T00:22:39.225Z
+Generated 2025-09-18T00:25:56.852Z
 
 <img alt="C++Builder 6.0" src="./badges/jvcl_c6.svg">
 <img alt="Delphi 6.0" src="./badges/jvcl_d6.svg">
@@ -38,3 +38,5 @@ Generated 2025-09-16T00:22:39.225Z
 <img alt="Embarcadero RAD Studio 11 Win64" src="./badges/jvcl_d28_x64.svg">
 <img alt="Embarcadero RAD Studio 12 Win32" src="./badges/jvcl_d29.svg">
 <img alt="Embarcadero RAD Studio 12 Win64" src="./badges/jvcl_d29_x64.svg">
+<img alt="Embarcadero RAD Studio 13 Win32" src="./badges/jvcl_d37.svg">
+<img alt="Embarcadero RAD Studio 13 Win64" src="./badges/jvcl_d37_x64.svg">
