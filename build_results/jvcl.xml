@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<JvclInstall timestamp="2026-05-03 02:28:25">
+<JvclInstall timestamp="2026-05-07 02:32:54">
   <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
   <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
