@@ -1,20 +1,20 @@
-<svg width="271.9" height="20" viewBox="0 0 2719 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Embarcadero RAD Studio 10.2 Win64: Success">
-  <title>Embarcadero RAD Studio 10.2 Win64: Success</title>
-  <linearGradient id="DPauj" x2="0" y2="100%">
+<svg width="260.4" height="20" viewBox="0 0 2604 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Embarcadero RAD Studio 10.2 Win64: Failed">
+  <title>Embarcadero RAD Studio 10.2 Win64: Failed</title>
+  <linearGradient id="nzkjb" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="PjhxL"><rect width="2719" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#PjhxL)">
+  <mask id="QUXpq"><rect width="2604" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#QUXpq)">
     <rect width="2180" height="200" fill="#555"/>
-    <rect width="539" height="200" fill="#3C1" x="2180"/>
-    <rect width="2719" height="200" fill="url(#DPauj)"/>
+    <rect width="424" height="200" fill="#E43" x="2180"/>
+    <rect width="2604" height="200" fill="url(#nzkjb)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="2080" fill="#000" opacity="0.25">Embarcadero RAD Studio 10.2 Win64</text>
     <text x="50" y="138" textLength="2080">Embarcadero RAD Studio 10.2 Win64</text>
-    <text x="2235" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
-    <text x="2225" y="138" textLength="439">Success</text>
+    <text x="2235" y="148" textLength="324" fill="#000" opacity="0.25">Failed</text>
+    <text x="2225" y="138" textLength="324">Failed</text>
   </g>
   
 </svg>

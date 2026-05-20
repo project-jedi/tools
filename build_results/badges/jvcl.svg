@@ -1,20 +1,20 @@
-<svg width="90.2" height="20" viewBox="0 0 902 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JVCL: Success">
-  <title>JVCL: Success</title>
-  <linearGradient id="EiswA" x2="0" y2="100%">
+<svg width="93.7" height="20" viewBox="0 0 937 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JVCL: All failed">
+  <title>JVCL: All failed</title>
+  <linearGradient id="zBuhz" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="GdJjq"><rect width="902" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#GdJjq)">
+  <mask id="ITuaP"><rect width="937" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#ITuaP)">
     <rect width="363" height="200" fill="#555"/>
-    <rect width="539" height="200" fill="#3C1" x="363"/>
-    <rect width="902" height="200" fill="url(#EiswA)"/>
+    <rect width="574" height="200" fill="#E43" x="363"/>
+    <rect width="937" height="200" fill="url(#zBuhz)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="263" fill="#000" opacity="0.25">JVCL</text>
     <text x="50" y="138" textLength="263">JVCL</text>
-    <text x="418" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
-    <text x="408" y="138" textLength="439">Success</text>
+    <text x="418" y="148" textLength="474" fill="#000" opacity="0.25">All failed</text>
+    <text x="408" y="138" textLength="474">All failed</text>
   </g>
   
 </svg>
