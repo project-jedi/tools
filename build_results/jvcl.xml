@@ -1,269 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<JvclInstall timestamp="2026-05-20 02:09:00">
-  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_c6.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: '[' expected but ')' found
-C:\Prog\build_auto\sources\jvcl\jvcl\packages\c6\JvBands.dpk (52) - Fatal: Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d6.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: '[' expected but ')' found
-C:\Prog\build_auto\sources\jvcl\jvcl\packages\d6\JvBands.dpk (52) - Fatal: Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d7.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: '[' expected but ')' found
-C:\Prog\build_auto\sources\jvcl\jvcl\packages\d7\JvBands.dpk (52) - Fatal: Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D10" TargetName="Borland Developer Studio 2006" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d10.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-C:\Prog\build_auto\sources\jvcl\jvcl\packages\d10\JvBands.dpk (52) - Fatal: F2063 Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D11" TargetName="CodeGear RAD Studio 2007" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d11.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-C:\Prog\build_auto\sources\jvcl\jvcl\packages\D11\JvBands.dpk (52) - Fatal: F2063 Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D12" TargetName="CodeGear RAD Studio 2009" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d12.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (52) - Fatal: F2063 Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D14" TargetName="Embarcadero RAD Studio 2010" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d14.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (52) - Fatal: F2063 Could not compile used unit '..\..\run\JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D15" TargetName="Embarcadero RAD Studio XE" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d15.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D16" TargetName="Embarcadero RAD Studio XE2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d16.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D16_x64" TargetName="Embarcadero RAD Studio XE2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d16_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D17_x64" TargetName="Embarcadero RAD Studio XE3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d17_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D17" TargetName="Embarcadero RAD Studio XE3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d17.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D18" TargetName="Embarcadero RAD Studio XE4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d18.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D18_x64" TargetName="Embarcadero RAD Studio XE4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d18_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D19" TargetName="Embarcadero RAD Studio XE5 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d19.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D19_x64" TargetName="Embarcadero RAD Studio XE5 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d19_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D20_x64" TargetName="Embarcadero RAD Studio XE6 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d20_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D20" TargetName="Embarcadero RAD Studio XE6 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d20.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D21_x64" TargetName="Embarcadero RAD Studio XE7 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d21_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D21" TargetName="Embarcadero RAD Studio XE7 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d21.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D22_x64" TargetName="Embarcadero RAD Studio XE8 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d22_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D22" TargetName="Embarcadero RAD Studio XE8 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d22.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D23_x64" TargetName="Embarcadero RAD Studio 10 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d23_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D23" TargetName="Embarcadero RAD Studio 10 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d23.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D24_x64" TargetName="Embarcadero RAD Studio 10.1 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d24_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D24" TargetName="Embarcadero RAD Studio 10.1 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d24.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D25" TargetName="Embarcadero RAD Studio 10.2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d25.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D25_x64" TargetName="Embarcadero RAD Studio 10.2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d25_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D26" TargetName="Embarcadero RAD Studio 10.3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d26.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D26_x64" TargetName="Embarcadero RAD Studio 10.3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d26_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D27" TargetName="Embarcadero RAD Studio 10.4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d27.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D27_x64" TargetName="Embarcadero RAD Studio 10.4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d27_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d28.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d28_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D29_x64" TargetName="Embarcadero RAD Studio 12 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D29" TargetName="Embarcadero RAD Studio 12 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d29.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D37_x64" TargetName="Embarcadero RAD Studio 13 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d37_x64.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
-  <Installation Target="D37" TargetName="Embarcadero RAD Studio 13 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="0" LogFileName="c:\Prog\build_auto\sources\jvcl\jvcl\bin\jvcl_install_d37.log">
-    <LogFile>
-      <![CDATA[C:\Prog\build_auto\sources\jvcl\jvcl\run\JvBandForms.pas (479) - Error: E2029 '[' expected but ')' found
-JvBands.dpk (2962) - Fatal: F2063 Could not compile used unit 'JvBandForms.pas'
-]]>
-    </LogFile>
-  </Installation>
+<JvclInstall timestamp="2026-05-30 02:29:17">
+  <Installation Target="C6" TargetName="C++Builder 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D6" TargetName="Delphi 6.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D7" TargetName="Delphi 7.0" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D10" TargetName="Borland Developer Studio 2006" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D11" TargetName="CodeGear RAD Studio 2007" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D12" TargetName="CodeGear RAD Studio 2009" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D14" TargetName="Embarcadero RAD Studio 2010" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D15" TargetName="Embarcadero RAD Studio XE" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D16" TargetName="Embarcadero RAD Studio XE2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D16_x64" TargetName="Embarcadero RAD Studio XE2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D17_x64" TargetName="Embarcadero RAD Studio XE3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D17" TargetName="Embarcadero RAD Studio XE3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D18" TargetName="Embarcadero RAD Studio XE4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D18_x64" TargetName="Embarcadero RAD Studio XE4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D19" TargetName="Embarcadero RAD Studio XE5 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D19_x64" TargetName="Embarcadero RAD Studio XE5 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D20_x64" TargetName="Embarcadero RAD Studio XE6 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D20" TargetName="Embarcadero RAD Studio XE6 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D21_x64" TargetName="Embarcadero RAD Studio XE7 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D21" TargetName="Embarcadero RAD Studio XE7 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D22_x64" TargetName="Embarcadero RAD Studio XE8 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D22" TargetName="Embarcadero RAD Studio XE8 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D23_x64" TargetName="Embarcadero RAD Studio 10 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D23" TargetName="Embarcadero RAD Studio 10 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D24_x64" TargetName="Embarcadero RAD Studio 10.1 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D24" TargetName="Embarcadero RAD Studio 10.1 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D25" TargetName="Embarcadero RAD Studio 10.2 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D25_x64" TargetName="Embarcadero RAD Studio 10.2 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D26" TargetName="Embarcadero RAD Studio 10.3 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D26_x64" TargetName="Embarcadero RAD Studio 10.3 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D27" TargetName="Embarcadero RAD Studio 10.4 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D27_x64" TargetName="Embarcadero RAD Studio 10.4 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D28" TargetName="Embarcadero RAD Studio 11 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D28_x64" TargetName="Embarcadero RAD Studio 11 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D29_x64" TargetName="Embarcadero RAD Studio 12 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D29" TargetName="Embarcadero RAD Studio 12 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D37_x64" TargetName="Embarcadero RAD Studio 13 Win64" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
+  <Installation Target="D37" TargetName="Embarcadero RAD Studio 13 Win32" Enabled="-1" InstallAttempted="-1" InstallSuccess="-1" LogFileName=""/>
 </JvclInstall>
