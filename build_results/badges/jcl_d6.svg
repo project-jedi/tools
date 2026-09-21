@@ -1,20 +1,20 @@
 <svg width="109.8" height="20" viewBox="0 0 1098 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Delphi 6: Success">
   <title>Delphi 6: Success</title>
-  <linearGradient id="vrUQO" x2="0" y2="100%">
+  <linearGradient id="nmDpp" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
   </linearGradient>
-  <mask id="RRrpD"><rect width="1098" height="200" rx="30" fill="#FFF"/></mask>
-  <g mask="url(#RRrpD)">
+  <mask id="ekLnA"><rect width="1098" height="200" rx="30" fill="#FFF"/></mask>
+  <g mask="url(#ekLnA)">
     <rect width="559" height="200" fill="#555"/>
     <rect width="539" height="200" fill="#3C1" x="559"/>
-    <rect width="1098" height="200" fill="url(#vrUQO)"/>
+    <rect width="1098" height="200" fill="url(#nmDpp)"/>
   </g>
-  <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
+  <g aria-hidden="true" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="459" fill="#000" opacity="0.25">Delphi 6</text>
-    <text x="50" y="138" textLength="459">Delphi 6</text>
+    <text x="50" y="138" textLength="459" fill="#fff">Delphi 6</text>
     <text x="614" y="148" textLength="439" fill="#000" opacity="0.25">Success</text>
-    <text x="604" y="138" textLength="439">Success</text>
+    <text x="604" y="138" textLength="439" fill="#fff">Success</text>
   </g>
   
 </svg>
